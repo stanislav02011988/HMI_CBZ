@@ -1,0 +1,7 @@
+{
+    "db_users": {
+          "folder": "database_files/database_users",
+          "name": "Users.db",
+          "echo": true
+    }
+}
