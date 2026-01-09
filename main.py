@@ -9,7 +9,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 
 from python.py_utils.massage_handler.message_handler import PyMessageHandler
 from python.py_utils.utils_json.json_manager import Manager_Json
-from python.py_data_base.database_connect import DataBaseConnect
+from python.py_data_base.db_manager import DB_Manager
 
 class Project:
     def __init__(self):
@@ -20,13 +20,11 @@ class Project:
         self.base_path = Path(__file__).resolve().parent
 
         # --- 1. Активация Сервисов ---
-        self.py_message_handler = PyMessageHandler()
-        self.manager_json = Manager_Json()
-        self.db = DataBaseConnect()
+        self.py_message_handler = PyMessageHandler()        
 
         # --- 2. Загрузка настроек базы данных ---
-        self._load_json_database_settings()
-        self._init_database_users()
+        self.manager_json = Manager_Json()
+        self.db_manager = DB_Manager(self.manager_json)
 
         # --- 3. Приложение ---
         self.app = QGuiApplication(sys.argv)
@@ -37,25 +35,11 @@ class Project:
         # --- Запуск ---
         self._load_main_qml()
 
-    def _load_json_database_settings(self):
-        self.manager_json.read_json_file(
-            "files_settings/json_files/settings/project_settings/database_settings",
-            "database_settings.json"
-        )
 
-    def _init_database_users(self):
-        self.db.init_settings(
-            folder=self.manager_json.items['db_users']['folder'],
-            name=self.manager_json.items['db_users']['name'],
-            echo=self.manager_json.items['db_users']['echo']
-
-        )
-        self.db.engine_db()
-        self.db.createDB()
 
     def _load_main_qml(self):
         """Загружаем QML."""
-        qml_file = self.base_path / "ui/qml/main_window/main.qml"
+        qml_file = self.base_path / "ui/qml/splesh_screen/splesh_screen.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

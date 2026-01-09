@@ -2,10 +2,10 @@ import os
 
 from sqlalchemy import create_engine
 
-from python.py_data_base.base import Base
+from python.py_data_base.users.base import Base
 
 
-class DataBaseConnect:
+class UsersDataBaseConnect:
     def __init__(self):
 
         self.folder = None
