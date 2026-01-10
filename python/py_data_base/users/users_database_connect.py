@@ -18,15 +18,13 @@ class UsersDataBaseConnect:
         self.folder = folder
         self.name = name
         self.echo = echo
-
-        path = os.path.join(folder, name)
-        self.path = path
+        self.path = os.path.join(folder, name)
 
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-    def engine_db(self):
+    def _engine_db(self):
         return create_engine(f'sqlite:///{self.path}', echo=self.echo)
 
     def createDB(self):
-        Base.metadata.create_all(self.engine_db())
+        Base.metadata.create_all(self._engine_db())

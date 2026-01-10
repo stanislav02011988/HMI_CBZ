@@ -14,4 +14,4 @@ class Users(Base):
     day_registration: Mapped[str]
 
     def __repr__(self) -> str:
-        return (f'{self.id} {self.family} {self.first_name} {self.second_name} {self.tab_number} {self.position_users} {self.login} {self.password} {self.daty_registration}')
+        return (f'{self.id} {self.family} {self.first_name} {self.second_name} {self.tab_number} {self.position_users} {self.login} {self.password} {self.day_registration}')

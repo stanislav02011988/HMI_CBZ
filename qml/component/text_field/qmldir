@@ -1,0 +1,2 @@
+module qml.component.text_field
+CustomTextField 1.0 CustomTextField.qml

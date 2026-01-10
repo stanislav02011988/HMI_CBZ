@@ -1,7 +1,7 @@
 from python.py_data_base.users.users_database_connect import UsersDataBaseConnect
 
 
-class DB_Manager:
+class DB_Menager:
     def __init__(self, manajer_json):
         super().__init__()
 
@@ -9,8 +9,7 @@ class DB_Manager:
 
         self.db_users = UsersDataBaseConnect()
 
-        self._load_json_database_settings()
-        self._init_database_users()
+        self._load_json_database_settings()        
 
 
     def _load_json_database_settings(self):
@@ -18,6 +17,7 @@ class DB_Manager:
             "files_settings/json_files/settings/project_settings/database_settings",
             "database_settings.json"
         )
+        self._init_database_users()
 
     def _init_database_users(self):
         self.db_users.init_settings(
@@ -26,5 +26,4 @@ class DB_Manager:
             echo=self.manager_json.items['db_users']['echo']
 
         )
-        self.db_users.engine_db()
         self.db_users.createDB()

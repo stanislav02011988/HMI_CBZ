@@ -7,9 +7,12 @@ from pathlib import Path
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
+from python.py_utils.qml_registration_module.qml_registration_module import QmlRegistrationModule
+
 from python.py_utils.massage_handler.message_handler import PyMessageHandler
-from python.py_utils.utils_json.json_manager import Manager_Json
-from python.py_data_base.db_manager import DB_Manager
+from python.py_utils.utils_json.json_menager import Menager_Json
+from python.py_data_base.db_menager import DB_Menager
+from python.py_auth_menager.auth_menager import AuthMenager
 
 class Project:
     def __init__(self):
@@ -21,10 +24,16 @@ class Project:
 
         # --- 1. Активация Сервисов ---
         self.py_message_handler = PyMessageHandler()        
+        self.qml_registration_module = QmlRegistrationModule()
 
         # --- 2. Загрузка настроек базы данных ---
-        self.manager_json = Manager_Json()
-        self.db_manager = DB_Manager(self.manager_json)
+        self.menager_json = Menager_Json()
+        self.db_menager = DB_Menager(self.menager_json)
+
+        self.auth_menager = AuthMenager(self.db_menager.db_users._engine_db())
+
+        # --- Активация регистрации Qml модулей ----
+        self.register_qml_module_auth_menager()
 
         # --- 3. Приложение ---
         self.app = QGuiApplication(sys.argv)
@@ -35,11 +44,14 @@ class Project:
         # --- Запуск ---
         self._load_main_qml()
 
+    def register_qml_module_auth_menager(self):
+        self.qml_registration_module.registration_module(self.auth_menager)
+
 
 
     def _load_main_qml(self):
         """Загружаем QML."""
-        qml_file = self.base_path / "ui/qml/splesh_screen/splesh_screen.qml"
+        qml_file = self.base_path / "qml/splesh_screen/splesh_screen.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

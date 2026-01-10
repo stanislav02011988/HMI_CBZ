@@ -1,7 +1,7 @@
 import json
 import os
 
-class Manager_Json:
+class Menager_Json:
     def __init__(self):
         super().__init__()
 

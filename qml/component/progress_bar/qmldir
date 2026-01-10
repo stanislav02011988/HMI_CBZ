@@ -1,0 +1,2 @@
+module qml.component.progress_bar
+CircularProgressBar 1.0 CircularProgressBar.qml

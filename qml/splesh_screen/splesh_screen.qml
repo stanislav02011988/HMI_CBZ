@@ -3,9 +3,12 @@ import QtQuick.Window
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import QtQuick.Timeline
-import "../component/button"
-import "../component/progress_bar"
-import "../component/text_field"
+
+import qml.component.button
+import qml.component.progress_bar
+import qml.component.text_field
+
+import python.py_auth_menager.interface_auth_menager
 
 Window {
     id: splashScreen
@@ -18,23 +21,23 @@ Window {
     // Remove Title Bar
     flags: Qt.SplashScreen | Qt.FramelessWindowHint
 
-    // Internal Functions
-    QtObject{
-        id: internal
-
-        function checkLogin(username, password) {
-            if (username === "1" || password === "1") {
-                var component = Qt.createComponent("../main_window/main.qml")
-                if (component.status === Component.Ready) {
-                    var win = component.createObject(null)
-                    if (win) {
-                        win.show()
-                        splashScreen.close()
-                    }
-                } else {
-                    console.error("Ошибка загрузки main.qml:", component.errorString())
+    Connections {
+        target: AuthMenager
+        function onLoginSuccess() {
+            console.error("[Qml - SplashScreen] Успешно")
+            var component = Qt.createComponent("../main_window/main.qml")
+            if (component.status === Component.Ready) {
+                var win = component.createObject(null)
+                if (win) {
+                    win.show()
+                    splashScreen.close()
                 }
             }
+        }
+
+        function onLoginFailed(errorMsg) {
+            console.error("Ошибка входа:", errorMsg)
+            // Можно показать AlertDialog или Label с ошибкой
         }
     }
 
@@ -71,7 +74,7 @@ Window {
             height: 120
             opacity: 1
             anchors.top: parent.top
-            source: "../../../res/logo.svg"
+            source: "../../res/logo.svg"
             anchors.topMargin: 45
             anchors.horizontalCenter: parent.horizontalCenter
             fillMode: Image.PreserveAspectFit
@@ -117,7 +120,7 @@ Window {
             colorDefault: "#67aa25"
             anchors.bottomMargin: 50
             anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: internal.checkLogin(textUsername.text, textPassword.text)
+            onClicked: AuthMenager.login(textUsername.text, textPassword.text)
         }
 
         Label {

@@ -1,0 +1,2 @@
+module python.py_auth_menager.interface_auth_menager
+typeinfo auth_menager.qmltypes
