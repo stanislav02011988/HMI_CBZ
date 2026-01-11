@@ -18,10 +18,25 @@ Module {
                                         exportMetaObjectRevisions: [256]
                                         Signal { name: "loginSuccess" }
     Signal { name: "loginFailed" }
+    Signal { name: "registerSuccess" }
+    Signal { name: "registerFailed" }
+    Signal { name: "keyRegistrationSuccess" }
+    Signal { name: "keyRegistrationFailed" }
     Method { name: "get_parametrs_qml_module"; type: "void" }
     Method { name: "login"; type: "void"
                 Parameter { name: "username"; type: "var" }
                 Parameter { name: "password"; type: "var" } }
+    Method { name: "processRegistrationKey"; type: "void"
+                Parameter { name: "file_path"; type: "str" } }
+    Method { name: "register"; type: "void"
+                Parameter { name: "last_name"; type: "str" }
+                Parameter { name: "first_name"; type: "str" }
+                Parameter { name: "second_name"; type: "str" }
+                Parameter { name: "tab_number"; type: "str" }
+                Parameter { name: "position_users"; type: "str" }
+                Parameter { name: "login"; type: "str" }
+                Parameter { name: "password"; type: "str" }
+                Parameter { name: "access_group"; type: "str" } }
                                     }
 
 }

@@ -32,6 +32,9 @@ Item {
     property string textFontFamily: "Segoe UI"
     property int textSize: 12
     property color textColor: "#7c7c7c"
+    //Image
+    property string image_source: "../../../res/svg/logo.svg"
+
 
     // Internal Properties/Functions
     QtObject{
@@ -89,14 +92,26 @@ Item {
             }
         }
 
-        Text {
-            id: textProgress
-            text: progress.textShowValue ? parseInt(progress.value) + progress.text : progress.text
+        // Text {
+        //     id: textProgress
+        //     text: progress.textShowValue ? parseInt(progress.value) + progress.text : progress.text
+        //     anchors.verticalCenter: parent.verticalCenter
+        //     anchors.horizontalCenter: parent.horizontalCenter
+        //     color: progress.textColor
+        //     font.pointSize: progress.textSize
+        //     font.family: progress.textFontFamily
+        // }
+
+        Image {
+            id: logoImage
+            width: 150
+            height: 100
+            opacity: 1
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
-            color: progress.textColor
-            font.pointSize: progress.textSize
-            font.family: progress.textFontFamily
+            source: progress.image_source
+            anchors.topMargin: 45
+            fillMode: Image.PreserveAspectFit
         }
     }
 }
