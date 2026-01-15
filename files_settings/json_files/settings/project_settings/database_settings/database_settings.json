@@ -2,11 +2,11 @@
     "db_users": {
           "folder": "database_files/database_users",
           "name": "Users.db",
-          "echo": true
+          "echo": false
     },
     "db_LogIn": {
             "folder": "database_files/database_users",
             "name": "LogIn.db",
-            "echo": true
+            "echo": false
     }
 }

@@ -7,6 +7,9 @@ import Qt5Compat.GraphicalEffects
 Button {
     id: root
 
+    property int m_width: 25
+    property int m_height: 25
+
     // Кастомные цвета (можно задавать извне)
     property color colorDefault: "#67aa25"
     property color colorMouseOver: "#7ece2d"
@@ -37,8 +40,8 @@ Button {
 
     // Автоматический выбор цвета
     background: Rectangle {
-        implicitWidth: 25
-        implicitHeight: 25
+        implicitWidth: root.m_width
+        implicitHeight: root.m_height
         radius: 6
         color: root.pressed ? root.colorPressed
               : root.hovered ? root.colorMouseOver

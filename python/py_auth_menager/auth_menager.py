@@ -1,7 +1,11 @@
 import os
 import jwt
 import bcrypt
+
+from datetime import datetime
+
 from PySide6.QtCore import QObject, Slot, Signal
+
 from sqlalchemy.orm import Session
 
 from python.py_data_base.users.models.model_user.users import Users
@@ -16,7 +20,7 @@ QML_MODULE_MINOR_VERSION = 0
 
 @QmlRegistrationModule(QML_IMPORT_NAME, QML_MODULE_MAJOR_VERSION, QML_MODULE_MINOR_VERSION, QML_IMPORT_TYPE)
 class AuthMenager(QObject):
-    loginSuccess = Signal()
+    loginSuccess = Signal("QVariant")
     loginFailed = Signal(str, str)
 
     registerSuccess = Signal()
@@ -38,9 +42,7 @@ class AuthMenager(QObject):
     def login(self, username, password):
         try:
             with Session(self._engine) as session:
-                # Ищем пользователя только по логину
                 user = session.query(Users).filter_by(login=username).first()
-
                 if not user:
                     self.loginFailed.emit("[AuthMenager] Ошибка ввода!!! Неверное имя пользователя", "login_user")
                     return
@@ -48,7 +50,18 @@ class AuthMenager(QObject):
                     password.encode('utf-8'),
                     user.password.encode('utf-8')
                 ):
-                    self.loginSuccess.emit()
+                    user_dict = {
+                        "id_user": user.id,
+                        "last_name": user.last_name,
+                        "first_name": user.first_name,
+                        "second_name": user.second_name,
+                        "tab_number": user.tab_number,
+                        "position_users": user.position_users,
+                        "access_group": user.access_group,
+                        "time_in": datetime.now().strftime("%d-%m-%Y %H:%M"),
+                        "time_out": "---"
+                    }
+                    self.loginSuccess.emit(user_dict)
                 else:
                     self.loginFailed.emit("[AuthMenager] Ошибка ввода!!! Неверный пароль", "password_user")
 

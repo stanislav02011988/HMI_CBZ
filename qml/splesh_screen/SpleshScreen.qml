@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Window
+import QtQuick.Dialogs
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Timeline
@@ -9,8 +10,10 @@ import Qt5Compat.GraphicalEffects
 import qml.component.button
 import qml.component.progress_bar
 import qml.component.text_field
+import qml.component.dialog
 
 import python.py_auth_menager.interface_auth_menager
+import python.py_settings_project.interface_settings_project
 
 Window {
     id: splashScreen
@@ -18,16 +21,15 @@ Window {
     height: 580
     visible: true
     color: "#00000000"
-    title: qsTr("Hello World")
 
-    // Remove Title Bar
+
     flags: Qt.SplashScreen | Qt.FramelessWindowHint
 
     QtObject {
         id: openWindowRegistration
 
         function openWindow() {
-            var component = Qt.createComponent("../registration_window/RegistrationWindow.qml")
+            var component = Qt.createComponent("../registration/RegistrationWindow.qml")
             if (component.status === Component.Ready) {
                 var win = component.createObject(null)
                 if (win) {
@@ -38,17 +40,25 @@ Window {
         }
     }
 
+    Component.onDestruction: {
+        openWindowRegistration.destroy()
+        authMenager.destroy()
+    }
+
     Connections {
+        id: authMenager
         target: AuthMenager
-        function onLoginSuccess() {
-            console.log("[Qml - SplashScreen] Успешно")
-            var component = Qt.createComponent("../main_window/main.qml")
+
+        function onLoginSuccess(dict_user) {
+            var component = Qt.createComponent("../windows/main_window/MainWindow.qml")
             if (component.status === Component.Ready) {
                 var win = component.createObject(null)
                 if (win) {
-                    win.show()
                     splashScreen.close()
+                    SettingsProject.write_block_user_settings_project(dict_user)
                 }
+            } else {
+                console.error("Ошибка загрузки main.qml:", component.errorString())
             }
         }
 
@@ -61,6 +71,9 @@ Window {
                 textPassword.color = "red"
                 textPassword.placeholderTextColor = "red"
                 textPassword.placeholderText = "Неверный пароль"
+
+                customMessageDialog.open()
+
             } else {
                 textUsername.color = "green"
                 textUsername.placeholderTextColor = "green"
@@ -75,12 +88,17 @@ Window {
                 textPassword.color = "red"
                 textPassword.placeholderTextColor = "red"
                 textPassword.placeholderText = "Неверный пароль"
+                customMessageDialog.open()
             }
 
             if (errorMsg2 !== "login_user" && errorMsg2 !== "password_user") {
                 console.error(errorMsg1, errorMsg2)
             }
         }
+    }
+
+    CustomMessageDialog {
+        id: customMessageDialog
     }
 
     Rectangle {
@@ -102,7 +120,6 @@ Window {
             y: 198
             opacity: 0
             anchors.verticalCenter: parent.verticalCenter
-            // value: 0
             image_source: "../../../res/svg/logo.svg"
             progressWidth: 8
             strokeBgWidth: 4
@@ -200,13 +217,10 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
-        CustomButton {
+        CustomButtonClose {
             id: closeBtn
-            text: "✕"
-
-            colorDefault: "#67aa25"
-            colorMouseOver: "#ff4d4d"
-            colorPressed: "#e0e0e0"
+            m_width: 30
+            m_height: 30
 
             anchors.right: parent.right
             anchors.top: parent.top
@@ -276,25 +290,6 @@ Window {
                 value: 1
             }
         }
-
-        // KeyframeGroup {
-        //     target: logoImage
-        //     property: "opacity"
-        //     Keyframe {
-        //         frame: 1801
-        //         value: 0
-        //     }
-
-        //     Keyframe {
-        //         frame: 2300
-        //         value: 1
-        //     }
-
-        //     Keyframe {
-        //         frame: 0
-        //         value: 0
-        //     }
-        // }
 
         KeyframeGroup {
             target: label
@@ -409,25 +404,5 @@ Window {
                 value: 0
             }
         }
-
-        // KeyframeGroup {
-        //     target: bg
-        //     property: "height"
-        //     Keyframe {
-        //         frame: 1301
-        //         value: 360
-        //     }
-
-        //     Keyframe {
-        //         easing.bezierCurve: [0.221,-0.00103,0.222,0.997,1,1]
-        //         frame: 1899
-        //         value: 300
-        //     }
-
-        //     Keyframe {
-        //         frame: 0
-        //         value: 360
-        //     }
-        // }
     }
 }

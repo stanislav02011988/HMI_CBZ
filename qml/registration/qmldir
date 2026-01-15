@@ -1,0 +1,2 @@
+module qml.registration
+RegistrationWindow 1.0 RegistrationWindow.qml

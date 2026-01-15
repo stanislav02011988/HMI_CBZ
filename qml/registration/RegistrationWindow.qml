@@ -19,9 +19,8 @@ Window {
     height: 580
     visible: true
     color: "#00000000"
-    flags: Qt.SplashScreen | Qt.FramelessWindowHint  // Qt.RegistrationWindow не существует!
+    flags: Qt.SplashScreen | Qt.FramelessWindowHint
 
-    // === Валидация полей ===
     readonly property bool allFieldsFilled:
         last_name.text.trim() !== "" &&
         first_name.text.trim() !== "" &&
@@ -158,6 +157,21 @@ Window {
                 )
             }
         }
+
+        Label {
+            id: label1
+            text: qsTr("Вернуться обратно к окну входа")
+            anchors.top: btnRegistration.bottom
+            anchors.topMargin: 2
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "#ffffff"
+            font.family: "Segoe UI"
+            font.pointSize: 5
+            MouseArea {
+                anchors.fill: parent
+                onClicked: openSpleshScreen.openWindow()
+            }
+        }
     }
 
     FileDialog {
@@ -169,6 +183,21 @@ Window {
             if (url) {
                 let path = url.toString().replace(/^file:\/\/\//, "")
                 AuthMenager.processRegistrationKey(path)
+            }
+        }
+    }
+
+    QtObject {
+        id: openSpleshScreen
+
+        function openWindow() {
+            var component = Qt.createComponent("../splesh_screen/SpleshScreen.qml")
+            if (component.status === Component.Ready) {
+                var win = component.createObject(null)
+                if (win) {
+                    win.show()
+                    root.close()
+                }
             }
         }
     }
@@ -325,6 +354,14 @@ Window {
 
         KeyframeGroup {
             target: btnRegistration
+            property: "opacity"
+            Keyframe { frame: 0; value: 0 }
+            Keyframe { frame: 1200; value: 0 }
+            Keyframe { frame: 1600; value: 1 }
+        }
+
+        KeyframeGroup {
+            target: label1
             property: "opacity"
             Keyframe { frame: 0; value: 0 }
             Keyframe { frame: 1200; value: 0 }

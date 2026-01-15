@@ -1,0 +1,2 @@
+module qml.windows.main_window.component.top_bar
+CustomTopBar 1.0 CustomTopBar.qml

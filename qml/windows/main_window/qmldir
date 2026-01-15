@@ -1,0 +1,2 @@
+module qml.windows.main_window
+MainWindow 1.0 MainWindow.qml
