@@ -7,19 +7,24 @@ import QtQuick.Timeline
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
+import qml.menager_windows
+
 import qml.component.button
 import qml.component.progress_bar
 import qml.component.text_field
+import qml.component.dialog
 
 import python.py_auth_menager.interface_auth_menager
 
-Window {
+ApplicationWindow {
     id: root
     width: 380
     height: 580
     visible: true
     color: "#00000000"
     flags: Qt.SplashScreen | Qt.FramelessWindowHint
+
+
 
     readonly property bool allFieldsFilled:
         last_name.text.trim() !== "" &&
@@ -29,7 +34,24 @@ Window {
         position_user.text.trim() !== "" &&
         login_user.text.trim() !== "" &&
         password_user.text.trim() !== "" &&
-        code_registration.text.trim() !== ""    
+        code_registration.text.trim() !== ""
+
+    Component.onDestruction: {
+        last_name.text = ""
+        first_name.text = ""
+        second_name.text = ""
+        tab_number.text = ""
+        position_user.text = ""
+        login_user.text = ""
+        password_user.text = ""
+        code_registration.text = ""
+
+        authMenager.destroy()
+        fileDialog.destroy()
+        customMessageDialog.destroy()
+        timeline.destroy()
+        timelineAnimation.destroy()
+    }
 
     Rectangle {
         id: bg
@@ -41,15 +63,15 @@ Window {
         anchors.centerIn: parent
         z: 1
 
-        CustomButton {
+        CustomButtonClose {
             id: closeBtn
-            text: "✕"
-            colorDefault: "#67aa25"
-            colorMouseOver: "#ff4d4d"
-            colorPressed: "#e0e0e0"
-            anchors.top: parent.top; anchors.right: parent.right
+            m_width: 30
+            m_height: 30
+            anchors.top: parent.top
+            anchors.right: parent.right
             anchors.margins: 10
-            onClicked: root.close()
+            m_background_color: "transparent"
+            onClicked: { root.close(); MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog) }
         }
 
         Label {
@@ -138,11 +160,11 @@ Window {
             anchors.bottomMargin: 25
 
             // Динамические цвета
-            colorDefault: allFieldsFilled ? "#67aa25" : "#666666"
-            colorMouseOver: allFieldsFilled ? "#7ece2d" : "#777777"
-            colorPressed: allFieldsFilled ? "#558b1f" : "#555555"
+            colorDefault: root.allFieldsFilled ? "#67aa25" : "#666666"
+            colorMouseOver: root.allFieldsFilled ? "#7ece2d" : "#777777"
+            colorPressed: root.allFieldsFilled ? "#558b1f" : "#555555"
 
-            enabled: allFieldsFilled
+            enabled: root.allFieldsFilled
 
             onClicked: {
                 AuthMenager.register(
@@ -169,7 +191,7 @@ Window {
             font.pointSize: 5
             MouseArea {
                 anchors.fill: parent
-                onClicked: openSpleshScreen.openWindow()
+                onClicked: {root.close(); MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog)}
             }
         }
     }
@@ -187,54 +209,66 @@ Window {
         }
     }
 
-    QtObject {
-        id: openSpleshScreen
-
-        function openWindow() {
-            var component = Qt.createComponent("../splesh_screen/SpleshScreen.qml")
-            if (component.status === Component.Ready) {
-                var win = component.createObject(null)
-                if (win) {
-                    win.show()
-                    root.close()
-                }
-            }
-        }
+    CustomMessageDialog {
+        id: customMessageDialog
+        m_width: 320
+        m_height: 160
     }
 
     Connections {
+        id: authMenager
         target: AuthMenager
 
         function onRegisterSuccess() {
-            var component = Qt.createComponent("../splesh_screen/SpleshScreen.qml")
-            if (component.status === Component.Ready) {
-                var win = component.createObject(null)
-                if (win) {
-                    win.show()
-                    root.close()
-                }
-            }
+            root.close()
+            MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog)
         }
 
-        function onRegisterFailed(errorMsg) {
-            if (errorMsg === "Логин уже занят") {
+        function onRegisterFailed(errorMsg1, errorMsg2, errorMsg3) {
+            if (errorMsg2 === "Ошибка регистрации") {
                 login_user.text = ""
                 login_user.placeholderText = errorMsg
                 login_user.placeholderTextColor = 'red'
+
+                if (customMessageDialog.visible) {
+                    customMessageDialog.close()
+                }
+                customMessageDialog.showDialog("error", errorMsg1, errorMsg2, errorMsg3)
+
+
             } else {
-                console.error(errorMsg)
+                if (customMessageDialog.visible) {
+                    customMessageDialog.close()
+                }
+                customMessageDialog.showDialog("error", errorMsg1, errorMsg2, errorMsg3)
             }
         }
 
         function onKeyRegistrationSuccess(accessGroup) {
             code_registration.text = accessGroup
             code_registration.color = 'green'
+            if (customMessageDialog.visible) {
+                customMessageDialog.close()
+            }
+            customMessageDialog.showDialog("error", errorMsg1, errorMsg2, errorMsg3)
         }
 
-        function onKeyRegistrationFailed(erroMsg) {
-            code_registration.text = erroMsg
-            code_registration.placeholderTextColor = 'red'
-            code_registration.color = 'red'
+        function onKeyRegistrationFailed(errorMsg1, errorMsg2, errorMsg3) {
+            if (onKeyRegistrationFailed._handler) {
+                customMessageDialog.signalBtnOK.disconnect(onKeyRegistrationFailed._handler)
+            }
+            var handler = function() {
+                root.close()
+                MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog)
+            }
+            onKeyRegistrationFailed._handler = handler
+
+            customMessageDialog.signalBtnOK.connect(handler)
+
+            if (customMessageDialog.visible) {
+                customMessageDialog.close()
+            }
+            customMessageDialog.showDialog("error", errorMsg1, errorMsg2, errorMsg3)
         }
     }
 

@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import qml.windows.main_window.component.top_bar
+import qml.main_window.main_window.component.top_bar
 
-Window {
+ApplicationWindow {
     id: root
     minimumWidth: 1000
     minimumHeight: 600
@@ -13,10 +13,6 @@ Window {
     color: "#00ffffff"
 
     // flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowSystemMenuHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint
-
-    Component.onCompleted: {
-        root.showMaximized()
-    }
 
     Rectangle {
         id: bg

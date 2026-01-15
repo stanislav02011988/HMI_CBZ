@@ -5,8 +5,6 @@ class Menager_Json:
     def __init__(self):
         super().__init__()
 
-        self.items = {}
-
     def _joing_path_file(self, path_folder, file_name):
         app_path = os.path.abspath(os.getcwd())
         path = os.path.join(app_path, path_folder)
@@ -18,15 +16,12 @@ class Menager_Json:
             json.dump(items, write, indent=4, ensure_ascii=False)
 
     def read_json_file(self, path_folder, file_name):
-        # READ JSON FILE
         with open(self._joing_path_file(path_folder, file_name), "r", encoding='utf-8') as reader:
-            self.items = json.loads(reader.read())
+            items = json.loads(reader.read())
+        return items
 
     def update_json_file(self, path_folder, file_name, items):
         with open(self._joing_path_file(path_folder, file_name), 'r+', encoding='utf-8') as f:
             dic = json.loads(f.read())
             dic.update(items)
             json.dump(dic, f, indent=4, ensure_ascii=False)
-
-    def clear_items(self):
-        self.items.clear()

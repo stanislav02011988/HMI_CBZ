@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/logo">
+        <file>res/svg/logo.svg</file>
+    </qresource>
+    <qresource prefix="/svg_icon_message">
+        <file>res/svg/svg_icon_message/icon_error.svg</file>
+        <file>res/svg/svg_icon_message/icon_ok.svg</file>
+        <file>res/svg/svg_icon_message/icon_warning.svg</file>
+        <file>res/svg/svg_icon_message/icon_info.svg</file>
+    </qresource>
+</RCC>

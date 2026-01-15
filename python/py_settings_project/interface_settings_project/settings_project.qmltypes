@@ -16,8 +16,12 @@ Module {
                                         isCreatable: false
                                         isSingleton: false
                                         exportMetaObjectRevisions: [256]
-                                        Method { name: "get_parametrs_qml_module"; type: "void" }
-    Method { name: "read_block_graphic_settings"; type: "void" }
+                                        Signal { name: "signalLoadFile" }
+    Signal { name: "signalErrorLoad" }
+    Property { name: "itemsFileSettingsDict"; type: "QQmlPropertyMap*"; isWritable: false; notify: "signalLoadFile" }
+    Method { name: "checking_file_path"; type: "void" }
+    Method { name: "get_parametrs_qml_module"; type: "void" }
+    Method { name: "load_file_settings"; type: "void" }
     Method { name: "write_block_user_settings_project"; type: "void"
                 Parameter { name: "dict_user"; type: "var" } }
                                     }

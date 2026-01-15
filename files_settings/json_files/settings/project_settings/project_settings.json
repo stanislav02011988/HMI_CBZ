@@ -1,4 +1,6 @@
 {
+    "title_project": "Программа диагностики",
+    "logo_progect": "qrc:/logo/res/svg/logo.svg",
     "block_user": {
         "id_user": 1,
         "last_name": "Неберикутя",
@@ -7,7 +9,7 @@
         "tab_number": 14706,
         "position_users": "Старший механик",
         "access_group": "admin",
-        "time_in": "13-01-2026 11:01",
+        "time_in": "16-01-2026 00:50",
         "time_out": "---"
     },
     "block_graphic_settings": {}

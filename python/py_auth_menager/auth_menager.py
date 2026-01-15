@@ -21,13 +21,13 @@ QML_MODULE_MINOR_VERSION = 0
 @QmlRegistrationModule(QML_IMPORT_NAME, QML_MODULE_MAJOR_VERSION, QML_MODULE_MINOR_VERSION, QML_IMPORT_TYPE)
 class AuthMenager(QObject):
     loginSuccess = Signal("QVariant")
-    loginFailed = Signal(str, str)
+    loginFailed = Signal(str, str, str)
 
     registerSuccess = Signal()
-    registerFailed = Signal(str)
+    registerFailed = Signal(str, str, str)
 
     keyRegistrationSuccess = Signal(str)
-    keyRegistrationFailed = Signal(str)
+    keyRegistrationFailed = Signal(str, str, str)
 
     def __init__(self, engine, parent=None):
         super().__init__(parent)
@@ -44,7 +44,11 @@ class AuthMenager(QObject):
             with Session(self._engine) as session:
                 user = session.query(Users).filter_by(login=username).first()
                 if not user:
-                    self.loginFailed.emit("[AuthMenager] Ошибка ввода!!! Неверное имя пользователя", "login_user")
+                    self.loginFailed.emit(
+                    "[AuthMenager]",
+                    f"Ошибка ввода!\nДанный логин {username} отсутствует в базе",
+                    "login_user"
+                    )
                     return
                 if bcrypt.checkpw(
                     password.encode('utf-8'),
@@ -63,10 +67,18 @@ class AuthMenager(QObject):
                     }
                     self.loginSuccess.emit(user_dict)
                 else:
-                    self.loginFailed.emit("[AuthMenager] Ошибка ввода!!! Неверный пароль", "password_user")
+                    self.loginFailed.emit(
+                    "[AuthMenager]",
+                    "Ошибка ввода!\nНеверный пароль",
+                    "password_user"
+                    )
 
         except Exception as e:
-            self.loginFailed.emit("[AuthMenager] Ошибка базы данных:", str(e))
+            self.loginFailed.emit(
+            "[AuthMenager] строка 44",
+            "Ошибка базы данных:",
+            str(e)
+            )
 
     @Slot(str, str, str, str, str, str, str, str)
     def register(
@@ -87,7 +99,11 @@ class AuthMenager(QObject):
             with Session(self._engine) as session:
                 # Проверка уникальности логина
                 if session.query(Users).filter_by(login=login).first():
-                    self.registerFailed.emit("Логин уже занят")
+                    self.registerFailed.emit(
+                    "[AuthMenager]",
+                    "Ошибка регистрации",
+                    f"{login} - Логин уже занят"
+                    )
                     return
 
                 from datetime import datetime
@@ -107,7 +123,11 @@ class AuthMenager(QObject):
                 self.registerSuccess.emit()
 
         except Exception as e:
-            self.registerFailed.emit(f"Ошибка регистрации: {str(e)}")
+            self.registerFailed.emit(
+            "[AuthMenager]",
+            "Критическая ошибка базы даных!",
+            str(e)
+            )
 
     def _load_public_key(self) -> str:
         key_path = "res/keys/public.pem"
@@ -123,14 +143,22 @@ class AuthMenager(QObject):
     def processRegistrationKey(self, file_path: str):
         try:
             if not os.path.isfile(file_path):
-                self.keyRegistrationFailed.emit("Файл ключа не найден")
+                self.keyRegistrationFailed.emit(
+                "[AuthMenager]",
+                "Критическая ошибка!\nЛицензионный ключь не найден",
+                file_path
+                )
                 return
 
             with open(file_path, 'r', encoding='utf-8') as f:
                 token = f.read().strip()
 
             if not token:
-                self.keyRegistrationFailed.emit("Файл ключа пуст")
+                self.keyRegistrationFailed.emit(
+                "[AuthMenager]",
+                "Критическая ошибка!\nЛицензионный ключь пуст",
+                file_path
+                )
                 return
 
             # Используем загруженный ключ
@@ -140,19 +168,39 @@ class AuthMenager(QObject):
                 algorithms=["RS256"]
             )
 
-            if payload.get("iss").get("FIO") != "Неберикутя Станислав Александрович":
-                self.keyRegistrationFailed.emit("Недействительный издатель ключа")
+            if payload.get("iss").get("FIO") != "Неберикутя Станислав Александрович":                
+                self.keyRegistrationFailed.emit(
+                "[AuthMenager]",
+                "Критическая ошибка!\nНедействительный издатель ключа",
+                file_path
+                )
                 return
 
             access_group = payload.get("type")
             if access_group not in ("admin", "user"):
-                self.keyRegistrationFailed.emit("Неизвестная группа доступа")
+                self.keyRegistrationFailed.emit(
+                "[AuthMenager]",
+                "Критическая ошибка!\nНеизвестная группа доступа",
+                file_path
+                )
                 return
             self.keyRegistrationSuccess.emit(access_group)
 
         except jwt.ExpiredSignatureError:
-            self.keyRegistrationFailed.emit("Срок действия ключа истёк")
+            self.keyRegistrationFailed.emit(
+            "[AuthMenager]",
+            "Критическая ошибка!\nСрок действия Лицензионного ключа истёк",
+            file_path
+            )
         except jwt.InvalidTokenError:
-            self.keyRegistrationFailed.emit("Недействительный ключ: повреждён или подделан")
+            self.keyRegistrationFailed.emit(
+            "[AuthMenager]",
+            "Критическая ошибка!\nНедействительный ключ: повреждён или подделан",
+            file_path
+            )
         except Exception as e:
-            self.keyRegistrationFailed.emit(f"Ошибка обработки ключа: {str(e)}")
+            self.keyRegistrationFailed.emit(
+            "[AuthMenager]",
+            "Критическая ошибка!\nОшибка обработки ключа:",
+            str(e)
+            )

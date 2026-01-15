@@ -7,6 +7,8 @@ import QtQuick.Timeline
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
+import qml.menager_windows
+
 import qml.component.button
 import qml.component.progress_bar
 import qml.component.text_field
@@ -15,33 +17,18 @@ import qml.component.dialog
 import python.py_auth_menager.interface_auth_menager
 import python.py_settings_project.interface_settings_project
 
-Window {
+ApplicationWindow {
     id: splashScreen
     width: 380
     height: 580
     visible: true
     color: "#00000000"
 
+    property var registrationWindow: null
 
     flags: Qt.SplashScreen | Qt.FramelessWindowHint
 
-    QtObject {
-        id: openWindowRegistration
-
-        function openWindow() {
-            var component = Qt.createComponent("../registration/RegistrationWindow.qml")
-            if (component.status === Component.Ready) {
-                var win = component.createObject(null)
-                if (win) {
-                    win.show()
-                    splashScreen.close()
-                }
-            }
-        }
-    }
-
     Component.onDestruction: {
-        openWindowRegistration.destroy()
         authMenager.destroy()
     }
 
@@ -50,55 +37,76 @@ Window {
         target: AuthMenager
 
         function onLoginSuccess(dict_user) {
-            var component = Qt.createComponent("../windows/main_window/MainWindow.qml")
-            if (component.status === Component.Ready) {
-                var win = component.createObject(null)
-                if (win) {
-                    splashScreen.close()
-                    SettingsProject.write_block_user_settings_project(dict_user)
-                }
-            } else {
-                console.error("Ошибка загрузки main.qml:", component.errorString())
-            }
+            customMessageDialog.showDialog("access", "Авторизация успешна", "Добро пожаловать!!!", dict_user.last_name + " " + dict_user.first_name + " " + dict_user.second_name)
+            SettingsProject.write_block_user_settings_project(dict_user)
+            welcomeTimer.start()
         }
 
-        function onLoginFailed(errorMsg1, errorMsg2) {
-            if (errorMsg2 === "login_user") {
-                textUsername.color = "red"
-                textUsername.placeholderTextColor = "red"
-                textUsername.placeholderText = "Неверный логин"
+        function onLoginFailed(errorMsg1, errorMsg2, errorMsg3) {
+            if (errorMsg3 === "login_user") {
+                if (onLoginFailed._handler) {
+                    customMessageDialog.signalBtnOK.disconnect(onLoginFailed._handler)
+                }
+                var handler1 = function() {
+                    textUsername.color = "red"
+                    textUsername.placeholderTextColor = "red"
+                    textUsername.placeholderText = "Неверный логин"
 
-                textPassword.color = "red"
-                textPassword.placeholderTextColor = "red"
-                textPassword.placeholderText = "Неверный пароль"
+                    textPassword.color = "red"
+                    textPassword.text = ""
+                    customMessageDialog.close()
+                }
+                onLoginFailed._handler = handler1
 
-                customMessageDialog.open()
+                customMessageDialog.signalBtnOK.connect(handler1)
 
-            } else {
-                textUsername.color = "green"
-                textUsername.placeholderTextColor = "green"
-                textUsername.placeholderText = "UserName"
-
-                textPassword.color = "green"
-                textPassword.placeholderTextColor = "green"
-                textPassword.placeholderText = "Password"
+                if (customMessageDialog.visible) {
+                    customMessageDialog.close()
+                }
+                customMessageDialog.showDialog("error", errorMsg1, errorMsg2, "Обратитесь к разработчику программы")
             }
 
-            if (errorMsg2 === "password_user") {
-                textPassword.color = "red"
-                textPassword.placeholderTextColor = "red"
-                textPassword.placeholderText = "Неверный пароль"
-                customMessageDialog.open()
+            if (errorMsg3 === "password_user") {
+                if (onLoginFailed._handler) {
+                    customMessageDialog.signalBtnOK.disconnect(onLoginFailed._handler)
+                }
+                var handler2 = function() {
+                    textPassword.color = "red"
+                    textPassword.placeholderTextColor = "red"
+                    textPassword.placeholderText = "Неверный пароль"
+                    customMessageDialog.close()
+                }
+                onLoginFailed._handler = handler2
+
+                customMessageDialog.signalBtnOK.connect(handler2)
+
+                if (customMessageDialog.visible) {
+                    customMessageDialog.close()
+                }
+                customMessageDialog.showDialog("error", errorMsg1, errorMsg2, "")
             }
 
-            if (errorMsg2 !== "login_user" && errorMsg2 !== "password_user") {
-                console.error(errorMsg1, errorMsg2)
+            if (errorMsg3 !== "login_user" && errorMsg3 !== "password_user") {
+                customMessageDialog.showDialog("error", errorMsg1, errorMsg2, errorMsg3)
             }
         }
     }
 
     CustomMessageDialog {
         id: customMessageDialog
+        m_width: 320
+        m_height: 160
+    }
+
+    Timer {
+        id: welcomeTimer
+        interval: 1000
+        repeat: false
+        onTriggered: {
+            customMessageDialog.close()
+            splashScreen.close()
+            MenagerWindows.show("../main_window/main_window/MainWindow.qml", customMessageDialog)
+        }
     }
 
     Rectangle {
@@ -120,7 +128,7 @@ Window {
             y: 198
             opacity: 0
             anchors.verticalCenter: parent.verticalCenter
-            image_source: "../../../res/svg/logo.svg"
+            image_source: SettingsProject.itemsFileSettingsDict.logo_progect
             progressWidth: 8
             strokeBgWidth: 4
             progressColor: "#67aa25"
@@ -157,9 +165,15 @@ Window {
             width: 300
             height: 50
 
-            colorDefault: "#67aa25"
+            enabled: textUsername.text.trim() !== "" && textPassword.text.trim() !== ""
+
+            colorDefault: "transparent"
             colorMouseOver: "#7ece2d"
             colorPressed: "#558b1f"
+
+            colorDefaultText: "white"
+            colorMouseOverText: "yellow"
+            colorPressedText: "#81848c"
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
@@ -178,14 +192,19 @@ Window {
             colorMouseOver: "transparent"
             colorPressed: "transparent"
 
+            colorDefaultText: "yellow"
+            colorMouseOverText: "#ff007f"
+            colorPressedText: "#81848c"
+            m_text_size: 8
+
             border_width: 0
             border_color: "transparent"
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 20
+            anchors.bottomMargin: 10
 
-            onClicked: { openWindowRegistration.openWindow() }
+            onClicked: { splashScreen.close(); MenagerWindows.show("../registration/RegistrationWindow.qml", customMessageDialog) }
         }
 
         Label {
@@ -221,6 +240,8 @@ Window {
             id: closeBtn
             m_width: 30
             m_height: 30
+
+            m_background_color: "transparent"
 
             anchors.right: parent.right
             anchors.top: parent.top

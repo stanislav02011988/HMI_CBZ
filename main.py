@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 import sys
 import os
-# import rc_qml
+import rc_qrc
 from pathlib import Path
 
 # Отключаем DPI-масштабирование Windows

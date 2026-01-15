@@ -13,17 +13,16 @@ class DB_Menager:
 
 
     def _load_json_database_settings(self):
-        self.manager_json.read_json_file(
+        items = self.manager_json.read_json_file(
             "files_settings/json_files/settings/project_settings/database_settings",
             "database_settings.json"
         )
-        self._init_database_users()
 
-    def _init_database_users(self):
         self.db_users.init_settings(
-            folder=self.manager_json.items['db_users']['folder'],
-            name=self.manager_json.items['db_users']['name'],
-            echo=self.manager_json.items['db_users']['echo']
+            folder=items['db_users']['folder'],
+            name=items['db_users']['name'],
+            echo=items['db_users']['echo']
 
         )
         self.db_users.createDB()
+

@@ -10,8 +10,11 @@ Button {
     property int m_width: 30
     property int m_height: 30
 
+    property string m_background_color: "#e0e0e0"
+
     implicitWidth: closeBtn.m_width
     implicitHeight: closeBtn.m_height
+
     padding: 0
     text: "✕"
     font.pixelSize: 16
@@ -20,9 +23,9 @@ Button {
 
     contentItem: Text {
         text: closeBtn.text
-        font.pixelSize: closeBtn.font.pixelSize
+        font.pixelSize: 0
         font.bold: true
-        color: closeBtn.hovered ? "white" : "black"
+        color: closeBtn.hovered ? "white" : "yellow"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         anchors.fill: parent
@@ -31,7 +34,7 @@ Button {
     background: Rectangle {
         anchors.fill: parent
         radius: 6
-        color: closeBtn.hovered ? "#ff4d4d" : "#e0e0e0"
+        color: closeBtn.hovered ? "#ff4d4d" : closeBtn.m_background_color
         border.color: "#999"
         layer.enabled: true
         layer.effect: DropShadow {
