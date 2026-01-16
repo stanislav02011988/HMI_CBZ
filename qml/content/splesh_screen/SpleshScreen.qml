@@ -9,17 +9,17 @@ import Qt5Compat.GraphicalEffects
 
 import qml.content.menager_windows
 
-import qml.component.button
-import qml.component.progress_bar
-import qml.component.text_field
-import qml.component.dialog
+import qml.controls.button
+import qml.controls.progress_bar
+import qml.controls.text_field
+import qml.controls.dialog
 
 import qml.settings.menager_theme
 
 import python.py_auth_menager.interface_auth_menager
 import python.py_settings_project.interface_settings_project
 
-ApplicationWindow {
+Window {
     id: splashScreen
     width: 380
     height: 580
@@ -202,6 +202,7 @@ ApplicationWindow {
             colorDefaultText: "yellow"
             colorMouseOverText: "#ff007f"
             colorPressedText: "#81848c"
+
             m_text_size: 8
 
             border_width: 0

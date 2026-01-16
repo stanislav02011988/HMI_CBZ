@@ -8,15 +8,16 @@ import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
 import qml.content.menager_windows
+import qml.settings.menager_theme
 
-import qml.component.button
-import qml.component.progress_bar
-import qml.component.text_field
-import qml.component.dialog
+import qml.controls.button
+import qml.controls.progress_bar
+import qml.controls.text_field
+import qml.controls.dialog
 
 import python.py_auth_menager.interface_auth_menager
 
-ApplicationWindow {
+Window {
     id: root
     width: 380
     height: 580
@@ -57,21 +58,49 @@ ApplicationWindow {
         id: bg
         width: 360
         height: 560
-        color: "#1d0d0d"
+        color: QmlMenagerTheme.log_win_background
         radius: 10
-        border.color: "#1d0d0d"
+        border.color: "#999"
         anchors.centerIn: parent
         z: 1
 
         CustomButtonClose {
             id: closeBtn
+            text: "✕"
             m_width: 30
             m_height: 30
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.margins: 10
-            m_background_color: "transparent"
-            onClicked: { root.close(); MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog) }
+
+            m_background_color: QmlMenagerTheme.reg_win_cBtnClose_background
+            m_color_hovered: QmlMenagerTheme.reg_win_cBtnClose_color_hovered
+            m_borderColor: QmlMenagerTheme.reg_win_cBtnClose_borderColor
+
+            m_colorText: QmlMenagerTheme.reg_win_cBtnClose_colorText
+            m_colorTextHovered: QmlMenagerTheme.reg_win_cBtnClose_colorTextHovered
+
+            onClicked: { root.close() }
+        }
+
+        CustomButtonClose {
+            id: btnCallBackLogin
+            text: "⤺"
+            width: 30
+            height: 30
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.margins: 10
+            anchors.leftMargin: 10
+
+            m_background_color: QmlMenagerTheme.reg_win_cBtnCallBackLogin_background
+            m_color_hovered: QmlMenagerTheme.reg_win_cBtnCallBackLogin_color_hovered
+            m_borderColor: QmlMenagerTheme.reg_win_cBtnCallBackLogin_borderColor
+
+            m_colorText: QmlMenagerTheme.reg_win_cBtnCallBackLogin_colorText
+            m_colorTextHovered: QmlMenagerTheme.reg_win_cBtnCallBackLogin_colorTextHovered
+
+            onClicked: {root.close(); MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog)}
         }
 
         Label {
@@ -89,6 +118,8 @@ ApplicationWindow {
             placeholderText: "Фамилия"
             anchors.top: label.bottom; anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: 36
+            placeholderTextColor: QmlMenagerTheme.reg_win_cTextField_placeholderTextColor
+            colorDefault: "transparent"
         }
 
         CustomTextField {
@@ -96,6 +127,8 @@ ApplicationWindow {
             placeholderText: "Имя"
             anchors.top: last_name.bottom; anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: 10
+            placeholderTextColor: QmlMenagerTheme.reg_win_cTextField_placeholderTextColor
+            colorDefault: "transparent"
         }
 
         CustomTextField {
@@ -103,6 +136,8 @@ ApplicationWindow {
             placeholderText: "Отчество"
             anchors.top: first_name.bottom; anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: 10
+            placeholderTextColor: QmlMenagerTheme.reg_win_cTextField_placeholderTextColor
+            colorDefault: "transparent"
         }
 
         CustomTextField {
@@ -110,7 +145,8 @@ ApplicationWindow {
             placeholderText: "Табельный номер"
             anchors.top: second_name.bottom; anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: 10
-            // inputMethodHints: Qt.ImhDigitsOnly
+            placeholderTextColor: QmlMenagerTheme.reg_win_cTextField_placeholderTextColor
+            colorDefault: "transparent"
         }
 
         CustomTextField {
@@ -118,6 +154,8 @@ ApplicationWindow {
             placeholderText: "Должность"
             anchors.top: tab_number.bottom; anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: 10
+            placeholderTextColor: QmlMenagerTheme.reg_win_cTextField_placeholderTextColor
+            colorDefault: "transparent"
         }
 
         CustomTextField {
@@ -125,6 +163,8 @@ ApplicationWindow {
             placeholderText: "Логин"
             anchors.top: position_user.bottom; anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: 10
+            placeholderTextColor: QmlMenagerTheme.reg_win_cTextField_placeholderTextColor
+            colorDefault: "transparent"
         }
 
         CustomTextField {
@@ -133,6 +173,8 @@ ApplicationWindow {
             echoMode: TextInput.Password
             anchors.top: login_user.bottom; anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: 10
+            placeholderTextColor: QmlMenagerTheme.reg_win_cTextField_placeholderTextColor
+            colorDefault: "transparent"
         }
 
         CustomTextField {
@@ -140,6 +182,8 @@ ApplicationWindow {
             placeholderText: "Код регистрации"
             anchors.top: password_user.bottom; anchors.horizontalCenter: parent.horizontalCenter
             anchors.topMargin: 10
+            placeholderTextColor: QmlMenagerTheme.reg_win_cTextField_placeholderTextColor
+            colorDefault: "transparent"
 
             MouseArea {
                 anchors.fill: parent
@@ -160,9 +204,13 @@ ApplicationWindow {
             anchors.bottomMargin: 25
 
             // Динамические цвета
-            colorDefault: root.allFieldsFilled ? "#67aa25" : "#666666"
-            colorMouseOver: root.allFieldsFilled ? "#7ece2d" : "#777777"
-            colorPressed: root.allFieldsFilled ? "#558b1f" : "#555555"
+            colorDefault: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorDefault : "#666666"
+            colorMouseOver: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorMouseOver : "#777777"
+            colorPressed: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorPressed : "#555555"
+
+            colorDefaultText: QmlMenagerTheme.reg_win_cBtnRegistration_colorDefaultText
+            colorMouseOverText: QmlMenagerTheme.reg_win_cBtnRegistration_colorMouseOverText
+            colorPressedText: QmlMenagerTheme.reg_win_cBtnRegistration_colorPressedText
 
             enabled: root.allFieldsFilled
 
@@ -178,22 +226,7 @@ ApplicationWindow {
                     code_registration.text
                 )
             }
-        }
-
-        Label {
-            id: label1
-            text: qsTr("Вернуться обратно к окну входа")
-            anchors.top: btnRegistration.bottom
-            anchors.topMargin: 2
-            anchors.horizontalCenter: parent.horizontalCenter
-            color: "#ffffff"
-            font.family: "Segoe UI"
-            font.pointSize: 5
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {root.close(); MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog)}
-            }
-        }
+        }        
     }
 
     FileDialog {
@@ -395,7 +428,7 @@ ApplicationWindow {
         }
 
         KeyframeGroup {
-            target: label1
+            target: btnCallBackLogin
             property: "opacity"
             Keyframe { frame: 0; value: 0 }
             Keyframe { frame: 1200; value: 0 }

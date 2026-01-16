@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Window
 
 import qml.component.button
+import qml.settings.menager_theme
 
 import python.py_settings_project.interface_settings_project
 
@@ -50,9 +51,9 @@ Popup {
     // Цвет фона — тоже зависит от типа
     readonly property string backgroundColor: {
         switch (messageType) {
-            case "access": return "#d4edda"; // светло-зелёный
-            case "error":  return "#f8d7da"; // светло-красный
-            case "warning":return "#fff3cd"; // светло-жёлтый
+            case "access": return "#a3c6c0"; // светло-зелёный
+            case "error":  return "#d2d3d6"; // светло-красный
+            case "warning":return "#faebd7"; // светло-жёлтый
             case "info":
             default:       return "#cce5ff"; // светло-синий
         }
@@ -131,8 +132,14 @@ Popup {
                 m_width: 30
                 m_height: 30
                 visible: root.visibleBtnOK
-                m_background_color: "transparent"
-                onClicked: root.close()
+                m_background_color: QmlMenagerTheme.reg_win_cBtnClose_background
+                m_color_hovered: QmlMenagerTheme.reg_win_cBtnClose_color_hovered
+                m_borderColor: QmlMenagerTheme.reg_win_cBtnClose_borderColor
+
+                m_colorText: QmlMenagerTheme.reg_win_cBtnClose_colorText
+                m_colorTextHovered: QmlMenagerTheme.reg_win_cBtnClose_colorTextHovered
+
+                onClicked: { root.close() }
             }
         }
 

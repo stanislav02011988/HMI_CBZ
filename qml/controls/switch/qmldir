@@ -1,0 +1,2 @@
+module qml.controls.switch
+CustomSwitch 1.0 CustomSwitch.qml

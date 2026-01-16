@@ -4,13 +4,15 @@ import QtQuick.Layouts
 
 import qml.content.main_window.main_window.component.top_bar
 
-ApplicationWindow {
+Window {
     id: root
     minimumWidth: 1000
     minimumHeight: 600
     title: qsTr("Главное окно")
-    visible: false    
+    visible: true
     color: "#00ffffff"
+
+    Component.onCompleted: { root.showMaximized() }
 
     // flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowSystemMenuHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint
 
@@ -26,7 +28,7 @@ ApplicationWindow {
 
             LayoutItemProxy {
                 target: customMenuBar
-                height: 45
+                height: 40
                 Layout.fillWidth: true
             }
 
@@ -52,7 +54,6 @@ ApplicationWindow {
 
     CustomTopBar {
         id: customMenuBar
-        border_radius: 6
     }
 
     Rectangle {

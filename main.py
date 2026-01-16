@@ -1,8 +1,24 @@
 # This Python file uses the following encoding: utf-8
 import sys
 import os
+import socket
 import rc_qrc
 from pathlib import Path
+
+# === Защита от двойного запуска ===
+def is_already_running(port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.bind(("127.0.0.1", port))
+        return False
+    except OSError:
+        return True
+    finally:
+        sock.close()
+
+if is_already_running(port = hash("MyUniqueAppName_HMI_CBZ") % 10000 + 20000):
+    print("❌ Данная программа уже запущена!")
+    sys.exit(1)
 
 # Отключаем DPI-масштабирование Windows
 if sys.platform == "win32":
@@ -77,8 +93,8 @@ class Project:
 
     def _load_main_qml(self):
         """Загружаем QML."""
-        qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
-        # qml_file = self.base_path / "qml/content/main_window/main_window/MainWindow.qml"
+        # qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
+        qml_file = self.base_path / "qml/content/main_window/main_window/MainWindow.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

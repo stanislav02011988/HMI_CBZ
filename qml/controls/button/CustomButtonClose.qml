@@ -10,7 +10,12 @@ Button {
     property int m_width: 30
     property int m_height: 30
 
-    property string m_background_color: "#e0e0e0"
+    property color m_background_color: "#e0e0e0"
+    property color m_color_hovered: "#ff4d4d"
+    property color m_borderColor: "#999"
+
+    property color m_colorText: "yellow"
+    property color m_colorTextHovered: "white"
 
     implicitWidth: closeBtn.m_width
     implicitHeight: closeBtn.m_height
@@ -23,9 +28,10 @@ Button {
 
     contentItem: Text {
         text: closeBtn.text
-        font.pixelSize: 0
+        font.family: "Times New Roman"
+        font.pixelSize: 12
         font.bold: true
-        color: closeBtn.hovered ? "white" : "yellow"
+        color: closeBtn.hovered ? closeBtn.m_colorTextHovered : closeBtn.m_colorText
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         anchors.fill: parent
@@ -34,8 +40,8 @@ Button {
     background: Rectangle {
         anchors.fill: parent
         radius: 6
-        color: closeBtn.hovered ? "#ff4d4d" : closeBtn.m_background_color
-        border.color: "#999"
+        color: closeBtn.hovered ? closeBtn.m_color_hovered : closeBtn.m_background_color
+        border.color: closeBtn.m_borderColor
         layer.enabled: true
         layer.effect: DropShadow {
             color: "#40000000"

@@ -1,2 +1,2 @@
-module qml.component.text_field
+module qml.controls.text_field
 CustomTextField 1.0 CustomTextField.qml

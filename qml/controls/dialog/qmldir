@@ -1,2 +1,2 @@
-module qml.component.dialog
+module qml.controls.dialog
 CustomMessageDialog 1.0 CustomMessageDialog.qml

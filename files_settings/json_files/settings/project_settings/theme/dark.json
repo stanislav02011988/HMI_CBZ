@@ -7,5 +7,30 @@
       "progressColor": "#67aa25",
       "bgStrokeColor": "transparent",
       "strokeBgWidth": "8"
+  },
+  "theme_registration_window":{
+      "background": "#81848c",
+      "borderColor": "#999",
+
+      "cBtnClose_background": "transparent",
+      "cBtnClose_color_hovered": "#ff4d4d",
+      "cBtnClose_borderColor": "#999",
+      "cBtnClose_colorText": "yellow",
+      "cBtnClose_colorTextHovered": "white",
+
+      "cBtnCallBackLogin_background": "transparent",
+      "cBtnCallBackLogin_color_hovered": "#666666",
+      "cBtnCallBackLogin_borderColor": "#999",
+      "cBtnCallBackLogin_colorText": "yellow",
+      "cBtnCallBackLogin_colorTextHovered": "white",
+
+      "cTextField_placeholderTextColor": "white",
+
+      "cBtnRegistration_colorDefault": "#67aa25",
+      "cBtnRegistration_colorMouseOver": "#7ece2d",
+      "cBtnRegistration_colorPressed": "#558b1f",
+      "cBtnRegistration_colorDefaultText": "white",
+      "cBtnRegistration_colorMouseOverText": "yellow",
+      "cBtnRegistration_colorPressedText": "#81848c"
   }
 }

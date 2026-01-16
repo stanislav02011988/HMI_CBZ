@@ -1,127 +1,141 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 
 import qml.settings.menager_theme
 
+import qml.controls.switch
+
 Item {
     id: root
-    width: parent ? parent.width : 800
-    height: parent ? parent.height : 800
-
-    property int font_text: 10
-
-    property string name_installation
-    property string type_installation
-    property string version_manuals
-    property string path_manuals
-
-    // --- Сигнал для родителя ---
-    signal menuActionTriggered(string action)
-
-    property int border_radius: 0
+    width: parent.width
+    height: parent.height
 
     Rectangle {
         id: bg
         anchors.fill: parent
-        color: "#eeeeee"
-        border.color: "#898989"
-        border.width: 1
-        radius: root.border_radius
+        color: "transparent"
+        border.color: "#999"
+        border.width: 2
+        radius: 6
 
-        // --- Меню слева ---
-        MenuBar {
-            id: menuBar
+        // // Тень (опционально)
+        layer.enabled: true
+        layer.effect: DropShadow {
+            color: "#40000000"
+            radius: 8
+            samples: 16
+            verticalOffset: 2
+        }
 
-            signal menuActionTriggered(string action)
-
-            anchors.leftMargin: 1
-            anchors.rightMargin: 1
-            anchors.topMargin: 1
-            anchors.bottomMargin: 1
-
-            Menu { title: "Файл"
-                MenuItem { text: "Новый"; onTriggered: menuBar.menuActionTriggered("file_new") }
-                MenuItem { text: "Открыть"; onTriggered: menuBar.menuActionTriggered("file_open") }
-                MenuItem { text: "Выход"; onTriggered: menuBar.menuActionTriggered("file_exit") }
+        Rectangle {
+            id: container_menu
+            width: bg.width / 2
+            Layout.fillHeight: true
+            anchors{
+                left: bg.left
+                top: bg.top
             }
+            color: "transparent"
 
-            Menu { title: "Правка"
-                MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
-                MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
-            }
+            MenuBar {
+                id: menuBar
+                anchors.fill: parent
 
-            Menu { title: "Документация"
-                MenuItem {
-                    text: "Открыть руководство" + " " + root.name_installation + " " + root.type_installation + "ver." + root.version_manuals
-                    // onTriggered: pyPdfOpener.openPdf("qrc:/manuals/resources/manuals/extec/x44/X44-RU-10401.pdf")
-                }
-            }
-
-            delegate: MenuBarItem {
-                id: menuBarItem
-
-                contentItem: Text {
-                    text: menuBarItem.text
-                    font: menuBarItem.font
-                    opacity: enabled ? 1.0 : 0.3
-                    color: menuBarItem.highlighted ? "#ffffff" : "#21be2b"
-                    horizontalAlignment: Text.AlignVCenter
-                    verticalAlignment: Text.AlignVCenter
-                    elide: Text.ElideRight
-                }
+                signal menuActionTriggered(string action)
 
                 background: Rectangle {
-                    implicitWidth: 40
-                    implicitHeight: root.height
-                    opacity: enabled ? 1 : 0.3
-                    color: menuBarItem.highlighted ? "#21be2b" : "transparent"
-                }
-            }
-
-            background: Rectangle {
-                implicitWidth: root.width
-                implicitHeight: root.height
-                color: "transparent"
-
-                Rectangle {
                     color: "transparent"
-                    width: parent.width
-                    height: 1
-                    anchors.bottom: parent.bottom
+                }
+
+                Menu { title: "Файл"
+                    MenuItem { text: "Новый"; onTriggered: menuBar.menuActionTriggered("file_new") }
+                    MenuItem { text: "Открыть"; onTriggered: menuBar.menuActionTriggered("file_open") }
+                    MenuItem { text: "Выход"; onTriggered: menuBar.menuActionTriggered("file_exit") }
+                }
+
+                Menu { title: "Правка 1"
+                    MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
+                    MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
+                }
+
+                Menu { title: "Правка 2"
+                    MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
+                    MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
+                }
+
+                Menu { title: "Правка 3"
+                    MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
+                    MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
+                }
+
+                Menu { title: "Правка 4"
+                    MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
+                    MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
+                }
+
+                delegate: MenuBarItem {
+                    id: menuBarItem
+                    contentItem: Text {
+                        text: menuBarItem.text
+                        font: menuBarItem.font
+                        opacity: enabled ? 1.0 : 0.3
+                        color: menuBarItem.highlighted ? "#ffffff" : "black"
+                        horizontalAlignment: Text.AlignVCenter
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideRight
+                    }
+
+                    background: Rectangle {
+                        width: menuBarItem.width
+                        height: root.height - 6
+                        opacity: enabled ? 1 : 0.3
+                        radius: 4
+                        color: menuBarItem.highlighted ? "#21be2b" : "transparent"
+                    }
                 }
             }
         }
 
         Rectangle {
-            id: container_btn
-            x: 118
-            width: 242
+            width: 100
+            height: bg.height
+            anchors{
+                right: bg.right
+                top: bg.top
+            }
             color: "transparent"
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.rightMargin: 0
-            anchors.topMargin: 0
-            anchors.bottomMargin: 0
 
-            // --- Переключатель темы справа ---
             RowLayout {
                 spacing: 5
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
 
                 Text {
                     text: QmlMenagerTheme.name_theme
+                    font.family: "Times New Roman"
+                    font.bold: true
+                    font.pointSize: 14
                     verticalAlignment: Text.AlignVCenter
-                    color: QmlMenagerTheme.textColor
+                    color: "black"
                 }
 
-                Switch {
-                    implicitWidth: 40
-                    implicitHeight: 40
-                    checked: QmlMenagerTheme ? QmlMenagerTheme.name_theme === "dark" : true
-                    onToggled: {
-                        if (QmlMenagerTheme) { QmlMenagerTheme.toggleTheme() }
+                CustomSwitch {
+                    id: themeSwitch
+
+                    // Привязка состояния из менеджера темы
+                    checked: QmlMenagerTheme ? QmlMenagerTheme.name_theme === "dark" : false
+
+                    // Кастомные цвета (опционально)
+                    trackColorOn: "#21be2b"
+                    trackColorOff: "#aaaaaa"
+
+                    // Реакция на переключение
+                    onToggled: (newChecked) => {
+                        if (QmlMenagerTheme) {
+                            QmlMenagerTheme.toggleTheme()
+                        }
                     }
                 }
             }
