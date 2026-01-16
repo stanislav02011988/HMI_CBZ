@@ -1,2 +1,2 @@
-module qml.splesh_screen
+module qml.content.splesh_screen
 SpleshScreen 1.0 SpleshScreen.qml

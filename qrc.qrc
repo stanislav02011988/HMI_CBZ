@@ -8,4 +8,8 @@
         <file>res/svg/svg_icon_message/icon_warning.svg</file>
         <file>res/svg/svg_icon_message/icon_info.svg</file>
     </qresource>
+    <qresource prefix="/json_file_theme">
+        <file>files_settings/json_files/settings/project_settings/theme/dark.json</file>
+        <file>files_settings/json_files/settings/project_settings/theme/light.json</file>
+    </qresource>
 </RCC>

@@ -21,12 +21,16 @@ from python.py_utils.utils_json.json_menager import Menager_Json
 from python.py_data_base.db_menager import DB_Menager
 from python.py_auth_menager.auth_menager import AuthMenager
 from python.py_settings_project.settings_project import SettingsProject
+from python.py_menager_theme.menager_theme import MenagerTheme
 
 class Project:
     def __init__(self):
         super().__init__()
         # Разрешение локального чтения для QML
         os.environ["QML_XHR_ALLOW_FILE_READ"] = "1"
+
+        self._file_path = "files_settings/json_files/settings/project_settings"
+        self._file_name = "project_settings.json"
 
         self.base_path = Path(__file__).resolve().parent
 
@@ -39,10 +43,13 @@ class Project:
         self.db_menager = DB_Menager(self.menager_json)
 
         self.auth_menager = AuthMenager(self.db_menager.db_users._engine_db())
-        self.settings_project = SettingsProject(self.db_menager, self.menager_json)
+        self.settings_project = SettingsProject(self._file_path, self._file_name, self.db_menager, self.menager_json)
+        self.menager_theme = MenagerTheme()
 
         # --- Активация регистрации Qml модулей ----
         self.register_qml_module_auth_menager()
+        self.register_qml_module_settings_project()
+        self.register_qml_module_menager_theme()
 
         # --- 3. Приложение ---
         self.app = QGuiApplication(sys.argv)
@@ -54,12 +61,24 @@ class Project:
 
     def register_qml_module_auth_menager(self):
         self.qml_registration_module.registration_module(self.auth_menager)
+
+    def register_qml_module_settings_project(self):
         self.qml_registration_module.registration_module(self.settings_project)
+
+    def register_qml_module_menager_theme(self):
+        try:
+                path_file = self.menager_json.read_json_file(self._file_path, self._file_name)
+                self.menager_theme.load_theme(path_file["block_graphic_settings"]["theme_path"])
+                self.qml_registration_module.registration_module(self.menager_theme)
+        except Exception as e:
+            print(f"[main.py] : 68 ->  Ошибка в функции 'def register_qml_module_menager_theme(self)': {e}")
+
+
 
     def _load_main_qml(self):
         """Загружаем QML."""
-        qml_file = self.base_path / "qml/splesh_screen/SpleshScreen.qml"
-        # qml_file = self.base_path / "qml/windows/main_window/MainWindow.qml"
+        qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
+        # qml_file = self.base_path / "qml/content/main_window/main_window/MainWindow.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

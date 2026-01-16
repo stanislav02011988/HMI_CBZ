@@ -1,0 +1,11 @@
+{
+  "name_theme": "dark",
+  "theme_login_window": {
+      "background": "#1d0d0d",
+      "borderColor": "#1d0d0d",
+      "textColor": "green",
+      "progressColor": "#67aa25",
+      "bgStrokeColor": "transparent",
+      "strokeBgWidth": "8"
+  }
+}

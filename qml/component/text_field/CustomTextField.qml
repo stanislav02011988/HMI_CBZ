@@ -29,7 +29,16 @@ TextField {
     color: "#ffffff"
     background: Rectangle {
         color: internal.dynamicColor
-        radius: 10
+        radius: 4
+        border.color: "#999"
+        border.width: 1
+        layer.enabled: true
+        layer.effect: DropShadow {
+            color: "#40000000"
+            radius: 8
+            samples: 16
+            verticalOffset: 2
+        }
     }
 
     selectByMouse: true

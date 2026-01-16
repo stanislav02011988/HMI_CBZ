@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import qml.main_window.main_window.component.top_bar
+import qml.content.main_window.main_window.component.top_bar
 
 ApplicationWindow {
     id: root

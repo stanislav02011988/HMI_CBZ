@@ -18,11 +18,11 @@ class SettingsProject(QObject):
     signalLoadFile = Signal()
     signalErrorLoad = Signal(str, str)
 
-    def __init__(self, db_engine, json_menager, parent=None):
+    def __init__(self, file_path, file_name, db_engine, json_menager, parent=None):
         super().__init__(parent)
 
-        self._file_path = "files_settings/json_files/settings/project_settings"
-        self._file_name = "project_settings.json"
+        self._file_path = file_path
+        self._file_name = file_name
 
         self._db_engine = db_engine
         self._json_menager = json_menager
@@ -97,3 +97,8 @@ class SettingsProject(QObject):
     def itemsFileSettingsDict(self):
         return self._items
 
+    @Slot(str)
+    def save_theme(self, name_theme):
+        data = self._json_menager.read_json_file(self._file_path, self._file_name)
+        data["block_graphic_settings"]["theme_path"] = f"qrc:/json_file_theme/files_settings/json_files/settings/project_settings/theme/{name_theme}.json"
+        self._json_menager.write_json_file(path_folder=self._file_path, file_name=self._file_name, items=data)

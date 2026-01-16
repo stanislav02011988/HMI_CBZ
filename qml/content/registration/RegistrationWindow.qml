@@ -7,7 +7,7 @@ import QtQuick.Timeline
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
-import qml.menager_windows
+import qml.content.menager_windows
 
 import qml.component.button
 import qml.component.progress_bar

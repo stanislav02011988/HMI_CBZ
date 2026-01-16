@@ -1,0 +1,2 @@
+module qml.settings.menager_theme
+singleton QmlMenagerTheme 1.0 QmlMenagerTheme.qml

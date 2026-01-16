@@ -7,12 +7,14 @@ import QtQuick.Timeline
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
-import qml.menager_windows
+import qml.content.menager_windows
 
 import qml.component.button
 import qml.component.progress_bar
 import qml.component.text_field
 import qml.component.dialog
+
+import qml.settings.menager_theme
 
 import python.py_auth_menager.interface_auth_menager
 import python.py_settings_project.interface_settings_project
@@ -115,9 +117,9 @@ ApplicationWindow {
         y: 131
         width: 360
         height: 300
-        color: "#1d0d0d"
+        color: "transparent"
         radius: 10
-        border.color: "#1d0d0d"
+        border.color: "transparent"
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         z: 1
@@ -131,7 +133,8 @@ ApplicationWindow {
             image_source: SettingsProject.itemsFileSettingsDict.logo_progect
             progressWidth: 8
             strokeBgWidth: 4
-            progressColor: "#67aa25"
+            progressColor: QmlMenagerTheme.log_win_progressColor
+            bgStrokeColor: QmlMenagerTheme.log_win_bgStrokeColor
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -145,6 +148,8 @@ ApplicationWindow {
             anchors.bottomMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: "Username"
+            placeholderTextColor: QmlMenagerTheme.log_win_textColor
+            colorDefault: "transparent"
         }
 
         CustomTextField {
@@ -156,6 +161,8 @@ ApplicationWindow {
             anchors.bottomMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
             placeholderText: "Password"
+            placeholderTextColor: QmlMenagerTheme.log_win_textColor
+            colorDefault: "transparent"
             echoMode: TextInput.Password
         }
 
@@ -240,7 +247,6 @@ ApplicationWindow {
             id: closeBtn
             m_width: 30
             m_height: 30
-
             m_background_color: "transparent"
 
             anchors.right: parent.right
@@ -310,6 +316,21 @@ ApplicationWindow {
                 frame: 0
                 value: 1
             }
+        }
+
+        KeyframeGroup {
+            target: bg
+            property: "color"
+            Keyframe { frame: 1500; value: "transparent" }
+            Keyframe { frame: 2500; value: QmlMenagerTheme.log_win_background }
+        }
+
+        KeyframeGroup {
+            target: closeBtn
+            property: "opacity"
+            Keyframe { frame: 0;      value: 0.0 }
+            Keyframe { frame: 2000;   value: 0.0 }
+            Keyframe { frame: 2400;   value: 1.0 }
         }
 
         KeyframeGroup {

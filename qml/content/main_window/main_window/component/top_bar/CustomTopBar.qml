@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import qml.settings.menager_theme
+
 Item {
     id: root
     width: parent ? parent.width : 800
@@ -93,8 +95,8 @@ Item {
 
         Rectangle {
             id: container_btn
-            x: 271
-            width: 100
+            x: 118
+            width: 242
             color: "transparent"
             anchors.right: parent.right
             anchors.top: parent.top
@@ -109,18 +111,18 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 Text {
-                    // text: isRuntimeM ? AppTheme.currentTheme : "light"
+                    text: QmlMenagerTheme.name_theme
                     verticalAlignment: Text.AlignVCenter
-                    // color: isRuntimeM ? AppTheme.text : "black"
+                    color: QmlMenagerTheme.textColor
                 }
 
                 Switch {
                     implicitWidth: 40
                     implicitHeight: 40
-                    // checked: AppTheme ? AppTheme.currentTheme === "dark" : false
-                    // onToggled: {
-                    //     if (AppTheme) AppTheme.toggleTheme()
-                    // }
+                    checked: QmlMenagerTheme ? QmlMenagerTheme.name_theme === "dark" : true
+                    onToggled: {
+                        if (QmlMenagerTheme) { QmlMenagerTheme.toggleTheme() }
+                    }
                 }
             }
         }
