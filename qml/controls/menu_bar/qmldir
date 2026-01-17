@@ -1,0 +1,2 @@
+module qml.controls.menu_bar
+CustomMenuBar 1.0 CustomMenuBar.qml

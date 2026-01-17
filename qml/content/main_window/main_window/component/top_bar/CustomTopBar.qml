@@ -6,11 +6,16 @@ import Qt5Compat.GraphicalEffects
 import qml.settings.menager_theme
 
 import qml.controls.switch
+import qml.controls.menu_bar
 
 Item {
     id: root
     width: parent.width
     height: parent.height
+
+    property color colorDefault: "#67aa25"
+    property color colorMouseOver: "#7ece2d"
+    property color colorPressed: "#558b1f"
 
     Rectangle {
         id: bg
@@ -39,60 +44,15 @@ Item {
             }
             color: "transparent"
 
-            MenuBar {
-                id: menuBar
-                anchors.fill: parent
-
-                signal menuActionTriggered(string action)
-
-                background: Rectangle {
-                    color: "transparent"
-                }
-
-                Menu { title: "Файл"
-                    MenuItem { text: "Новый"; onTriggered: menuBar.menuActionTriggered("file_new") }
-                    MenuItem { text: "Открыть"; onTriggered: menuBar.menuActionTriggered("file_open") }
-                    MenuItem { text: "Выход"; onTriggered: menuBar.menuActionTriggered("file_exit") }
-                }
-
-                Menu { title: "Правка 1"
-                    MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
-                    MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
-                }
-
-                Menu { title: "Правка 2"
-                    MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
-                    MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
-                }
-
-                Menu { title: "Правка 3"
-                    MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
-                    MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
-                }
-
-                Menu { title: "Правка 4"
-                    MenuItem { text: "Копировать"; onTriggered: menuBar.menuActionTriggered("edit_copy") }
-                    MenuItem { text: "Вставить"; onTriggered: menuBar.menuActionTriggered("edit_paste") }
-                }
-
-                delegate: MenuBarItem {
-                    id: menuBarItem
-                    contentItem: Text {
-                        text: menuBarItem.text
-                        font: menuBarItem.font
-                        opacity: enabled ? 1.0 : 0.3
-                        color: menuBarItem.highlighted ? "#ffffff" : "black"
-                        horizontalAlignment: Text.AlignVCenter
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideRight
-                    }
-
-                    background: Rectangle {
-                        width: menuBarItem.width
-                        height: root.height - 6
-                        opacity: enabled ? 1 : 0.3
-                        radius: 4
-                        color: menuBarItem.highlighted ? "#21be2b" : "transparent"
+            CustomMenuBar {
+                id: topBar
+                height: bg.height
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onMenuActionTriggered: (action) => {
+                    console.log("Действие:", action)
+                    if (action === "file_exit") {
+                        Qt.quit()
                     }
                 }
             }

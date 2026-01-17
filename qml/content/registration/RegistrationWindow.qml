@@ -100,7 +100,7 @@ Window {
             m_colorText: QmlMenagerTheme.reg_win_cBtnCallBackLogin_colorText
             m_colorTextHovered: QmlMenagerTheme.reg_win_cBtnCallBackLogin_colorTextHovered
 
-            onClicked: {root.close(); MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog)}
+            onClicked: { root.close(); MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog) }
         }
 
         Label {
