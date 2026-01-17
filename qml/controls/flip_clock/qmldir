@@ -1,0 +1,3 @@
+module qml.controls.flip_clock
+CustomFlipClock 1.0 CustomFlipClock.qml
+CustomFlipDigit 1.0 CustomFlipDigit.qml

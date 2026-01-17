@@ -7,7 +7,7 @@ import QtQuick.Timeline
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
-import qml.content.menager_windows
+import qml.content
 
 import qml.controls.button
 import qml.controls.progress_bar
@@ -107,7 +107,7 @@ Window {
         onTriggered: {
             customMessageDialog.close()
             splashScreen.close()
-            MenagerWindows.show("../main_window/main_window/MainWindow.qml", customMessageDialog)
+            MenagerWindows.show("main_window/main_window/MainWindow.qml", customMessageDialog)
         }
     }
 
@@ -212,7 +212,7 @@ Window {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 10
 
-            onClicked: { splashScreen.close(); MenagerWindows.show("../registration/RegistrationWindow.qml", customMessageDialog) }
+            onClicked: { splashScreen.close(); MenagerWindows.show("registration/RegistrationWindow.qml", customMessageDialog) }
         }
 
         Label {

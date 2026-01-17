@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
 
-import qml.component.button
+import qml.controls.button
 import qml.settings.menager_theme
 
 import python.py_settings_project.interface_settings_project

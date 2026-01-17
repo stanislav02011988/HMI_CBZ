@@ -9,6 +9,7 @@ Button {
 
     property int m_width: 30
     property int m_height: 30
+    property int m_raduis: 6
 
     property color m_background_color: "#e0e0e0"
     property color m_color_hovered: "#ff4d4d"
@@ -39,7 +40,7 @@ Button {
 
     background: Rectangle {
         anchors.fill: parent
-        radius: 6
+        radius: closeBtn.m_raduis
         color: closeBtn.hovered ? closeBtn.m_color_hovered : closeBtn.m_background_color
         border.color: closeBtn.m_borderColor
         layer.enabled: true

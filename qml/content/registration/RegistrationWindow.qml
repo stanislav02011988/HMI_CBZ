@@ -7,7 +7,7 @@ import QtQuick.Timeline
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
-import qml.content.menager_windows
+import qml.content
 import qml.settings.menager_theme
 
 import qml.controls.button
@@ -100,7 +100,7 @@ Window {
             m_colorText: QmlMenagerTheme.reg_win_cBtnCallBackLogin_colorText
             m_colorTextHovered: QmlMenagerTheme.reg_win_cBtnCallBackLogin_colorTextHovered
 
-            onClicked: { root.close(); MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog) }
+            onClicked: { root.close(); MenagerWindows.show("splesh_screen/SpleshScreen.qml", customMessageDialog) }
         }
 
         Label {
@@ -254,7 +254,7 @@ Window {
 
         function onRegisterSuccess() {
             root.close()
-            MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog)
+            MenagerWindows.show("splesh_screen/SpleshScreen.qml", customMessageDialog)
         }
 
         function onRegisterFailed(errorMsg1, errorMsg2, errorMsg3) {
@@ -292,7 +292,7 @@ Window {
             }
             var handler = function() {
                 root.close()
-                MenagerWindows.show("../splesh_screen/SpleshScreen.qml", customMessageDialog)
+                MenagerWindows.show("splesh_screen/SpleshScreen.qml", customMessageDialog)
             }
             onKeyRegistrationFailed._handler = handler
 

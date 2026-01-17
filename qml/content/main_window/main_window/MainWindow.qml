@@ -2,7 +2,10 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import qml.content.main_window.main_window.component.navigation_button_bar
 import qml.content.main_window.main_window.component.top_bar
+
+
 
 Window {
     id: root
@@ -18,23 +21,28 @@ Window {
 
     Rectangle {
         id: bg
-        color: "transparent"
+        color: "#dfd8d8"
         anchors.fill: parent
 
         ColumnLayout {
             id: layoutContent
             anchors.fill: parent
-            anchors.margins: 2
+            anchors{
+                leftMargin: 4
+                topMargin: 4
+                rightMargin: 4
+                bottomMargin: 4
+            }
 
             LayoutItemProxy {
-                target: customMenuBar
+                target: customNavigationBtnBar
                 height: 40
                 Layout.fillWidth: true
             }
 
             LayoutItemProxy {
-                target: secondBar
-                height: 40
+                target: customTopBar
+                height: 50
                 Layout.fillWidth: true
             }
 
@@ -52,22 +60,9 @@ Window {
         }
     }
 
-    CustomTopBar {
-        id: customMenuBar
-    }
+    CustomNavigationButtonBar { id: customNavigationBtnBar }
 
-    Rectangle {
-        id: secondBar
-
-        color: "red"
-
-        Label {
-            id: label1
-            text: qsTr("Доп меню")
-            anchors.fill: parent
-            horizontalAlignment: Text.AlignHCenter
-        }
-    }
+    CustomTopBar { id: customTopBar }
 
     Rectangle {
         id: mainContent
