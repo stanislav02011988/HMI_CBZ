@@ -70,7 +70,7 @@ Item {
                     y: -parent.height
                     text: currentText
                     font.family: root.fontFamily
-                    font.pixelSize: root.fontSize
+                    font.pixelSize: 0
                     color: root.flipFontColor
                     style: root.useRaisedText ? Text.Raised : Text.Normal
                     styleColor: "#000"

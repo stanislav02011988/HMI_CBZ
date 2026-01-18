@@ -15,6 +15,7 @@ import qml.controls.text_field
 import qml.controls.dialog
 
 import qml.settings.menager_theme
+import qml.settings.project_settings
 
 import python.py_auth_menager.interface_auth_menager
 import python.py_settings_project.interface_settings_project
@@ -40,7 +41,7 @@ Window {
 
         function onLoginSuccess(dict_user) {
             customMessageDialog.showDialog("access", "Авторизация успешна", "Добро пожаловать!!!", dict_user.last_name + " " + dict_user.first_name + " " + dict_user.second_name)
-            SettingsProject.write_block_user_settings_project(dict_user)
+            QmlProjectSettings.saveBlockUserSettings(dict_user)
             welcomeTimer.start()
         }
 
@@ -107,7 +108,7 @@ Window {
         onTriggered: {
             customMessageDialog.close()
             splashScreen.close()
-            MenagerWindows.show("main_window/main_window/MainWindow.qml", customMessageDialog)
+            MenagerWindows.show("qrc:/qml_files/qml/content/main_window/main_window/MainWindow.qml", customMessageDialog)
         }
     }
 
@@ -130,7 +131,7 @@ Window {
             y: 198
             opacity: 0
             anchors.verticalCenter: parent.verticalCenter
-            image_source: SettingsProject.itemsFileSettingsDict.logo_progect
+            image_source: QmlProjectSettings.logoImage
             progressWidth: 8
             strokeBgWidth: 4
             progressColor: QmlMenagerTheme.log_win_progressColor
@@ -212,7 +213,7 @@ Window {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 10
 
-            onClicked: { splashScreen.close(); MenagerWindows.show("registration/RegistrationWindow.qml", customMessageDialog) }
+            onClicked: { splashScreen.close(); MenagerWindows.show("qrc:/qml_files/qml/content/registration/RegistrationWindow.qml", customMessageDialog) }
         }
 
         Label {

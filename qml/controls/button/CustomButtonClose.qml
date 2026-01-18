@@ -25,7 +25,7 @@ Button {
     text: "✕"
     font.pixelSize: 16
     font.bold: true
-    // Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+    Layout.alignment: Qt.AlignVCenter | Qt.AlignVCenter
 
     contentItem: Text {
         text: closeBtn.text

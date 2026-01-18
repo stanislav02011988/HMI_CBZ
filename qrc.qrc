@@ -12,4 +12,42 @@
         <file>files_settings/json_files/settings/project_settings/theme/dark.json</file>
         <file>files_settings/json_files/settings/project_settings/theme/light.json</file>
     </qresource>
+    <qresource prefix="/json_file">
+        <file>files_settings/json_files/settings/project_settings/project_settings.json</file>
+    </qresource>
+    <qresource prefix="/image/bekchoff/modules">
+        <file>res/image/bekchoff/images_modules/kl1002.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl1408.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl2408.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl2622.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl2722.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl3044.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl3064.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl3202.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl3356.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl3403.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl9010.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl9100.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl9150.jpg</file>
+        <file>res/image/bekchoff/images_modules/kl9512.jpg</file>
+    </qresource>
+    <qresource prefix="/image/bekchoff/controllers">
+        <file>res/image/bekchoff/images_controllers/bc3100.jpg</file>
+        <file>res/image/bekchoff/images_controllers/bk1150.jpg</file>
+        <file>res/image/bekchoff/images_controllers/bk3120.jpg</file>
+    </qresource>
+    <qresource prefix="/qml_files">
+        <file>qml/content/splesh_screen/SpleshScreen.qml</file>
+        <file>qml/content/registration/RegistrationWindow.qml</file>
+        <file>qml/content/main_window/MainWindow.qml</file>
+    </qresource>
+    <qresource prefix="/qml_files/bekchoff">
+        <file>qml/modules/bekchoff/controllers/BC3100.qml</file>
+        <file>qml/modules/bekchoff/controllers/BK1150.qml</file>
+        <file>qml/modules/bekchoff/controllers/BK3120.qml</file>
+        <file>qml/modules/bekchoff/modules/KL3044.qml</file>
+        <file>qml/modules/bekchoff/modules/KL3064.qml</file>
+        <file>qml/modules/bekchoff/modules/KL3202.qml</file>
+        <file>qml/modules/bekchoff/modules/KL3403.qml</file>
+    </qresource>
 </RCC>

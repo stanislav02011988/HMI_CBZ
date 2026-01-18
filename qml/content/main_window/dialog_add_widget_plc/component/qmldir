@@ -1,0 +1,4 @@
+module qml.content.main_window.dialog_add_widget_plc.component
+ListModelPlc 1.0 ListModelPlc.qml
+WidgetPreview 1.0 WidgetPreview.qml
+WidgetTreeListView 1.0 WidgetTreeListView.qml

@@ -1,0 +1,2 @@
+module qml.controls.led_indicator
+LedIndicator 1.0 LedIndicator.qml

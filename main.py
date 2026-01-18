@@ -31,9 +31,10 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
 from python.py_utils.qml_registration_module.qml_registration_module import QmlRegistrationModule
-
 from python.py_utils.massage_handler.message_handler import PyMessageHandler
 from python.py_utils.utils_json.json_menager import Menager_Json
+from python.py_utils.time_menager.time_menager import TimeManager
+
 from python.py_data_base.db_menager import DB_Menager
 from python.py_auth_menager.auth_menager import AuthMenager
 from python.py_settings_project.settings_project import SettingsProject
@@ -53,6 +54,7 @@ class Project:
         # --- 1. Активация Сервисов ---
         self.py_message_handler = PyMessageHandler()        
         self.qml_registration_module = QmlRegistrationModule()
+        self.time_menager = TimeManager()
 
         # --- 2. Загрузка настроек базы данных ---
         self.menager_json = Menager_Json()
@@ -66,6 +68,7 @@ class Project:
         self.register_qml_module_auth_menager()
         self.register_qml_module_settings_project()
         self.register_qml_module_menager_theme()
+        self.register_qml_module_time_menager()
 
         # --- 3. Приложение ---
         self.app = QGuiApplication(sys.argv)
@@ -89,12 +92,13 @@ class Project:
         except Exception as e:
             print(f"[main.py] : 68 ->  Ошибка в функции 'def register_qml_module_menager_theme(self)': {e}")
 
-
+    def register_qml_module_time_menager(self):
+        self.qml_registration_module.registration_module(self.time_menager)        
 
     def _load_main_qml(self):
         """Загружаем QML."""
         # qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
-        qml_file = self.base_path / "qml/content/main_window/main_window/MainWindow.qml"
+        qml_file = self.base_path / "qml/content/main_window/MainWindow.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

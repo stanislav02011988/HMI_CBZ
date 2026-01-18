@@ -1,0 +1,2 @@
+module qml.settings.project_settings
+singleton QmlProjectSettings 1.0 QmlProjectSettings.qml

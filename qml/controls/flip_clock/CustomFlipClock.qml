@@ -2,17 +2,31 @@
 import QtQuick
 import QtQuick.Layouts
 
+import python.py_utils.time_menager.interface_qml_menager_time
+
 RowLayout {
     id: root
 
     // === ВНЕШНИЕ СВОЙСТВА ===
     property bool use24HourFormat: true   // true = 24h, false = 12h
     property bool useUTC: false           // true = UTC, false = local time
-    property bool showSeconds: true
+    property bool showSeconds: false
 
     spacing: Math.max(4, height * 0.05)
     Layout.minimumHeight: 30
     Layout.preferredHeight: parent ? parent.height : 60
+
+    // === AM/PM индикатор ===
+    Text {
+        id: amPmText
+        Layout.fillHeight: true
+        text: ""
+        font.pixelSize: 12
+        font.family: "Courier New"
+        color: "black"
+        horizontalAlignment: Text.AlignHCenter
+        visible: !root.use24HourFormat  // ← Показываем ТОЛЬКО в 12-часовом формате
+    }
 
     // ЧЧ
     CustomFlipDigit { id: hourTens;   Layout.fillHeight: true; Layout.minimumWidth: height * 0.6 }
@@ -61,66 +75,61 @@ RowLayout {
 
     property bool colonVisible: true
 
-    Timer {
-        interval: 500
-        repeat: true
-        running: true
-        onTriggered: colonVisible = !colonVisible
-    }
-
     // Храним предыдущие значения
     property int prevHour: -1
     property int prevMinute: -1
     property int prevSecond: -1
+    property string prevAmPm: ""
 
-    function updateTime() {
-        const now = new Date();
+    Connections {
+        target: TimeManager
+        function onTimeUpdated(h, m, s, blink) {
+            colonVisible = blink;
 
-        let h, m, s;
-        if (useUTC) {
-            h = now.getUTCHours();
-            m = now.getUTCMinutes();
-            s = now.getUTCSeconds();
-        } else {
-            h = now.getHours();
-            m = now.getMinutes();
-            s = now.getSeconds();
+            var displayHour = h;
+            var amPm = "AM";
+
+            if (!root.use24HourFormat) {
+                // Определяем AM/PM по исходному 24-часовому значению `h`
+                if (h >= 12) {
+                    amPm = "PM";
+                } else {
+                    amPm = "AM";
+                }
+
+                // Преобразуем в 12-часовой формат
+                if (h === 0) {
+                    displayHour = 12;       // 00:xx → 12:xx AM
+                } else if (h > 12) {
+                    displayHour = h - 12;   // 13–23 → 1–11 PM
+                } else if (h === 12) {
+                    displayHour = 12;       // 12:xx → 12:xx PM
+                }
+                // h = 1..11 → остаётся как есть (AM)
+
+                // Обновляем AM/PM, только если изменилось
+                if (amPm !== prevAmPm) {
+                    amPmText.text = amPm;
+                    prevAmPm = amPm;
+                }
+            }
+
+            // Обновляем часы, минуты, секунды
+            if (displayHour !== prevHour) {
+                hourTens.setDigit(Math.floor(displayHour / 10));
+                hourOnes.setDigit(displayHour % 10);
+                prevHour = displayHour;
+            }
+            if (m !== prevMinute) {
+                minuteTens.setDigit(Math.floor(m / 10));
+                minuteOnes.setDigit(m % 10);
+                prevMinute = m;
+            }
+            if (root.showSeconds && s !== prevSecond) {
+                secondTens.setDigit(Math.floor(s / 10));
+                secondOnes.setDigit(s % 10);
+                prevSecond = s;
+            }
         }
-
-        // Обработка 12-часового формата
-        if (!use24HourFormat) {
-            if (h === 0) h = 12;
-            else if (h > 12) h -= 12;
-        }
-
-        // Обновление часов
-        if (h !== prevHour) {
-            hourTens.setDigit(Math.floor(h / 10));
-            hourOnes.setDigit(h % 10);
-            prevHour = h;
-        }
-        if (m !== prevMinute) {
-            minuteTens.setDigit(Math.floor(m / 10));
-            minuteOnes.setDigit(m % 10);
-            prevMinute = m;
-        }
-
-        // Обновление секунд — только если включены
-        if (root.showSeconds && s !== prevSecond) {
-            secondTens.setDigit(Math.floor(s / 10));
-            secondOnes.setDigit(s % 10);
-            prevSecond = s;
-        }
-    }
-
-    Component.onCompleted: {
-        updateTime();
-    }
-
-    Timer {
-        interval: root.showSeconds ? 1000 : 60000  // если секунды скрыты — обновлять раз в минуту
-        repeat: true
-        running: true
-        onTriggered: root.updateTime()
     }
 }

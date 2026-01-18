@@ -4,6 +4,18 @@
     "block_graphic_settings": {
         "theme_path": "qrc:/json_file_theme/files_settings/json_files/settings/project_settings/theme/light.json"
     },
+    "block_time_settings": {
+        "use24HourFormat": true,
+        "useUTC": false,
+        "showSeconds": true
+    },
+    "block_installation_settings": {
+        "name_installation": "Euromix",
+        "type_installation": "4000",
+        "inf_number": "14174",
+        "installation_number": "AZ-1564",
+        "year_installation": "2013"
+    },
     "block_user": {
         "id_user": 1,
         "last_name": "Неберикутя",
@@ -12,7 +24,7 @@
         "tab_number": 14706,
         "position_users": "Старший механик",
         "access_group": "admin",
-        "time_in": "17-01-2026 14:08",
+        "time_in": "18-01-2026 17:57",
         "time_out": "---"
     }
 }
