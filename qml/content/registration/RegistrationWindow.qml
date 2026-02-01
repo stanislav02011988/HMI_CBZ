@@ -7,7 +7,7 @@ import QtQuick.Timeline
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
-import qml.content
+import qml.utils.menadger_windows
 import qml.settings.menager_theme
 
 import qml.controls.button

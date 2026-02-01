@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import qml.content.main_window.main_window.component.navigation_button_bar
-import qml.content.main_window.main_window.component.top_bar
+import qml.content.main_window.main_blocks_widgets.top_bar
+import qml.content.main_window.main_blocks_widgets.top_bar_button
 
 
 
@@ -15,7 +15,7 @@ Window {
     visible: true
     color: "#00ffffff"
 
-    Component.onCompleted: { root.showMaximized() }
+    // Component.onCompleted: { root.showMaximized() }
 
     // flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowSystemMenuHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint
 
@@ -60,7 +60,7 @@ Window {
         }
     }
 
-    CustomNavigationButtonBar { id: customNavigationBtnBar }
+    CustomTopBarButton { id: customNavigationBtnBar }
 
     CustomTopBar { id: customTopBar }
 

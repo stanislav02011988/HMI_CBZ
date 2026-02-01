@@ -32,6 +32,7 @@ QtObject {
     property string second_name: SettingsProject.itemsFileSettingsDict.block_user.second_name
     property string position_users: SettingsProject.itemsFileSettingsDict.block_user.position_users
     property string access_group: SettingsProject.itemsFileSettingsDict.block_user.access_group
+    property bool access: { if (SettingsProject.itemsFileSettingsDict.block_user.access_group === "admin") { return true } else { return false }}
 
     function saveBlockUserSettings(dict_user){ SettingsProject.save_block_user_settings_project(dict_user) }    
 

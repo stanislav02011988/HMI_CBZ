@@ -3,10 +3,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
-import qml.content.main_window.component.top_bar.conteiner_clock
-import qml.content.main_window.component.top_bar.conteiner_day
-import qml.content.main_window.component.top_bar.conteiner_data_installation
-import qml.content.main_window.component.top_bar.conteiner_data_user
+import qml.content.main_window.main_blocks_widgets.top_bar.conteiner_clock
+import qml.content.main_window.main_blocks_widgets.top_bar.conteiner_day
+import qml.content.main_window.main_blocks_widgets.top_bar.conteiner_data_installation
+import qml.content.main_window.main_blocks_widgets.top_bar.conteiner_data_user
 
 Item {
     id: root

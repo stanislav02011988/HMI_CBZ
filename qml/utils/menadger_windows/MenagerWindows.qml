@@ -14,7 +14,7 @@ QtObject {
         if (comp.status === Component.Ready) {
             root.currentWindow = comp.createObject(null)
             if (root.currentWindow) {
-                if (windowComponentUrl === "../main_window/main_window/MainWindow.qml"){ root.currentWindow.showMaximized() }
+                if (windowComponentUrl === "qrc:/qml_files/qml/content/main_window/MainWindow.qml"){ root.currentWindow.showMaximized() }
                 else { root.currentWindow.show() }
             }
         }  else {

@@ -1,2 +1,2 @@
-module qml.content
+module qml.utils.menadger_windows
 singleton MenagerWindows 1.0 MenagerWindows.qml

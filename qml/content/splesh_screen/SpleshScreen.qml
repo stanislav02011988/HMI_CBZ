@@ -7,7 +7,7 @@ import QtQuick.Timeline
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
-import qml.content
+import qml.utils.menadger_windows
 
 import qml.controls.button
 import qml.controls.progress_bar
@@ -108,7 +108,7 @@ Window {
         onTriggered: {
             customMessageDialog.close()
             splashScreen.close()
-            MenagerWindows.show("qrc:/qml_files/qml/content/main_window/main_window/MainWindow.qml", customMessageDialog)
+            MenagerWindows.show("qrc:/qml_files/qml/content/main_window/MainWindow.qml", customMessageDialog)
         }
     }
 
