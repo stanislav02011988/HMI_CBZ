@@ -4,8 +4,8 @@ import Qt5Compat.GraphicalEffects
 
 AbstractButton {
     id: root
-    implicitWidth: 140
-    implicitHeight: 48
+    width: parent.width
+    height: parent.height
     hoverEnabled: true
     focusPolicy: Qt.StrongFocus
 

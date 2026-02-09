@@ -4,8 +4,8 @@ import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
-    implicitWidth: 140
-    implicitHeight: 48
+    width: parent.width
+    height: parent.height
 
     // --- свойства для цветов треугольников ---
     property color leftColor: "#a8a8a8"
@@ -37,7 +37,6 @@ Item {
         }
     }
 
-    anchors.fill: parent
     layer.enabled: true
     layer.effect: DropShadow {
         color: "#60000000"

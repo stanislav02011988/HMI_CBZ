@@ -1,65 +1,47 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
+import QtQuick.Controls.Material
 
 Button {
     id: root
 
-    property int m_width: 25
-    property int m_height: 25
+    property int m_width: 30
+    property int m_height: 30
+    property int m_raduis: 6
 
-    // Кастомные цвета (можно задавать извне)
-    property color colorDisabled: "#cccccc"
-    property color colorDisabledText: "#888888"
+    property color m_background_color: "#e0e0e0"
+    property color m_color_hovered: "#ff4d4d"
+    property color m_borderColor: "#999"
 
-    property color colorDefault: "#67aa25"
-    property color colorMouseOver: "#7ece2d"
-    property color colorPressed: "#558b1f"
+    property color m_colorText: "yellow"
+    property color m_colorTextHovered: "white"
 
-    property color colorDefaultText: "white"
-    property color colorMouseOverText: "#ff007f"
-    property color colorPressedText: "#81848c"
+    implicitWidth: root.m_width
+    implicitHeight: root.m_height
 
-    property int m_text_size: 10
+    padding: 0
+    font.pixelSize: 16
+    font.bold: true
+    Layout.alignment: Qt.AlignVCenter | Qt.AlignVCenter
 
-    property color border_color: "#999"
-    property int border_width: 1
-
-
-    QtObject{
-        id: internal
-
-        property var dynamicColor: if(root.down){
-                                       root.down ? colorPressed : colorDefault
-                                   }else{
-                                       root.hovered ? colorMouseOver : colorDefault
-                                   }
-
-        property var dynamicColorText: if(root.down){
-                                       root.down ? colorPressedText : colorDefaultText
-                                   }else{
-                                       root.hovered ? colorMouseOverText : colorDefaultText
-                                   }
+    contentItem: Text {
+        text: root.text
+        font.family: "Times New Roman"
+        font.pixelSize: 12
+        font.bold: true
+        color: root.hovered ? root.m_colorTextHovered : root.m_colorText
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.fill: parent
     }
 
-    // Автоматический выбор цвета
     background: Rectangle {
-        implicitWidth: root.m_width
-        implicitHeight: root.m_height
-        radius: 6
-        color: {
-            if (!root.enabled) return "#cccccc"; // серый — заблокировано
-            return root.pressed ? root.colorPressed
-                 : root.hovered ? root.colorMouseOver
-                 : root.colorDefault;
-        }
-
-        border.color: root.border_color
-        border.width: root.border_width
-
-        // Тень (опционально)
+        anchors.fill: parent
+        radius: root.m_raduis
+        color: root.hovered ? root.m_color_hovered : root.m_background_color
+        border.color: root.m_borderColor
         layer.enabled: true
         layer.effect: DropShadow {
             color: "#40000000"
@@ -68,21 +50,4 @@ Button {
             verticalOffset: 2
         }
     }
-
-    // Стиль текста
-    contentItem: Text {
-        text: root.text
-        font.family: "Times New Roman"
-        font.pointSize: root.m_text_size
-        color: {
-            if (!root.enabled) return "#888888"; // тусклый текст
-            return root.pressed ? root.colorPressedText
-                 : root.hovered ? root.colorMouseOverText
-                 : root.colorDefaultText;
-        }
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.fill: parent
-    }
-    padding: 0
 }

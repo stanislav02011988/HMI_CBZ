@@ -127,7 +127,7 @@ Popup {
                 }
             }
 
-            CustomButtonClose {
+            CustomButton {
                 id: btnClose
                 m_width: 30
                 m_height: 30
@@ -196,13 +196,13 @@ Popup {
                 m_width: 50
                 m_height: 30
 
-                colorDefault: "transparent"
-                colorMouseOver: "#81848c"
-                colorPressed: "#1c1f18"
+                // colorDefault: "transparent"
+                // colorMouseOver: "#81848c"
+                // colorPressed: "#1c1f18"
 
-                colorDefaultText: "#81848c"
-                colorMouseOverText: "black"
-                colorPressedText: "#81848c"
+                // colorDefaultText: "#81848c"
+                // colorMouseOverText: "black"
+                // colorPressedText: "#81848c"
 
                 onClicked: root.signalBtnOK()
             }

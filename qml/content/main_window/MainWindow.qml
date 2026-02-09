@@ -2,8 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import qml.content.main_window.main_blocks_widgets.top_bar
-import qml.content.main_window.main_blocks_widgets.top_bar_button
+import qml.content.main_window.main_window_widgets.top_bar
+import qml.content.main_window.main_window_widgets.top_bar_button
+import qml.content.main_window.main_window_widgets.center_widget
 
 
 
@@ -15,7 +16,7 @@ Window {
     visible: true
     color: "#00ffffff"
 
-    // Component.onCompleted: { root.showMaximized() }
+    Component.onCompleted: { root.showMaximized() }
 
     // flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowSystemMenuHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint
 
@@ -35,7 +36,7 @@ Window {
             }
 
             LayoutItemProxy {
-                target: customNavigationBtnBar
+                target: customTopBarButton
                 height: 40
                 Layout.fillWidth: true
             }
@@ -47,7 +48,7 @@ Window {
             }
 
             LayoutItemProxy {
-                target: mainContent
+                target: centerWidget
                 Layout.fillWidth: true
                 Layout.fillHeight: true
             }
@@ -60,22 +61,13 @@ Window {
         }
     }
 
-    CustomTopBarButton { id: customNavigationBtnBar }
+    CustomTopBarButton { id: customTopBarButton }
 
     CustomTopBar { id: customTopBar }
 
-    Rectangle {
-        id: mainContent
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        color: "green"
-
-        Label {
-            id: label2
-            text: qsTr("Основной контейнер")
-            anchors.fill: parent
-            horizontalAlignment: Text.AlignHCenter
-        }
+    CenterWidget {
+        id: centerWidget
+        anchors.fill: parent
     }
 
     Rectangle {

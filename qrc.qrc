@@ -51,5 +51,16 @@
         <file>qml/modules/bekchoff/modules/KL3403.qml</file>
         <file>qml/content/main_window/MainWindow.qml</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>qml/content/main_window/main_window_widgets/center_widget/component/silos/Silos.qml</file>
+    </qresource>
+    <qresource prefix="/svg_icon_btn">
+        <file>res/svg/svg_image_btn/reset/reset_a.svg</file>
+        <file>res/svg/svg_image_btn/zeroing/zeroing_out_a.svg</file>
+        <file>res/svg/svg_image_btn/zeroing/zeroing_out_d.svg</file>
+        <file>res/svg/svg_image_btn/zeroing/zeroing_out_init.svg</file>
+        <file>res/svg/svg_image_btn/hand/hand.svg</file>
+        <file>res/svg/svg_image_btn/setting/setting_d.svg</file>
+        <file>res/svg/svg_image_btn/hand/hand-point-right.svg</file>
+    </qresource>
 </RCC>

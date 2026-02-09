@@ -175,13 +175,13 @@ Window {
 
             enabled: textUsername.text.trim() !== "" && textPassword.text.trim() !== ""
 
-            colorDefault: "transparent"
-            colorMouseOver: "#7ece2d"
-            colorPressed: "#558b1f"
+            // colorDefault: "transparent"
+            // colorMouseOver: "#7ece2d"
+            // colorPressed: "#558b1f"
 
-            colorDefaultText: "white"
-            colorMouseOverText: "yellow"
-            colorPressedText: "#81848c"
+            // colorDefaultText: "white"
+            // colorMouseOverText: "yellow"
+            // colorPressedText: "#81848c"
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
@@ -196,18 +196,18 @@ Window {
             width: 300
             height: 40
 
-            colorDefault: "transparent"
-            colorMouseOver: "transparent"
-            colorPressed: "transparent"
+            // colorDefault: "transparent"
+            // colorMouseOver: "transparent"
+            // colorPressed: "transparent"
 
-            colorDefaultText: "yellow"
-            colorMouseOverText: "#ff007f"
-            colorPressedText: "#81848c"
+            // colorDefaultText: "yellow"
+            // colorMouseOverText: "#ff007f"
+            // colorPressedText: "#81848c"
 
-            m_text_size: 8
+            // m_text_size: 8
 
-            border_width: 0
-            border_color: "transparent"
+            // border_width: 0
+            // border_color: "transparent"
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
@@ -245,7 +245,7 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
-        CustomButtonClose {
+        CustomButton {
             id: closeBtn
             m_width: 30
             m_height: 30

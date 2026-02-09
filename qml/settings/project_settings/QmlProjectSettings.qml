@@ -1,3 +1,4 @@
+//QmlProjectSettings.qml
 pragma Singleton
 import QtQuick
 
@@ -27,6 +28,7 @@ QtObject {
     function saveBlockInstallationSettings (dict) {SettingsProject.save_block_installation_settings(dict)}
 
     //---- Данные Пользователя
+    property int idUser: SettingsProject.itemsFileSettingsDict.block_user.id_user
     property string last_name: SettingsProject.itemsFileSettingsDict.block_user.last_name
     property string first_name: SettingsProject.itemsFileSettingsDict.block_user.first_name
     property string second_name: SettingsProject.itemsFileSettingsDict.block_user.second_name
@@ -34,9 +36,47 @@ QtObject {
     property string access_group: SettingsProject.itemsFileSettingsDict.block_user.access_group
     property bool access: { if (SettingsProject.itemsFileSettingsDict.block_user.access_group === "admin") { return true } else { return false }}
 
-    function saveBlockUserSettings(dict_user){ SettingsProject.save_block_user_settings_project(dict_user) }    
+    function saveBlockUserSettings(dict_user){ SettingsProject.save_block_user_settings_project(dict_user) }
+
+    // === МЕТОДЫ РАБОТЫ С СИЛОСАМИ (прокси к SettingsProject) ===
+    function save_silos_element(elementConfig) {
+        // Убедимся, что передаём правильный объект
+        if (typeof elementConfig === "object") {
+            return SettingsProject.save_silos_element(elementConfig)
+        }
+        console.error("Неверный формат конфигурации силоса:", elementConfig)
+        return false
+    }
+
+    function get_all_silos_elements() {
+        return SettingsProject.get_all_silos_elements()
+    }
+
+    function get_silos_element(silosId) {
+        return SettingsProject.get_silos_element(silosId)
+    }
+
+    function remove_silos_element(silosId) {
+        return SettingsProject.remove_silos_element(silosId)
+    }
+
+    function silos_element_exists(silosId) {
+        return SettingsProject.silos_element_exists(silosId)
+    }
+
+    // === СИГНАЛЫ ОБНОВЛЕНИЯ СИЛОСОВ ===
+    // Проксируем сигналы бэкенда
+    signal silosElementAdded(string silosId)
+    signal silosElementRemoved(string silosId)
 
     Component.onCompleted: {
         TimeManager.start_timer()
+        // Подключаемся к сигналам бэкенда
+        SettingsProject.signalSilosElementAdded.connect(function(silosId) {
+            silosElementAdded(silosId)
+        })
+        SettingsProject.signalSilosElementRemoved.connect(function(silosId) {
+            silosElementRemoved(silosId)
+        })
     }
 }

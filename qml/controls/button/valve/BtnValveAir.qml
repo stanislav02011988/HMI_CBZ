@@ -1,14 +1,18 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Shapes
+import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
-AbstractButton {
+Button {
     id: root
     implicitWidth: 140
     implicitHeight: 48
     hoverEnabled: true
     focusPolicy: Qt.StrongFocus
+
+    property string id_valve_air: ""
+    property string name_valve_air: ""
 
     // Градиенты для всех состояний
     property color normalLeftStart:   "#a8a8a8"
@@ -42,16 +46,6 @@ AbstractButton {
 
     background: Item {
         anchors.fill: parent
-
-        // Тень
-        layer.enabled: true
-        layer.effect: DropShadow {
-            color: "#60000000"
-            radius: 4
-            horizontalOffset: 2
-            samples: 16
-            verticalOffset: 2
-        }
 
         Canvas {
             id: canvas
@@ -145,29 +139,29 @@ AbstractButton {
         }
     }
 
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
+    // MouseArea {
+    //     anchors.fill: parent
+    //     hoverEnabled: true
 
-        onPressed: {
-            root.down = true
-            pressedAuto = true
-            autoReleaseTimer.start()
-        }
+    //     onPressed: {
+    //         root.down = true
+    //         pressedAuto = true
+    //         autoReleaseTimer.start()
+    //     }
 
-        onReleased: {
-            if (!pressedAuto) { // обычное нажатие без автосрабатывания
-                root.down = false
-                root.clicked()
-            }
-        }
+    //     onReleased: {
+    //         if (!pressedAuto) { // обычное нажатие без автосрабатывания
+    //             root.down = false
+    //             root.clicked()
+    //         }
+    //     }
 
-        onExited: {
-            if (!pressedAuto) {
-                root.hovered = false
-            }
-        }
+    //     onExited: {
+    //         if (!pressedAuto) {
+    //             root.hovered = false
+    //         }
+    //     }
 
-        onEntered: root.hovered = true
-    }
+    //     onEntered: root.hovered = true
+    // }
 }

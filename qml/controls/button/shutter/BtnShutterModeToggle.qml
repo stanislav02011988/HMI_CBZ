@@ -1,193 +1,115 @@
 import QtQuick
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Controls.Material
 
-AbstractButton {
-
-    signal signalComandPlcOpenCloseShutter(string status_shutter, bool mode_dosage)
-
+Button {
     id: root
     implicitWidth: 140
     implicitHeight: 48
-    hoverEnabled: true
-    focusPolicy: Qt.StrongFocus
-    
-    // ---- Адресс Команды Открыть ----
-    property string addressComandOpenFull: "null"
+    focusPolicy: Qt.NoFocus
 
-    // --- режим работы ---
-    // false = momentary, true = toggle
-    property bool modeToggleOrMomentary: false
-    checkable: modeToggleOrMomentary
+    property string id_shutter_silos: ""
+    property string name_shutter_silos: ""
 
-    // --- подрежим дозировки ---
-    // false = Грубая дозировка, true = Тонкая дозировка
-    property bool modeDosage: false
+    /* =========================================================
+     * РЕЖИМЫ
+     * ========================================================= */
+    // false = Автоматический режим , true =Ручной режим
+    property bool controlMode: false
 
-    // --- состояния открытия затвора---
-    // 0=закрыто, 1=открыто, 2=ожидание PLC, 3=ошибка
-    property int mode: 0
+    // false = Грубо, true = Точно
+    property bool dosageMode: false
 
-    // блокировка при ошибке
-    property bool lockOnError: true
-    enabled: !(mode === 4 && lockOnError)
+    /* =========================================================
+     * СОСТОЯНИЕ ЗАТВОРА
+     * 0 = CLOSED
+     * 1 = OPENED
+     * 2 = WAIT
+     * 3 = ERROR
+     * ========================================================= */
+    property int state: 0
 
-    // --- интервал ожидания ответа от ПЛК ---
-    property real inteval_reqest_plc: 1000
+    /* =========================================================
+     * СИГНАЛЫ
+     * ========================================================= */
+    signal manualCoarseOpenRequest()
+    signal manualFineOpenRequest()
+    signal signalStateShutter(state:int)
+    /* =========================================================
+     * API ДЛЯ КОНТРОЛЛЕРА / PLC
+     * ========================================================= */
+    function setClosed() { state = 0; root.signalStateShutter(state) }
+    function setOpened() { state = 1; root.signalStateShutter(state) }
+    function setWait()   { state = 2; root.signalStateShutter(state) }
+    function setError()  { state = 3; root.signalStateShutter(state) }
 
-    // размеры открытия
-    property real separationFull: 10
-    property real separationFine: 6
-    property real separationWait: 3
-    property real separationError: 2
+    /* =========================================================
+     * ДОСТУПНОСТЬ UI
+     * ========================================================= */
+    // AUTO → полный запрет взаимодействия
+    enabled: controlMode && state !== 2
+    hoverEnabled: controlMode
 
-    // --- текущий сдвиг ---
+    /* =========================================================
+     * ВИЗУАЛЬНЫЕ ПАРАМЕТРЫ
+     * ========================================================= */
     property real separation: {
-        if (mode === 1) return modeDosage ? separationFine : separationFull
-        if (mode === 3) return separationWait
-        if (mode === 4) return separationError
-        return 0
+        switch (state) {
+        case 1:   // OPENED
+            return dosageMode ? 4 : 6
+        case 2:   // WAIT
+            return 3
+        case 3:   // ERROR
+            return 2
+        default:  // CLOSED
+            return 0
+        }
     }
 
-    // --- текущий цвет ---
     property color currentColor: {
-        if (mode === 1) return modeDosage ? "blue" : "green"
-        if (mode === 3) return "yellow"
-        if (mode === 4) return "red"
-        return "#a8a8a8"
+        switch (state) {
+        case 1:   // OPENED
+            return dosageMode ? "blue" : "green"
+        case 2:   // WAIT
+            return "yellow"
+        case 3:   // ERROR
+            return "red"
+        default:  // CLOSED
+            return "#a8a8a8"
+        }
     }
 
-    // --- анимации ---
     Behavior on separation { NumberAnimation { duration: 200; easing.type: Easing.InOutQuad } }
     Behavior on currentColor { ColorAnimation { duration: 120 } }
 
-    // --- momentary ---
-    onPressed: {
-        if (!modeToggleOrMomentary) {
-            checkable = true
-            mode = 3
-            plcWaitTimer.restart()
-            signalComandPlcOpenCloseShutter("open", root.modeDosage)
-        }
-    }
-    onReleased: {
-        if (!modeToggleOrMomentary) {
-            mode = 3
-            checkable = false
-            plcWaitTimer.stop()
-            plcWaitTimerClose.restart()
-            signalComandPlcOpenCloseShutter("close", root.modeDosage)
-        }
+    /* =========================================================
+     * ЛОГИКА КЛИКА (ТОЛЬКО MANUAL)
+     * ========================================================= */
+    onClicked: {
+        if (!controlMode)    // AUTO
+            return
+
+        if (dosageMode)
+            manualFineOpenRequest()
+        else
+            manualCoarseOpenRequest()
+
+        setWait()
     }
 
-    // --- toggle ---
-    onToggled: {
-        if (modeToggleOrMomentary) {
-            if (checked) {
-                mode = 3 // ждём подтверждения PLC
-                plcWaitTimer.restart()
-                signalComandPlcOpenCloseShutter("open", root.modeDosage)
-            } else {
-                mode = 3
-                plcWaitTimer.stop()
-                plcWaitTimerClose.start()
-                signalComandPlcOpenCloseShutter("close", root.modeDosage)
-            }
-        }
+    /* =========================================================
+     * СБРОС ПРИ ВКЛЮЧЕНИИ MANUAL
+     * ========================================================= */
+    onControlModeChanged: {
+        if (controlMode)   // MANUAL
+            setClosed()
     }
 
-    // --- функции управления ---
-    function getStatusPlcOpenOrClose(status_btn) {
-        if (status_btn === "open"){
-            mode = 1
-            plcWaitTimer.stop()
-            // btnShutterModeToggleOrMomentary.reqestPlcOk()
-        } else if (status_btn === "close"){
-            mode = 0
-            plcWaitTimerClose.restart()
-            // btnShutterModeToggleOrMomentary.reqestPlcOk()
-        }
-    }
-
-    function getStatusPlcError() {
-        plcWaitTimer.stop()
-        plcWaitTimerClose.stop()
-        mode = 4
-        // btnShutterModeToggleOrMomentary.reqestPlcError()
-    }
-
-    function resetError() {
-        if (mode === 4) {
-            mode = 0
-            checked = false
-        }
-    }
-
-    function open() {
-        if (!mode === 4) {
-            if (!modeToggleOrMomentary) {
-                mode = 3
-            } else {
-                if (!checked) {
-                    checked = true
-                    mode = 3
-                    plcWaitTimer.restart()
-                }
-            }
-        }
-    }
-
-    function close() {
-        if (!mode === 4) {
-            if (!modeToggleOrMomentary) {
-                mode = 3
-                plcWaitTimerClose.start()
-            } else {
-                if (checked) {
-                    mode = 3
-                    checked = false
-                    plcWaitTimerClose.start()
-                }
-            }
-        }
-    }
-
-    // --- таймер ожидания ответа от PLC ---
-    Timer {
-        id: plcWaitTimer
-        interval: root.inteval_reqest_plc
-        repeat: false
-        onTriggered: {
-            if (mode === 3) {
-                mode = 4
-                // btnShutterModeToggleOrMomentary.reqestPlcError()
-            }
-        }
-    }
-
-    // // --- таймер ожидания ответа от PLC ---
-    Timer {
-        id: plcWaitTimerClose
-        interval: root.inteval_reqest_plc
-        repeat: false
-        onTriggered: {
-            if (mode === 3) {
-                mode = 4
-                // btnShutterModeToggleOrMomentary.reqestPlcError()
-            }
-        }
-    }
-
-    // --- фон (треугольники) --- Content
+    /* =========================================================
+     * ФОН / ТРЕУГОЛЬНИКИ (БЕЗ ИЗМЕНЕНИЙ)
+     * ========================================================= */
     background: Item {
         anchors.fill: parent
-        layer.enabled: true
-        layer.effect: DropShadow {
-            color: "#60000000"
-            radius: 4
-            horizontalOffset: 2
-            verticalOffset: 2
-        }
 
         Canvas {
             id: canvas
@@ -204,41 +126,37 @@ AbstractButton {
                 const ctx = getContext("2d")
                 ctx.clearRect(0, 0, width, height)
 
-                const cx = width/2
-                const topY = 0
-                const bottomY = height
+                const cx = width / 2
 
-                // левый
+                // левый треугольник
                 ctx.beginPath()
-                ctx.moveTo(cx - root.separation, topY)
-                ctx.lineTo(cx - root.separation, bottomY)
-                ctx.lineTo(0, topY)
+                ctx.moveTo(cx - root.separation, 0)
+                ctx.lineTo(cx - root.separation, height)
+                ctx.lineTo(0, 0)
                 ctx.closePath()
-                ctx.fillStyle = gradient(ctx, root.currentColor, 0, 0, width/2, height)
+                ctx.fillStyle = gradient(ctx, root.currentColor, 0, 0, width / 2, height)
                 ctx.fill()
 
-                // правый
+                // правый треугольник
                 ctx.beginPath()
-                ctx.moveTo(cx + root.separation, topY)
-                ctx.lineTo(cx + root.separation, bottomY)
-                ctx.lineTo(width, topY)
+                ctx.moveTo(cx + root.separation, 0)
+                ctx.lineTo(cx + root.separation, height)
+                ctx.lineTo(width, 0)
                 ctx.closePath()
-                ctx.fillStyle = gradient(ctx, root.currentColor, width, 0, width/2, height)
+                ctx.fillStyle = gradient(ctx, root.currentColor, width, 0, width / 2, height)
                 ctx.fill()
             }
 
             Connections {
                 target: root
-
                 function onSeparationChanged() { canvas.requestPaint() }
                 function onCurrentColorChanged() { canvas.requestPaint() }
-                function onModeChanged() { canvas.requestPaint() }
-                function onCheckedChanged() { canvas.requestPaint() }
+                function onStateChanged() { canvas.requestPaint() }
             }
 
-            onWidthChanged:  requestPaint()
-            onHeightChanged: requestPaint()
             Component.onCompleted: requestPaint()
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
         }
     }
 }

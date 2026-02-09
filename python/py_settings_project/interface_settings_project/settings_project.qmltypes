@@ -18,18 +18,29 @@ Module {
                                         exportMetaObjectRevisions: [256]
                                         Signal { name: "signalLoadFile" }
     Signal { name: "signalErrorLoad" }
+    Signal { name: "signalSilosElementAdded" }
+    Signal { name: "signalSilosElementRemoved" }
     Property { name: "itemsFileSettingsDict"; type: "QQmlPropertyMap*"; isWritable: false; notify: "signalLoadFile" }
     Method { name: "checking_file_path"; type: "void" }
+    Method { name: "get_all_silos_elements"; type: "dict" }
     Method { name: "get_parametrs_qml_module"; type: "void" }
+    Method { name: "get_silos_element"; type: "dict"
+                Parameter { name: "silos_id"; type: "str" } }
     Method { name: "load_file_settings"; type: "void" }
+    Method { name: "remove_silos_element"; type: "bool"
+                Parameter { name: "silos_id"; type: "str" } }
     Method { name: "save_block_installation_settings"; type: "void"
-                Parameter { name: "dict"; type: "var" } }
+                Parameter { name: "dict_installation"; type: "var" } }
     Method { name: "save_block_settings_time_us_format"; type: "void"
                 Parameter { name: "usFormat"; type: "bool" } }
     Method { name: "save_block_user_settings_project"; type: "void"
                 Parameter { name: "dict_user"; type: "var" } }
+    Method { name: "save_silos_element"; type: "bool"
+                Parameter { name: "element_config"; type: "var" } }
     Method { name: "save_theme"; type: "void"
                 Parameter { name: "name_theme"; type: "var" } }
+    Method { name: "silos_element_exists"; type: "bool"
+                Parameter { name: "silos_id"; type: "str" } }
                                     }
 
 }

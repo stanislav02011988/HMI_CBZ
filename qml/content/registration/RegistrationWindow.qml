@@ -64,7 +64,7 @@ Window {
         anchors.centerIn: parent
         z: 1
 
-        CustomButtonClose {
+        CustomButton {
             id: closeBtn
             text: "✕"
             m_width: 30
@@ -83,7 +83,7 @@ Window {
             onClicked: { root.close() }
         }
 
-        CustomButtonClose {
+        CustomButton {
             id: btnCallBackLogin
             text: "⤺"
             width: 30
@@ -204,13 +204,13 @@ Window {
             anchors.bottomMargin: 25
 
             // Динамические цвета
-            colorDefault: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorDefault : "#666666"
-            colorMouseOver: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorMouseOver : "#777777"
-            colorPressed: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorPressed : "#555555"
+            // colorDefault: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorDefault : "#666666"
+            // colorMouseOver: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorMouseOver : "#777777"
+            // colorPressed: root.allFieldsFilled ? QmlMenagerTheme.reg_win_cBtnRegistration_colorPressed : "#555555"
 
-            colorDefaultText: QmlMenagerTheme.reg_win_cBtnRegistration_colorDefaultText
-            colorMouseOverText: QmlMenagerTheme.reg_win_cBtnRegistration_colorMouseOverText
-            colorPressedText: QmlMenagerTheme.reg_win_cBtnRegistration_colorPressedText
+            // colorDefaultText: QmlMenagerTheme.reg_win_cBtnRegistration_colorDefaultText
+            // colorMouseOverText: QmlMenagerTheme.reg_win_cBtnRegistration_colorMouseOverText
+            // colorPressedText: QmlMenagerTheme.reg_win_cBtnRegistration_colorPressedText
 
             enabled: root.allFieldsFilled
 

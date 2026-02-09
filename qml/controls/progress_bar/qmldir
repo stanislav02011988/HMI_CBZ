@@ -1,2 +1,3 @@
 module qml.controls.progress_bar
 CircularProgressBar 1.0 CircularProgressBar.qml
+CustomProgressBar 1.0 CustomProgressBar.qml
