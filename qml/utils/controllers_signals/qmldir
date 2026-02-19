@@ -1,0 +1,2 @@
+module qml.utils.controllers_signals
+singleton ControllersSignalsCementScales 1.0 ControllersSignalsCementScales.qml

@@ -1,0 +1,2 @@
+module qml.utils.scene_bus
+SceneBus 1.0 SceneBus.qml

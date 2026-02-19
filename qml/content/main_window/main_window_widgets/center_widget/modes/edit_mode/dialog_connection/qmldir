@@ -1,0 +1,2 @@
+module qml.content.main_window.main_window_widgets.center_widget.modes.edit_mode.dialog_connection
+DialogConnection 1.0 DialogConnection.qml

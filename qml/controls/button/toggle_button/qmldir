@@ -1,0 +1,4 @@
+module qml.controls.button.toggle_button
+CustomToggleButton 1.0 CustomToggleButton.qml
+CustomToggleButtonIcon 1.0 CustomToggleButtonIcon.qml
+CustomToggleButtonText 1.0 CustomToggleButtonText.qml

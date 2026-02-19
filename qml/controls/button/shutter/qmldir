@@ -1,0 +1,3 @@
+module qml.controls.button.shutter
+BtnShutter 1.0 BtnShutter.qml
+BtnShutterModeToggle 1.0 BtnShutterModeToggle.qml

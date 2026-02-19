@@ -1,0 +1,2 @@
+module qml.controls.tool_tip
+CustomToolTip 1.0 CustomToolTip.qml
