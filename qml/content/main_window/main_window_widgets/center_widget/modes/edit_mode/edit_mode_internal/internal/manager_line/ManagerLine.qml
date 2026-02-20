@@ -32,7 +32,7 @@ Item {
 
     // === СИГНАЛЫ ===
     signal dragStarted(string sourceId, string signalName)
-    signal dragEnded()
+    signal dragEnded(bool check)
     signal connectionCreated(string fromId, string signal, string toId, string slot)
     signal connectionRejected()
 
@@ -43,7 +43,6 @@ Item {
         console.log(` [ArrowManager] Инициализация...`)
         console.log(`   sceneLayer: ${sceneLayer}`)
         console.log(`   connectionManager: ${connectionManager}`)
-
         if (connectionManager && Array.isArray(connectionManager.rules)) {
             rulesArray = connectionManager.rules.slice()
             calculateConnectionIndices()
@@ -156,6 +155,7 @@ Item {
         console.log(` DragLine создан`)
         hoverMouseArea.enabled = false
         dragMouseArea.enabled = true
+        dragEnded(true)
         console.log(`   dragMouseArea.enabled = ${dragMouseArea.enabled}`)
 
         dragStarted(sourceId, signalName)
@@ -194,7 +194,7 @@ Item {
         isInvalidTarget = false
         dragMouseArea.enabled = false
         hoverMouseArea.enabled = true
-        dragEnded()
+        dragEnded(false)
     }
 
     // =====================================================

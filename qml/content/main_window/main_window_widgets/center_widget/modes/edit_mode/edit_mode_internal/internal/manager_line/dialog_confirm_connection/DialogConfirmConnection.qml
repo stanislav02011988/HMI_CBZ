@@ -51,7 +51,7 @@ Popup {
         slotDesc = tgtElem?.widgetRef?.exposedSlots?.[sltName] || "Без описания"
 
         updateDisplay()
-        wasConfirmed = false  // 🔑 Сбрасываем флаг при открытии
+        wasConfirmed = false  // Сбрасываем флаг при открытии
     }
 
     function updateDisplay() {

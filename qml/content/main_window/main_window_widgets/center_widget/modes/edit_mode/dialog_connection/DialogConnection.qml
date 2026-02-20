@@ -50,7 +50,7 @@ Popup {
                 type: elem.wrapper.type
             })
         })
-        console.log(`🎯 Найдено ${targetModel.count} доступных целей`)
+        console.log(` Найдено ${targetModel.count} доступных целей`)
     }
 
     function findElementById(id) {

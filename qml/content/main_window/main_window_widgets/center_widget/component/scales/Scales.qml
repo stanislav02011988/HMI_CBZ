@@ -24,7 +24,7 @@ Item {
     property string id_widget: ""
     property string name_widget: ""
 
-    property var sceneBus: null
+    property var signalBus: null
     property var exposedSignals: ({
         "shutterOpened": "Сигнал изменения состояния затвора",
         "shutterError":  "Ошибка затвора"
@@ -140,8 +140,8 @@ Item {
                                         root.isZeroingInProgress = false
                                     }
 
-                                    if (root.sceneBus && root.id_element) {
-                                        root.sceneBus.emit("handModeActivated", root.id_element, { value: checked })
+                                    if (root.signalBus && root.id_element) {
+                                        root.signalBus.emit("handModeActivated", root.id_element, { value: checked })
                                     }
                                 }
 

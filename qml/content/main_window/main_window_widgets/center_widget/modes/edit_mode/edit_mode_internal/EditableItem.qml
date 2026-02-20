@@ -1,4 +1,13 @@
 // edit_mode_internal/EditableItem.qml
+// ============================================================================
+// ОБЁРТКА ДЛЯ ВИДЖЕТА НА СЦЕНЕ
+// ============================================================================
+// Отвечает за:
+// - Отображение виджета
+// - Сигнальные порты (зелёные)
+// - Слотовые порты (жёлтые)
+// - Выделение и перетаскивание
+// ============================================================================
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,33 +15,64 @@ import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
 import qml.content.main_window.main_window_widgets.center_widget.modes.edit_mode.edit_mode_internal.item.dialog_resize_element
-
+import qml.content.main_window.main_window_widgets.center_widget.modes.edit_mode.edit_mode_internal.item.ports_signal_slot
 Item {
     id: wrapper
+    // =========================================================================
+    // СВОЙСТВА
+    // =========================================================================
+
+    // ─── ГЕОМЕТРИЯ ──────────────────────────────────────────────────────────
+    property var geometry: ({
+        relX: 0.1,
+        relY: 0.1,
+        relW: 0.2,
+        relH: 0.2
+    })
+    property real relX: geometry.relX
+    property real relY: geometry.relY
+    property real relW: geometry.relW
+    property real relH: geometry.relH
+
+    // ─── ДАННЫЕ ВИДЖЕТА ─────────────────────────────────────────────────────
+    property var widgetData: ({
+        type: "",
+        id_widget: "",
+        name_widget: "",
+        component: null
+    })
+
+    // ─── СОСТОЯНИЕ ──────────────────────────────────────────────────────────
+    property var state: ({
+        isSelected: false,
+        editMode: false
+    })
+    property bool isSelected: state.isSelected
+    property bool editMode: state.editMode
+
+    // ─── МЕНЕДЖЕРЫ ──────────────────────────────────────────────────────────
+    property var managers: ({
+        signalBus: null,
+        connectionManager: null,
+        componentRegister: null
+    })
+    property var signalBus: managers.signalBus
+    property var connectionManager: managers.connectionManager
+    property var componentRegister: managers.componentRegister
+
+
     property Item widgetInstance: null
-    property string type: ""
-    property real relX: 0.1
-    property real relY: 0.1
-    property real relW: 0.2
-    property real relH: 0.2
-    property bool isSelected: false
-    property bool editMode: false
     property Item sceneContainer: null
     property var sceneController: null
-    property Component widgetComponent: null
-    property var widgetConfig: ({})
 
-    // === ГЛОБАЛЬНЫЕ МЕНЕДЖЕРЫ ===
-    property var connectionManager: null
-    property var componentRegister: null
-
-    property var sceneBus: null
     property var tooltip: null
 
     signal requestDelete()
     signal requestSelect(bool toggle)
 
-    // === ГЕОМЕТРИЯ (ЗАВИСИТ ОТ sceneContainer) ===
+    // =========================================================================
+    // ГЕОМЕТРИЯ
+    // =========================================================================
     x: sceneContainer ? (relX * sceneContainer.width) : 0
     y: sceneContainer ? (relY * sceneContainer.height) : 0
     width: sceneContainer ? (relW * sceneContainer.width) : 0
@@ -41,56 +81,76 @@ Item {
     // === СВОЙСТВО ОРИЕНТАЦИИ ЭЛЕМЕНТА ===
     property bool isWide: width > height  // true = горизонтальный, false = вертикальный
 
-    // === УСТАНОВКА ФОКУСА ПРИ ВЫДЕЛЕНИИ ===
+    // =========================================================================
+    // ФОКУС ПРИ ВЫДЕЛЕНИИ
+    // =========================================================================
     onIsSelectedChanged: {
         if (isSelected && editMode) {
             wrapper.forceActiveFocus()
         }
     }
 
-    // === КОНТЕЙНЕР ДЛЯ ВИДЖЕТА ===
+    // =========================================================================
+    // КОНТЕЙНЕР ВИДЖЕТА
+    // =========================================================================
     Item {
         id: contentItem
         anchors.fill: parent
     }
 
-    // === СОЗДАНИЕ ВИДЖЕТА ===
+    // =========================================================================
+    // СОЗДАНИЕ ВИДЖЕТА
+    // =========================================================================
     Component.onCompleted: {
-        if (!widgetComponent) {
-            console.error("widgetComponent НЕ ПЕРЕДАН!")
+        if (!widgetData.component) {
+            console.error("ERROR: widgetComponent НЕ ПЕРЕДАН!")
             return
         }
-        widgetInstance = widgetComponent.createObject(contentItem, widgetConfig)
+
+        widgetInstance = widgetData.component.createObject(contentItem, {
+            signalBus: managers.signalBus,
+            id_widget: widgetData.id_widget,
+            name_widget: widgetData.name_widget
+        })
+
         if (widgetInstance) {
             widgetInstance.anchors.fill = contentItem
-            // 🔑 ДОБАВЛЯЕМ ПРОВЕРКУ И КОРРЕКЦИЮ ТИПА
+
+            // ПРОВЕРКА exposedSignals
             if (!widgetInstance.exposedSignals || typeof widgetInstance.exposedSignals !== 'object') {
-                widgetInstance.exposedSignals = { "handModeActivated": "Ручной режим активирован" }
-                console.warn("️ exposedSignals сброшен на объект по умолчанию")
+                console.warn("WARNING: exposedSignals отсутствует: " + (widgetData.name_widget || widgetData.id_widget))
             }
+
+            // ПРОВЕРКА exposedSlots
             if (!widgetInstance.exposedSlots || typeof widgetInstance.exposedSlots !== 'object') {
-                widgetInstance.exposedSlots = { "setEnabled": "Включить", "setVisible": "Показать" }
-                console.warn("️ exposedSlots сброшен на объект по умолчанию")
+                console.warn("WARNING: exposedSlots отсутствует: " + (widgetData.name_widget || widgetData.id_widget))
             }
+
+            console.log("INFO: Виджет создан: " + widgetData.id_widget)
+
         } else {
-            console.error("Ошибка создания виджета из компонента")
+            console.error("ERROR: Ошибка создания виджета из компонента")
         }
     }
 
-    // === ОЧИСТКА РЕСУРСОВ ===
+    // =========================================================================
+    // ОЧИСТКА
+    // =========================================================================
     Component.onDestruction: {
         if (widgetInstance) {
-            if (widgetConfig.sceneBus?.unsubscribeAll && widgetConfig.id_widget) {
-                widgetConfig.sceneBus.unsubscribeAll(widgetConfig.id_widget)
+            if (signalBus?.unsubscribeAll && widgetData.id_widget) {
+                signalBus.unsubscribeAll(widgetData.id_widget)
             }
             widgetInstance.destroy()
             widgetInstance = null
         }
-        // if (connectionDialog?.visible) connectionDialog.close()
     }
 
-    // === УМНАЯ РАМКА ===
+    // =========================================================================
+    // РАМКА ВЫДЕЛЕНИЯ
+    // =========================================================================
     Rectangle {
+        id: borderRect
         anchors.fill: parent
         color: "transparent"
         border.width: editMode && (isSelected || hoverArea.containsMouse) ? 2 : 0
@@ -99,7 +159,9 @@ Item {
         z: 100
     }
 
-    // === ВЗАИМОДЕЙСТВИЕ ===
+    // =========================================================================
+    // МЫШЬ (ВЫДЕЛЕНИЕ)
+    // =========================================================================
     MouseArea {
         id: hoverArea
         anchors.fill: parent
@@ -119,8 +181,11 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
     }
 
-    // === ПЕРЕТАСКИВАНИЕ (ЗАВИСИТ ОТ sceneContainer) ===
+    // =========================================================================
+    // ПЕРЕТАСКИВАНИЕ
+    // =========================================================================
     MouseArea {
+        id: mouseAreaDradElement
         anchors.fill: parent
         enabled: editMode && isSelected
         cursorShape: Qt.SizeAllCursor
@@ -141,11 +206,12 @@ Item {
             newY = Math.max(0, Math.min(sceneContainer.height - wrapper.height, newY))
             wrapper.relX = newX / sceneContainer.width
             wrapper.relY = newY / sceneContainer.height
-            // 🔑 СИГНАЛ ОБНОВЛЕНИЯ ПОЗИЦИЙ УЖЕ СРАБОТАЕТ ЧЕРЕЗ onXChanged/onYChanged
         }
     }
 
-    // === КЛАВИАТУРА ===
+    // =========================================================================
+    // КЛАВИАТУРА
+    // =========================================================================
     Keys.onPressed: (event) => {
         if (!editMode || !isSelected || !sceneContainer) {
             return
@@ -166,188 +232,39 @@ Item {
         }
     }
 
-    // === КОНТЕКСТНОЕ МЕНЮ ===
+    // =========================================================================
+    // КОНТЕКСТНОЕ МЕНЮ
+    // =========================================================================
     Menu {
         id: contextMenu
         MenuItem { text: "Удалить"; onTriggered: wrapper.requestDelete() }
         MenuItem { text: "Изменить размеры..."; onTriggered: resizeDialog.open() }
-        MenuItem {
-            text: "Связь"
-            onTriggered: {
-                if (connectionDialog) {
-                    connectionDialog.setSourceWrapper(wrapper)
-                    connectionDialog.open()
-                } else {
-                    console.error("DialogConnection не инициализирован!")
-                }
-            }
-            enabled: connectionManager && componentRegister
-        }
     }
 
     // === ДИАЛОГИ ===
     DialogResizeElement { id: resizeDialog; targetElement: wrapper }
-    // DialogConnection {
-    //     id: connectionDialog
-    //     connectionManager: wrapper.connectionManager
-    //     componentRegister: wrapper.componentRegister
-    //     sceneBus: wrapper.sceneBus
-    //     onOpened: {
-    //         if (!sourceWrapper || sourceWrapper !== wrapper) {
-    //             setSourceWrapper(wrapper)
-    //         }
-    //     }
-    // }
 
-    // === 🔑 ВЫЧИСЛЕНИЕ КОЛИЧЕСТВА КЛЮЧЕЙ В ОБЪЕКТАХ ===
-    property int signalCount: {
-        if (!widgetInstance || typeof widgetInstance.exposedSignals !== 'object') return 0
-        return Object.keys(widgetInstance.exposedSignals).length
-    }
-    property int slotCount: {
-        if (!widgetInstance || typeof widgetInstance.exposedSlots !== 'object') return 0
-        return Object.keys(widgetInstance.exposedSlots).length
-    }
-
-    // 🟢 СИГНАЛЫ (зелёные) — АДАПТИВНОЕ РАСПОЛОЖЕНИЕ
-    Repeater {
+    // =========================================================================
+    // ПОРТЫ СИГНАЛОВ (ЗЕЛЁНЫЕ)
+    // =========================================================================
+    PortSignal {
         id: signalsRepeater
-        model: editMode ? signalCount : 0
-        delegate: Rectangle {
-            width: 18; height: 18
-            color: "#4CAF50"; radius: 4
-            z: 300
-            property string signalKey: Object.keys(widgetInstance.exposedSignals)[index]
-            property string signalDesc: widgetInstance.exposedSignals[signalKey] || signalKey
-            x: wrapper.isWide ?
-                (parent.width - width) / 2 + (index - (wrapper.signalCount - 1) / 2) * 26 :
-                -22
-            y: wrapper.isWide ?
-                -22 :
-                (parent.height - height) / 2 + (index - (wrapper.signalCount - 1) / 2) * 26
-            MouseArea {
-                id: signalMouseArea
-                anchors.fill: parent
-                cursorShape: Qt.OpenHandCursor
-                hoverEnabled: true
-                propagateComposedEvents: false
-                acceptedButtons: Qt.LeftButton
-                onEntered: {
-                    if (wrapper.sceneController?.isDragging) {
-                        wrapper.sceneController.setInvalidTarget()
-                    }
-                }
-                onExited: {
-                    if (wrapper.sceneController?.isDragging) {
-                        wrapper.sceneController.clearInvalidTarget()
-                    }
-                }
-                ToolTip {
-                    id: signalTooltip
-                    text: signalDesc
-                    visible: signalMouseArea.containsMouse && signalDesc.length > 0
-                    delay: 300
-                }
-                onPressed: (mouse) => {
-                    if (sceneController && sceneController.managerLine) {
-                        sceneController.managerLine.startDrag(
-                            widgetInstance.id_widget,
-                            signalKey,
-                            mapToItem(sceneContainer, mouse.x, mouse.y)
-                        )
-                    }
-
-                    mouse.accepted = true
-                }
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: "white"
-                opacity: signalMouseArea.containsMouse ? 0.4 : 0
-                radius: 4
-                enabled: false
-            }
-            Text {
-                anchors.centerIn: parent
-                text: signalKey.substring(0, 2).toUpperCase()
-                color: "white"
-                font.pixelSize: 9
-                font.bold: true
-                font.family: "Courier New"
-                rotation: wrapper.isWide ? 0 : -90
-            }
-        }
+        widgetInstance: wrapper.widgetInstance
+        sceneContainer: wrapper.sceneContainer
+        sceneController: wrapper.sceneController
+        isWide: wrapper.isWide
+        editMode: wrapper.editMode
     }
-
-    // 🟡 СЛОТЫ (жёлтые) — АДАПТИВНОЕ РАСПОЛОЖЕНИЕ
-    Repeater {
+    // =========================================================================
+    // ПОРТЫ СЛОТОВ (ЖЁЛТЫЕ)
+    // =========================================================================
+    PortSlot {
         id: slotsRepeater
-        model: editMode ? slotCount : 0
-        delegate: Rectangle {
-            width: 18; height: 18
-            color: "#FFC107"; radius: 4
-            z: 300
-            property string slotKey: Object.keys(widgetInstance.exposedSlots)[index]
-            property string slotDesc: widgetInstance.exposedSlots[slotKey] || slotKey
-            x: wrapper.isWide ?
-                (parent.width - width) / 2 + (index - (wrapper.slotCount - 1) / 2) * 26 :
-                parent.width + 8
-            y: wrapper.isWide ?
-                parent.height + 8 :
-                (parent.height - height) / 2 + (index - (wrapper.slotCount - 1) / 2) * 26
-            MouseArea {
-                id: slotMouseArea
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                hoverEnabled: true
-                propagateComposedEvents: false
-                acceptedButtons: Qt.LeftButton
-                ToolTip {
-                    id: slotTooltip
-                    text: slotDesc
-                    visible: slotMouseArea.containsMouse && slotDesc.length > 0
-                    delay: 300
-                }
-                onEntered: {
-                    if (sceneController.managerLine?.setDragTarget) {
-                        sceneController.managerLine.setDragTarget(
-                            widgetInstance.id_widget,
-                            slotKey
-                        )
-                    }
-                }
-
-                onExited: {
-                    if (sceneController.managerLine?.clearDragTarget) {
-                        sceneController.managerLine.clearDragTarget()
-                    }
-                }
-
-                onClicked: (mouse) => {
-                    if (sceneController.managerLine?.endDrag) {
-                        const pos = mapToItem(sceneContainer, mouse.x, mouse.y)
-                        sceneController.managerLine.endDrag(pos)
-                    }
-                    mouse.accepted = true
-                }
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: "black"
-                opacity: slotMouseArea.containsMouse ? 0.3 : 0
-                radius: 4
-                enabled: false
-            }
-            Text {
-                anchors.centerIn: parent
-                text: slotKey.substring(0, 2).toUpperCase()
-                color: "black"
-                font.pixelSize: 9
-                font.bold: true
-                font.family: "Courier New"
-                rotation: wrapper.isWide ? 0 : -90
-            }
-        }
+        widgetInstance: wrapper.widgetInstance
+        sceneContainer: wrapper.sceneContainer
+        sceneController: wrapper.sceneController
+        isWide: wrapper.isWide
+        editMode: wrapper.editMode
     }
 
     /**

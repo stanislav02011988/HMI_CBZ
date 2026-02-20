@@ -26,7 +26,7 @@ Item {
     property string id_widget: ""
     property string name_widget: ""
 
-    property var sceneBus: null
+    property var signalBus: null
 
     property var exposedSignals: ({
         "shutterOpened": "Сигнал изменения состояния затвора",
@@ -41,8 +41,8 @@ Item {
 
     // --- ЭМИТ СОБЫТИЯ ПРИ ИЗМЕНЕНИИ РУЧНОГО РЕЖИМА ---
     onManualModeEnabledChanged: {
-        if (sceneBus && id_widget) {
-            sceneBus.emit("handModeActivated", id_widget, { value: manualModeEnabled })
+        if (signalBus && id_widget) {
+            signalBus.emit("handModeActivated", id_widget, { value: manualModeEnabled })
         }
     }
 

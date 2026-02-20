@@ -10,9 +10,11 @@ Item {
     id: centerWidget
     anchors.fill: parent
 
+    property var managers: ({})
+
     // === ГЛОБАЛЬНАЯ ШИНА СИГНАЛОВ (НОВАЯ АРХИТЕКТУРА) ===
     Managers.SignalBus {
-        id: sceneBus
+        id: signalBus
     }
 
     // === РЕГИСТРАТОР ОБЪЕКТОВ СЦЕНЫ (ЕДИНЫЙ ДЛЯ ВСЕХ РЕЖИМОВ) ===
@@ -30,7 +32,7 @@ Item {
     // === МЕНЕДЖЕР СВЯЗЕЙ (ЕДИНЫЙ ДЛЯ ВСЕХ РЕЖИМОВ) ===
     Managers.ConnectionManager {
         id: connectionManager
-        signalBus: sceneBus
+        signalBus: signalBus
         componentRegister: componentRegister
         onConnectionCreated: (rule) => {
             console.log(`Связь создана: ${rule.fromId}.${rule.signal} → ${rule.toId}.${rule.slot}`)
@@ -52,7 +54,7 @@ Item {
         onLoaded: {
             if (item) {
                 // 🔑 ПЕРЕДАЁМ ГЛОБАЛЬНЫЕ МЕНЕДЖЕРЫ В РЕЖИМ
-                item.sceneBus = sceneBus
+                item.signalBus = signalBus
                 item.componentRegister = componentRegister
                 item.connectionManager = connectionManager
 

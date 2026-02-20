@@ -10,7 +10,7 @@ Item {
     anchors.fill: parent
 
     // ПРИНИМАЕМ ГЛОБАЛЬНЫЕ МЕНЕДЖЕРЫ ИЗ CenterWidget
-    property var sceneBus: null
+    property var signalBus: null
     property var componentRegister: null  // ← Получаем извне
     property var connectionManager: null  // ← Получаем извне
 
@@ -29,7 +29,7 @@ Item {
     EditModeInternal {
         id: internal
         anchors.fill: parent
-        sceneBus: editMode.sceneBus
+        signalBus: editMode.signalBus
         componentRegister: editMode.componentRegister
         connectionManager: editMode.connectionManager
 
@@ -38,13 +38,13 @@ Item {
         onSceneSaveRequested: (data) => editMode.sceneSaveRequested(data)
     }
 
-    // Диалог добавления (без изменений)
+    // Диалог добавления
     DialogAddElements {
         id: dialogAddElement
         sceneController: editMode
     }
 
-    // Панель управления (без изменений)
+    // Панель управления
     PanelButtonEditMode {
         anchors.left: parent.left
         anchors.top: parent.top
@@ -54,7 +54,7 @@ Item {
         onAddElementRequested: dialogAddElement.open()
     }
 
-    // Граница режима (без изменений)
+    // Граница режима
     Rectangle {
         anchors.fill: parent
         color: "transparent"
