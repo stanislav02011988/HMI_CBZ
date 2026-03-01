@@ -17,7 +17,7 @@ def is_already_running(port):
         sock.close()
 
 if is_already_running(port = hash("MyUniqueAppName_HMI_CBZ") % 10000 + 20000):
-    print("❌ Данная программа уже запущена!")
+    print(" Данная программа уже запущена!")
     sys.exit(1)
 
 # Отключаем DPI-масштабирование Windows
@@ -39,6 +39,8 @@ from python.py_data_base.db_menager import DB_Menager
 from python.py_auth_menager.auth_menager import AuthMenager
 from python.py_settings_project.settings_project import SettingsProject
 from python.py_menager_theme.menager_theme import MenagerTheme
+
+from python.py_register_component_object.RegisterComponentObject import RegisterComponentObject
 
 class Project:
     def __init__(self):
@@ -64,11 +66,14 @@ class Project:
         self.settings_project = SettingsProject(self._file_path, self._file_name, self.db_menager, self.menager_json)
         self.menager_theme = MenagerTheme()
 
+        self.register_component_object = RegisterComponentObject()
+
         # --- Активация регистрации Qml модулей ----
         self.register_qml_module_auth_menager()
         self.register_qml_module_settings_project()
         self.register_qml_module_menager_theme()
         self.register_qml_module_time_menager()
+        self.register_qml_register_component_object()
 
         # --- 3. Приложение ---
         self.app = QGuiApplication(sys.argv)
@@ -93,12 +98,15 @@ class Project:
             print(f"[main.py] : 68 ->  Ошибка в функции 'def register_qml_module_menager_theme(self)': {e}")
 
     def register_qml_module_time_menager(self):
-        self.qml_registration_module.registration_module(self.time_menager)        
+        self.qml_registration_module.registration_module(self.time_menager)
+
+    def register_qml_register_component_object(self):
+        self.qml_registration_module.registration_module(self.register_component_object)
 
     def _load_main_qml(self):
         """Загружаем QML."""
-        qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
-        # qml_file = self.base_path / "qml/content/main_window/MainWindow.qml"
+        # qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
+        qml_file = self.base_path / "qml/content/main_window/MainWindow.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

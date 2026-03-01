@@ -1,0 +1,2 @@
+module qml.content.main_window.top_bar
+CustomTopBar 1.0 CustomTopBar.qml

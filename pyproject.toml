@@ -2,4 +2,4 @@
 name = "HMI_CBZ"
 
 [tool.pyside6-project]
-files = ["main.py", "qrc.qrc"]
+files = ["main.py", "python/py_register_component_object/RegisterComponentObject.py", "qrc.qrc"]

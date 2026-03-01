@@ -1,3 +1,0 @@
-module qml.content.main_window.main_window_widgets.center_widget.modes.edit_mode.edit_mode_internal.item.ports_signal_slot
-PortSignal 1.0 PortSignal.qml
-PortSlot 1.0 PortSlot.qml

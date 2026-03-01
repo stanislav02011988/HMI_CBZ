@@ -1,0 +1,2 @@
+module qml.managers
+singleton QmlRegisterComponentObject 1.0 QmlRegisterComponentObject.qml

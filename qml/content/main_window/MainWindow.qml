@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import qml.content.main_window.main_window_widgets.top_bar
-import qml.content.main_window.main_window_widgets.top_bar_button
-import qml.content.main_window.main_window_widgets.center_widget
+import qml.content.main_window.top_bar
+import qml.content.main_window.top_bar_button
+import qml.content.main_window.center_widget
 
 
 
