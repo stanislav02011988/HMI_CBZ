@@ -1,2 +1,2 @@
 module python.py_register_component_object.interface_qml
-typeinfo RegisterComponentObject.qmltypes
+typeinfo register_component_object.qmltypes

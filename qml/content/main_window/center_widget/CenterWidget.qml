@@ -3,50 +3,17 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
+import qml.settings.project_settings
 import qml.managers
 
 import qml.content.main_window.center_widget.modes.operating_mode
 import qml.content.main_window.center_widget.modes.edit_mode
-import "managers" as Managers
 
 Item {
     id: centerWidget
     anchors.fill: parent
 
-    property var managers: ({})
-
-    // === ГЛОБАЛЬНАЯ ШИНА СИГНАЛОВ (НОВАЯ АРХИТЕКТУРА) ===
-    Managers.SignalBus {
-        id: signalBus
-    }
-
-    // // === РЕГИСТРАТОР ОБЪЕКТОВ СЦЕНЫ (ЕДИНЫЙ ДЛЯ ВСЕХ РЕЖИМОВ) ===
-    // Managers.ComponentObjectRegister {
-    //     id: componentRegister
-    //     // Автоматическая синхронизация списка ID для диалогов
-    //     onRegistryChanged: {
-    //         // Передаём актуальный список ID во все подписанные компоненты
-    //         if (mode && mode.signalListIdScene) {
-    //             mode.signalListIdScene(getAllIds())
-    //         }
-    //     }
-    // }
-
-    // === МЕНЕДЖЕР СВЯЗЕЙ (ЕДИНЫЙ ДЛЯ ВСЕХ РЕЖИМОВ) ===
-    Managers.ConnectionManager {
-        id: connectionManager
-        signalBus: signalBus
-        componentRegister: QmlRegisterComponentObject
-        onConnectionCreated: (rule) => {
-            console.log(`Связь создана: ${rule.fromId}.${rule.signal} → ${rule.toId}.${rule.slot}`)
-        }
-
-        onConnectionRemoved: (fromId, toId) => {
-            console.log(`Связь удалена: ${fromId} → ${toId}`)
-        }
-    }
-
-    property bool editMode: true
+    property bool editMode: false
     property alias mode: modeLoader.item
     signal sceneSaveRequested(var data)
 
@@ -54,28 +21,10 @@ Item {
         id: modeLoader
         anchors.fill: parent
         sourceComponent: editMode ? editModeComponent : operatingModeComponent
-        onLoaded: {
-            if (item) {
-                // 🔑 ПЕРЕДАЁМ ГЛОБАЛЬНЫЕ МЕНЕДЖЕРЫ В РЕЖИМ
-                item.signalBus = signalBus
-                item.componentRegister = QmlRegisterComponentObject
-                item.connectionManager = connectionManager
-
-                // Сигнал сохранения сцены
-                if (item.sceneSaveRequested) {
-                    item.sceneSaveRequested.connect(centerWidget.sceneSaveRequested)
-                }
-
-                // Для OperatingMode: автоматическая обработка связей
-                if (!editMode && item.initializeOperatingMode) {
-                    item.initializeOperatingMode()
-                }
-            }
-        }
     }
 
-    Component { id: editModeComponent; EditMode {} }
-    Component { id: operatingModeComponent; OperatingMode {} }
+    Component { id: editModeComponent; EditMode { editMode: editMode} }
+    Component { id: operatingModeComponent; OperatingMode { editMode: editMode } }
 
     // === КНОПКА ПЕРЕКЛЮЧЕНИЯ (ПОСЛЕ Loader, с высоким z) ===
     Button {

@@ -21,20 +21,11 @@ Item {
 
     // +++++++
     // === ОБЯЗАТЕЛЬНЫЕ СВОЙСТВА ДЛЯ СВЯЗЕЙ ===
+    property string subtype: ""
+    property string componentGroupe: ""
+
     property string id_widget: ""
     property string name_widget: ""
-
-    property var signalBus: null
-    property var exposedSignals: ({
-        "shutterOpened": "Сигнал изменения состояния затвора",
-        "shutterError":  "Ошибка затвора"
-    })
-
-    property var exposedSlots: ({
-        "open":        "Открыть",
-        "close":       "Закрыть",
-        "resetError":  "Сброс ошибки"
-    })
 
     // === СОСТОЯНИЕ РУЧНОГО РЕЖИМА ===
     property bool manualModeEnabled: false

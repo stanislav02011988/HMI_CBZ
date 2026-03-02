@@ -41,7 +41,6 @@ class RegisterComponentObject(QObject):
     # =========================================================================
     # PROPERTY count (для QML биндингов)
     # =========================================================================
-
     @Property(int, notify=registryChanged)
     def count(self) -> int:
         return len(self._elements_list)
@@ -49,34 +48,22 @@ class RegisterComponentObject(QObject):
     # =========================================================================
     # REGISTER
     # =========================================================================
-
-    @Slot(QObject, "QVariant", QObject, result=bool)
-    def registerElement(self, wrapper, config, widget_ref) -> bool:
-
-        # --- Конвертация QJSValue → dict ---
-        if isinstance(config, QJSValue):
-            config = config.toVariant()
-
-        if not isinstance(config, dict):
-            print("[ERR] registerElement: config не является dict")
+    @Slot(QObject, QObject, result=bool)
+    def registerElement(self, wrapper_ref, widget_ref):
+        if wrapper_ref is None or widget_ref is None:
             return False
 
-        if "id_widget" not in config:
-            print("[ERR] registerElement: id_widget отсутствует")
+        element_id = widget_ref.property("id_widget")
+        if not element_id:
             return False
-
-        element_id = config["id_widget"]
 
         if element_id in self._elements_by_id:
-            print(f"[WARN] ID '{element_id}' уже существует")
             return False
 
         record = {
-            "id": element_id,
-            "wrapper": wrapper,
+            "id_widget": element_id,
             "widgetRef": widget_ref,
-            "config": dict(config),
-            "createdAt": datetime.datetime.now().isoformat()
+            "wrapperRef": wrapper_ref
         }
 
         self._elements_by_id[element_id] = record
@@ -85,60 +72,64 @@ class RegisterComponentObject(QObject):
         self.elementAdded.emit(element_id)
         self.registryChanged.emit()
 
-        print(f"[OK] Зарегистрирован элемент: {element_id}")
         return True
 
     # =========================================================================
     # UNREGISTER
     # =========================================================================
-
     @Slot(QObject, result=bool)
-    def unregisterElement(self, wrapper) -> bool:
-
-        if wrapper is None:
+    def unregisterElement(self, wrapper_ref) -> bool:
+        if wrapper_ref is None:
             return False
 
-        element_id = None
-
+        id_widget = None
+        # === ИСПРАВЛЕНО: используем правильный ключ "wrapperRef" ===
         for key, record in self._elements_by_id.items():
-            if record["wrapper"] == wrapper:
-                element_id = key
+            if record.get("wrapperRef") == wrapper_ref:
+                id_widget = key
                 break
 
-        if not element_id:
+        if id_widget is None:
+            print("[WARN] unregisterElement: обёртка не найдена в реестре")
             return False
 
-        record = self._elements_by_id.pop(element_id)
+        record = self._elements_by_id.pop(id_widget)
         self._elements_list.remove(record)
 
-        self.elementRemoved.emit(element_id)
+        self.elementRemoved.emit(id_widget)
         self.registryChanged.emit()
-
-        print(f"[DEL] Удалён элемент: {element_id}")  # ← Исправлено: без эмодзи и селекторов
+        print(f"[DEL] Удалён элемент: {id_widget} Осталось элементов в сцене {self.count }")
         return True
+
 
     # =========================================================================
     # O(1) GET
     # =========================================================================
-
     @Slot(str, result="QVariant")
-    def getElementById(self, element_id: str) -> Optional[dict]:
-        return self._elements_by_id.get(element_id)
+    def getElementById(self, id_widget: str) -> Optional[dict]:
+        return self._elements_by_id.get(id_widget)
 
     @Slot(str, result=QObject)
-    def getElementWrapper(self, element_id: str):
-        record = self._elements_by_id.get(element_id)
+    def getElementWrapper(self, id_widget: str):
+        record = self._elements_by_id.get(id_widget)
         return record["wrapper"] if record else None
 
     @Slot(str, result=QObject)
-    def getElementWidgetRef(self, element_id: str):
-        record = self._elements_by_id.get(element_id)
+    def getElementWidgetRef(self, id_widget: str):
+        record = self._elements_by_id.get(id_widget)
         return record["widgetRef"] if record else None
+
+    @Slot(QObject, result="QVariant")
+    def getElementByWrapper(self, wrapper_ref):
+        """Получить запись элемента по ссылке на обёртку"""
+        for record in self._elements_list:
+            if record.get("wrapperRef") == wrapper_ref:
+                return record
+        return None
 
     # =========================================================================
     # GET ALL IDS
     # =========================================================================
-
     @Slot(result="QVariant")
     def getAllIds(self) -> List[str]:
         return list(self._elements_by_id.keys())
@@ -146,47 +137,47 @@ class RegisterComponentObject(QObject):
     # =========================================================================
     # EXPORT
     # =========================================================================
-
     @Slot(result="QVariant")
-    def exportSceneData(self) -> List[dict]:
+    def exportSceneData(self):
 
-        export_data = []
+        result = {}
 
         for record in self._elements_list:
 
-            wrapper = record["wrapper"]
+            widget = record["widgetRef"]
+            wrapper = record["wrapperRef"]
 
-            if wrapper is None:
-                continue
+            group = widget.property("componentGroupe")
+            subtype = widget.property("subtype")
+            element_id = widget.property("id_widget")
 
-            export_data.append({
-                "type": getattr(wrapper, "widgetData", {}).get("type", ""),
-                "relX": getattr(wrapper, "relX", 0.0),
-                "relY": getattr(wrapper, "relY", 0.0),
-                "relW": getattr(wrapper, "relW", 0.0),
-                "relH": getattr(wrapper, "relH", 0.0),
-                "widgetConfig": record["config"]
-            })
+            if group not in result:
+                result[group] = {}
 
-        return export_data
+            if subtype not in result[group]:
+                result[group][subtype] = {}
+
+            result[group][subtype][element_id] = {
+                "id_widget": element_id,
+                "name_widget": widget.property("name_widget"),
+                "componentGroupe": group,
+                "subtype": subtype,
+                "geometry": {
+                    "relX": wrapper.property("relX"),
+                    "relY": wrapper.property("relY"),
+                    "relW": wrapper.property("relW"),
+                    "relH": wrapper.property("relH")
+                }
+            }
+
+        return result
 
     # =========================================================================
-    # CLEAR
+    # Очистка
     # =========================================================================
-
     @Slot()
     def clear(self):
-
         self._elements_by_id.clear()
         self._elements_list.clear()
-
         self.registryChanged.emit()
-        print("[INFO] Регистр полностью очищен")  # ← Исправлено: без эмодзи
-
-    # =========================================================================
-    # CONTAINS
-    # =========================================================================
-
-    @Slot(str, result=bool)
-    def contains(self, element_id: str) -> bool:
-        return element_id in self._elements_by_id
+        print("[INFO] Регистр очищен")

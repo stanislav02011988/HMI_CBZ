@@ -18,6 +18,9 @@ import qml.utils.controllers_signals
 Item {
     id: root
 
+    property string subtype: ""
+    property string componentGroupe: ""
+
     property string id_widget: ""
     property string name_widget: ""
 

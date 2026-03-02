@@ -1,40 +1,8 @@
 {
     "title_project": "Программа диагностики",
     "logo_progect": "qrc:/logo/res/svg/logo.svg",
-    "block_graphic_settings": {
-        "theme_path": "qrc:/json_file_theme/files_settings/json_files/settings/project_settings/theme/light.json",
-        "widget_cement_silos": {
-            "silos_vertical": {
-                "id": "silos_vertical",
-                "level": 0.0,
-                "motorId": "motor_silos_vertical",
-                "name": "Вертикальный силос",
-                "path_file_element": "qrc:/qml/content/main_window/main_window_widgets/center_widget/component/silos/Silos.qml",
-                "subtype": "silos_vertical",
-                "timestamp": "2026-02-09T18:09:14.048Z",
-                "type": "silos"
-            },
-            "silos_vertical_1": {
-                "id": "silos_vertical_1",
-                "level": 0.0,
-                "motorId": "motor_silos_vertical",
-                "name": "Вертикальный силос",
-                "path_file_element": "qrc:/qml/content/main_window/main_window_widgets/center_widget/component/silos/Silos.qml",
-                "subtype": "silos_vertical",
-                "timestamp": "2026-02-09T18:27:55.117Z",
-                "type": "silos"
-            },
-            "silos_vertical_2": {
-                "id": "silos_vertical_2",
-                "level": 0.0,
-                "motorId": "motor_silos_vertical",
-                "name": "Вертикальный силос",
-                "path_file_element": "qrc:/qml/content/main_window/main_window_widgets/center_widget/component/silos/Silos.qml",
-                "subtype": "silos_vertical",
-                "timestamp": "2026-02-09T18:45:19.193Z",
-                "type": "silos"
-            }
-        }
+    "block_theme_app": {
+        "theme_path": "qrc:/json_file_theme/files_settings/json_files/settings/project_settings/theme/light.json"
     },
     "block_time_settings": {
         "use24HourFormat": true,
@@ -58,5 +26,61 @@
         "access_group": "admin",
         "time_in": "20-02-2026 12:54",
         "time_out": "---"
+    },
+    "block_graphics": {
+        "GroupeCement": {
+            "scales": {
+                "asdsdd": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.1,
+                        "relW": 0.1,
+                        "relX": 0.7353556485355649,
+                        "relY": 0.37777777777777777
+                    },
+                    "id_widget": "asdsdd",
+                    "name_widget": "asd",
+                    "subtype": "scales"
+                }
+            },
+            "silos_vertical": {
+                "asd": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.8017782426778243,
+                        "relY": 0.05023148148148145
+                    },
+                    "id_widget": "asd",
+                    "name_widget": "asd",
+                    "subtype": "silos_vertical"
+                },
+                "asdd": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.7383891213389122,
+                        "relY": 0.0523148148148148
+                    },
+                    "id_widget": "asdd",
+                    "name_widget": "asd",
+                    "subtype": "silos_vertical"
+                },
+                "sssasa": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.6723849372384937,
+                        "relY": 0.27199074074074076
+                    },
+                    "id_widget": "sssasa",
+                    "name_widget": "asd",
+                    "subtype": "silos_vertical"
+                }
+            }
+        }
     }
 }

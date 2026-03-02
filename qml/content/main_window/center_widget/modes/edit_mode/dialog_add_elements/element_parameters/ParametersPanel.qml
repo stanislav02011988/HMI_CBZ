@@ -4,6 +4,8 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material
 
+import qml.managers
+
 ColumnLayout {
     id: root
     Layout.fillWidth: true
@@ -14,7 +16,6 @@ ColumnLayout {
     signal addRequested(var dataList)
 
     property var sceneController: null
-    property var listIdScane: []
 
     // Статус
     property string statusMessage: ""
@@ -32,14 +33,6 @@ ColumnLayout {
     })
 
     visible: root.isVisible
-
-    Connections {
-        id: sceneControllerConnections
-        target: sceneController
-        function onSignalListIdScene(items) {
-            root.listIdScane = items
-        }
-    }
 
     Label {
         text: "Параметры элемента"
@@ -185,8 +178,8 @@ ColumnLayout {
         }
 
         // Проверка уникальности ID
-        for (var i = 0; i < root.listIdScane.length; i++) {
-            var id = root.listIdScane[i]
+        for (var i = 0; i < QmlRegisterComponentObject.getAllIds().length; i++) {
+            var id = QmlRegisterComponentObject.getAllIds()[i]
             if (id === textFieldID.text.trim()) {
                 root.statusMessage = "✗ ID уже существует: " + textFieldID.text
                 return
@@ -227,9 +220,5 @@ ColumnLayout {
         }
         root.isSaving = false
         root.statusMessage = ""
-    }
-
-    Component.onDestruction: {
-        sceneControllerConnections.target = null
     }
 }

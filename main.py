@@ -40,7 +40,7 @@ from python.py_auth_menager.auth_menager import AuthMenager
 from python.py_settings_project.settings_project import SettingsProject
 from python.py_menager_theme.menager_theme import MenagerTheme
 
-from python.py_register_component_object.RegisterComponentObject import RegisterComponentObject
+from python.py_register_component_object.register_component_object import RegisterComponentObject
 
 class Project:
     def __init__(self):
@@ -92,7 +92,7 @@ class Project:
     def register_qml_module_menager_theme(self):
         try:
                 path_file = self.menager_json.read_json_file(self._file_path, self._file_name)
-                self.menager_theme.load_theme(path_file["block_graphic_settings"]["theme_path"])
+                self.menager_theme.load_theme(path_file["block_theme_app"]["theme_path"])
                 self.qml_registration_module.registration_module(self.menager_theme)
         except Exception as e:
             print(f"[main.py] : 68 ->  Ошибка в функции 'def register_qml_module_menager_theme(self)': {e}")

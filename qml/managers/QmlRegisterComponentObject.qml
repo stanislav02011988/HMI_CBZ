@@ -57,8 +57,8 @@ QtObject {
     //  - нормализовать формат
     //  - добавлять кэширование
 
-    function registerElement(wrapper, config, widgetRef) {
-        return backend.registerElement(wrapper, config, widgetRef)
+    function registerElement(wrapper, widgetRef) {
+        return backend.registerElement(wrapper, widgetRef)
     }
 
     function unregisterElement(wrapper) {
@@ -76,6 +76,7 @@ QtObject {
     function getElementWidgetRef(id) {
         return backend.getElementWidgetRef(id)
     }
+    function getElementByWrapper(wrapper){ return backend.getElementByWrapper(wrapper) }
 
     function getAllIds() {
         return backend.getAllIds()
@@ -85,11 +86,7 @@ QtObject {
         return backend.exportSceneData()
     }
 
-    function clear() {
-        backend.clear()
-    }
+    function clear() { backend.clear() }
 
-    function contains(id) {
-        return backend.contains(id)
-    }
+    function contains(id) { return backend.contains(id) }
 }

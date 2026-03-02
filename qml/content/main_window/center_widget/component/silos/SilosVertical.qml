@@ -23,44 +23,27 @@ Item {
     readonly property real baseUnitH: height > 0 ? height / 240 : 1  // 200px = 100% высоты
 
     // Уникальный ID эелемента Силоса
+    property string subtype: ""
+    property string componentGroupe: ""
+
     property string id_widget: ""
     property string name_widget: ""
 
-    property var signalBus: null
-
-    property var exposedSignals: ({
-        "shutterOpened": "Сигнал изменения состояния затвора",
-        "shutterError":  "Ошибка затвора"
-    })
-
-    property var exposedSlots: ({
-        "open":        "Открыть",
-        "close":       "Закрыть",
-        "resetError":  "Сброс ошибки"
-    })
-
-    // --- ЭМИТ СОБЫТИЯ ПРИ ИЗМЕНЕНИИ РУЧНОГО РЕЖИМА ---
-    onManualModeEnabledChanged: {
-        if (signalBus && id_widget) {
-            signalBus.emit("handModeActivated", id_widget, { value: manualModeEnabled })
-        }
-    }
-
-    property string name_progress_bar: "silos.cement.1.progressBar"
+    property string name_progress_bar: ""
     property string address_progress_bar: ""
     property real level_cement_silos: 0  // 0.0 - 1.0
 
-    property string id_valve_air: "silos.cement.1.valve.air"
+    property string id_valve_air: ""
     property string name_valve_air: ""
 
-    property string id_shutter_silos: "silos.cement.1.shutter.silos"
+    property string id_shutter_silos: ""
     property string name_shutter_silos: ""
 
-    property string id_el_motor_shnek: "silos.cement.1.el.motor.shnek"
+    property string id_el_motor_shnek: ""
     property string name_el_motor_shnek: ""
     property int state_el_motor: 0
 
-    property string id_shutter_el_motor_shnek: "silos.cement.1.shutter.el.motor.shnek"
+    property string id_shutter_el_motor_shnek: ""
     property string name_shutter_el_motor_shnek: ""
     property int state_shutter_el_motor_shnek: 0
     property bool type_dosage_mode: false

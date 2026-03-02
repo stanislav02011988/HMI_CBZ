@@ -1,2 +1,3 @@
 module qml.managers
 singleton QmlRegisterComponentObject 1.0 QmlRegisterComponentObject.qml
+singleton QmlSceneManager 1.0 QmlSceneManager.qml

@@ -7,7 +7,7 @@ import QtQuick.tooling 1.2
 
 Module {
                                     Component {
-                                        file: "F:/__QtQml_Python_HMI_Euromix/HMI_CBZ/python/py_register_component_object/RegisterComponentObject.py"
+                                        file: "F:/__QtQml_Python_HMI_Euromix/HMI_CBZ/python/py_register_component_object/register_component_object.py"
                                         lineNumber: 0
                                         name: "RegisterComponentObject"
                                         accessSemantics: "reference"
@@ -25,16 +25,18 @@ Module {
     Method { name: "getAllIds"; type: "List" }
     Method { name: "getElementById"; type: "Optional"
                 Parameter { name: "id_widget"; type: "str" } }
+    Method { name: "getElementByWrapper"; type: "void"
+                Parameter { name: "wrapper_ref"; type: "var" } }
     Method { name: "getElementWidgetRef"; type: "void"
                 Parameter { name: "id_widget"; type: "str" } }
     Method { name: "getElementWrapper"; type: "void"
                 Parameter { name: "id_widget"; type: "str" } }
     Method { name: "get_parametrs_qml_module"; type: "void" }
-    Method { name: "registerElement"; type: "bool"
+    Method { name: "registerElement"; type: "void"
                 Parameter { name: "wrapper_ref"; type: "var" }
                 Parameter { name: "widget_ref"; type: "var" } }
     Method { name: "unregisterElement"; type: "bool"
-                Parameter { name: "wrapper"; type: "var" } }
+                Parameter { name: "wrapper_ref"; type: "var" } }
                                     }
 
 }

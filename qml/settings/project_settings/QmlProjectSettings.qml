@@ -38,45 +38,12 @@ QtObject {
 
     function saveBlockUserSettings(dict_user){ SettingsProject.save_block_user_settings_project(dict_user) }
 
-    // === МЕТОДЫ РАБОТЫ С СИЛОСАМИ (прокси к SettingsProject) ===
-    function save_silos_element(elementConfig) {
-        // Убедимся, что передаём правильный объект
-        if (typeof elementConfig === "object") {
-            return SettingsProject.save_silos_element(elementConfig)
-        }
-        console.error("Неверный формат конфигурации силоса:", elementConfig)
-        return false
-    }
+    //======== Сохранение и Загрузка данных Центральной Сцены Элементов QmlProjectSettings ========
+    function saveBlockGraphics(dict_scene){ SettingsProject.save_block_graphics(dict_scene) }
+    function loadBlockGraphics() { return SettingsProject.get_block_graphics() }
 
-    function get_all_silos_elements() {
-        return SettingsProject.get_all_silos_elements()
-    }
-
-    function get_silos_element(silosId) {
-        return SettingsProject.get_silos_element(silosId)
-    }
-
-    function remove_silos_element(silosId) {
-        return SettingsProject.remove_silos_element(silosId)
-    }
-
-    function silos_element_exists(silosId) {
-        return SettingsProject.silos_element_exists(silosId)
-    }
-
-    // === СИГНАЛЫ ОБНОВЛЕНИЯ СИЛОСОВ ===
-    // Проксируем сигналы бэкенда
-    signal silosElementAdded(string silosId)
-    signal silosElementRemoved(string silosId)
 
     Component.onCompleted: {
         TimeManager.start_timer()
-        // Подключаемся к сигналам бэкенда
-        SettingsProject.signalSilosElementAdded.connect(function(silosId) {
-            silosElementAdded(silosId)
-        })
-        SettingsProject.signalSilosElementRemoved.connect(function(silosId) {
-            silosElementRemoved(silosId)
-        })
     }
 }

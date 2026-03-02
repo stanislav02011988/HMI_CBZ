@@ -32,7 +32,8 @@ Popup {
 
     // === СОСТОЯНИЕ ===
     property bool isVisibleParamentrsElement: false
-    property var currentChoiceData: ({})  // ← храним данные из списка
+
+    signal signalAddElement(var data)
 
     Item {
         id: contentItem
@@ -123,12 +124,12 @@ Popup {
             subtype: dataList.subtypeId,
             id_widget: dataList.id_widget,
             name_widget: dataList.name_widget,
-            componentGroupe: dataList.componentGroupe,
-            config: {}
+            componentGroupe: dataList.componentGroupe
         }
 
-        if (sceneController && sceneController.addItemToScene) {
-            sceneController.addItemToScene(elementConfig)
+        if (sceneController) {
+            // sceneController.addItemToScene(elementConfig)
+            signalAddElement(elementConfig)
             paramsPanel.statusMessage = "✓ Элемент добавлен на сцену"
             Qt.callLater(() => {
                 root.close()

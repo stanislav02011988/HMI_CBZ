@@ -14,6 +14,7 @@ Item {
     signal signalGridEnable(bool check)
     signal signalClearScenes()
     signal addElementRequested()
+    signal signalSave()    
 
     Rectangle {
         id: bg
@@ -69,6 +70,13 @@ Item {
                 Layout.preferredHeight: 30
                 text: "🗑️ Очистить всё"
                 onClicked: root.signalClearScenes()
+            }
+
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 30
+                text: "Сохранить все в файл"
+                onClicked: root.signalSave()
             }
         }
     }
