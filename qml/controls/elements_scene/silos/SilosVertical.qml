@@ -1,4 +1,8 @@
-//module qml.content.main_window.main_window_widgets.center_widget.component.silos SilosVertical.qml
+// ===============================================================
+// SilosVertical.qml
+// Production-версия с адаптивной системой масштабирования
+// ===============================================================
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -13,86 +17,73 @@ import qml.controls.progress_bar
 import qml.controls.tool_tip
 import qml.controls.drop_shadow
 
-import qml.utils.controllers_signals
-
 Item {
     id: root
 
-    // === АДАПТИВНАЯ СИСТЕМА РАЗМЕРОВ (точно как в весах) ===
-    readonly property real baseUnitW: width > 0 ? width / 80 : 1    // 80px = 100% ширины
-    readonly property real baseUnitH: height > 0 ? height / 240 : 1  // 200px = 100% высоты
+    // ==========================================================
+    // 1. ЭТАЛОННЫЙ РАЗМЕР (Reference Geometry)
+    // ==========================================================
+    property real referenceWidth: 120
+    property real referenceHeight: 320
 
-    // Уникальный ID эелемента Силоса
-    property string subtype: ""
+    // ==========================================================
+    // 2. МАСШТАБИРОВАНИЕ
+    // ==========================================================
+    property real scaleX: width  > 0 ? width  / referenceWidth  : 1
+    property real scaleY: height > 0 ? height / referenceHeight : 1
+    property real scale: Math.min(scaleX, scaleY)
+
+    // ==========================================================
+    // 3. КОНФИГУРАЦИЯ ВСЕХ РАЗМЕРОВ (РАЗДЕЛЬНО)
+    // ==========================================================
+    property int containerRadius: 6
+    property real borderWidth: 1.5
+
+    property real shadowRadius: 6
+    property real shadowOffsetX: 2
+    property real shadowOffsetY: 2
+
+    property real progressBarWidthRatio: 0.35
+    property real progressBarHeightRatio: 0.9
+    property real progressPadding: 4
+
+    property real valveWidthRatio: 0.3
+    property real valveHeightRatio: 0.1
+
+    property real shutterButtonHeightRatio: 0.06
+
+    property real connectorLineWidthRatio: 0.05
+    property real connectorLineHeightRatio: 0.15
+
+    property int textSize: 14
+
+    // ==========================================================
+    // 4. БИЗНЕС-СВОЙСТВА
+    // ==========================================================
     property string componentGroupe: ""
+    property string subtype: ""
 
     property string id_widget: ""
     property string name_widget: ""
-
-    property string name_progress_bar: ""
-    property string address_progress_bar: ""
-    property real level_cement_silos: 0  // 0.0 - 1.0
+    property real level_cement_silos: 0
 
     property string id_valve_air: ""
     property string name_valve_air: ""
 
-    property string id_shutter_silos: ""
-    property string name_shutter_silos: ""
-
-    property string id_el_motor_shnek: ""
-    property string name_el_motor_shnek: ""
-    property int state_el_motor: 0
-
-    property string id_shutter_el_motor_shnek: ""
-    property string name_shutter_el_motor_shnek: ""
-    property int state_shutter_el_motor_shnek: 0
-    property bool type_dosage_mode: false
-
-    //Глобальное свойство Ручной режим весов
-    property bool manualModeEnabled: false
-    property bool accessCheck: false
-
-    // === СВОЙСТВА СИЛОСА ===
-    property string name_silos_color: "#333333"
-    property real size_text_name_silos: 14
-    property bool bold_text_name_silos: false
-    property string name_silos_border_color: "transparent"
-
-    property var elMotorSignalConnect: null
-    property var shutterShnekSignalConnect: null
-    // === СИГНАЛ ДЛЯ УДАЛЕНИЯ (обязательно!) ===
-    signal removeRequested()
-
-    // === ТЕНЬ И ОСНОВНОЙ КОНТЕЙНЕР ===
+    // ==========================================================
+    // 5. ОСНОВНОЙ КОНТЕЙНЕР С ТЕНЬЮ
+    // ==========================================================
     Item {
         anchors.fill: parent
 
         DropShadow {
             anchors.fill: silosContainer
             source: silosContainer
-            radius: Math.max(4, baseUnitW * 3)
+            radius: shadowRadius * scale
             samples: 16
             color: "#60000000"
-            horizontalOffset: Math.max(1, baseUnitW * 1.5)
-            verticalOffset: Math.max(1, baseUnitH * 1.5)
-        }
-
-        // === КНОПКА УДАЛЕНИЯ В ПРАВОМ ВЕРХНЕМ УГЛУ ===
-        CustomButton {
-            id: closeBtn
-            m_width: 20
-            m_height: 20
-            m_background_color: "transparent"
-            m_colorText: "black"
-            text: "X"
-
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 3
-            anchors.topMargin: 3
-            visible: root.accessCheck
-            z: 10
-            onClicked: root.removeRequested()
+            horizontalOffset: shadowOffsetX * scale
+            verticalOffset: shadowOffsetY * scale
         }
 
         Rectangle {
@@ -102,140 +93,118 @@ Item {
 
             ColumnLayout {
                 anchors.fill: parent
-                spacing: baseUnitH * 2
+                spacing: 4 * scale
 
-
-                // === ВЕРХНЯЯ ЧАСТЬ: СИЛОС С ПРОГРЕСС-БАРОМ ===
+                // ==================================================
+                // ТЕЛО СИЛОСА
+                // ==================================================
                 Rectangle {
                     id: silosBody
-                    Layout.preferredWidth: parent.width * 1
-                    Layout.preferredHeight: parent.height * 0.95
-                    Layout.alignment: Qt.AlignHCenter
-                    color: "transparent"
-                    radius: baseUnitW * 3
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    radius: containerRadius * scale
                     border.color: "#504e4e"
-                    border.width: baseUnitW * 1.5
-
-                    // MouseArea для отслеживания наведения (НЕ перехватывает клики!)
-                    MouseArea {
-                        id: silosMouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        acceptedButtons: Qt.NoButton  // Клики проходят к дочерним элементам (кнопкам и т.д.)
-                    }
-
-                    CustomToolTip {
-                        id: toolTipSilosMouseArea
-                        target: silosMouseArea
-                        customDelay: 500
-                        showOnDisabledOnly: false
-                        backgroundColor: "#2c3e50"
-                        borderColor: "#3498db"
-                        fontSize: 13
-                    }
+                    border.width: borderWidth * scale
+                    color: "transparent"
 
                     RowLayout {
                         anchors.fill: parent
-                        spacing: baseUnitW * 0
+                        spacing: 0
 
-                        // Прогресс-бар заполнения
+                        // ==========================================
+                        // ПРОГРЕСС-БАР
+                        // ==========================================
                         CustomProgressBar {
-                            Layout.preferredWidth: parent.width * 0.35
-                            Layout.preferredHeight: parent.height * 0.9
-                            Layout.leftMargin: 5
+                            Layout.preferredWidth: parent.width * progressBarWidthRatio
+                            Layout.preferredHeight: parent.height * progressBarHeightRatio
                             vertical: true
                             visible_border_progress: true
-                            blockCount: 1
-                            blockSpacing: 1
-                            borderRadius: baseUnitW * 2
-                            padding: baseUnitW * 4
+                            borderRadius: containerRadius * scale
+                            padding: progressPadding * scale
                             value: root.level_cement_silos
                         }
 
+                        // ==========================================
+                        // НАЗВАНИЕ СИЛОСА
+                        // ==========================================
                         Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             color: "transparent"
-                            border.color: root.name_silos_border_color
                             clip: true
 
                             Text {
                                 anchors.centerIn: parent
                                 text: root.name_widget
-                                font.family: "Times New Roman"
-                                font.pixelSize: Math.max(root.size_text_name_silos, baseUnitW * 8)
-                                font.bold: root.bold_text_name_silos
-                                color: root.name_silos_color
-                                verticalAlignment: Text.AlignBottom
-                                horizontalAlignment: Text.AlignBottom
+                                font.pixelSize: textSize * scale
+                                font.bold: true
+                                color: "#333333"
+
                                 rotation: -90
                                 transformOrigin: Item.Bottom
                             }
                         }
                     }
 
-                    // === КЛАПАН ВОЗДУХА (оригинальное расположение) ===
+                    // ==========================================
+                    // КЛАПАН ВОЗДУХА
+                    // ==========================================
                     Rectangle {
-                        id: valveAirContainer
-                        width: silosBody.width * 0.3
-                        height: silosBody.height * 0.1
-                        color: "transparent"
+                        width: silosBody.width * valveWidthRatio
+                        height: silosBody.height * valveHeightRatio
                         anchors.right: silosBody.right
                         anchors.bottom: silosBody.bottom
-                        anchors.rightMargin: -root.baseUnitW * 10
-                        anchors.bottomMargin: root.baseUnitH * 6
+                        color: "transparent"
 
                         BtnValveAir {
+                            anchors.fill: parent
                             id_valve_air: root.id_valve_air
                             name_valve_air: root.name_valve_air
-                            anchors.fill: parent
-                            anchors.margins: root.baseUnitW * 1.5
                         }
                     }
                 }
 
-                // === Кнопка затвора силоса ===
+                // ==================================================
+                // КНОПКА ЗАТВОРА
+                // ==================================================
                 BtnShutterModeToggle {
-                    id: btnShutterSilos
-                    Layout.preferredWidth: parent.width * 0.7
-                    Layout.preferredHeight: parent.height * 0.05
-                    Layout.alignment: Qt.AlignHCenter
-                }
-
-                // Верхняя линия
-                Rectangle {
-                    id: lineBtnShutterSilosElMotor
-                    Layout.preferredWidth: parent.width * 0.05
-                    Layout.preferredHeight: parent.height * 0.15
-                    Layout.alignment: Qt.AlignHCenter
-                    radius: baseUnitW * 1
-                    color: "transparent"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: parent.height * shutterButtonHeightRatio
                 }
             }
         }
     }
 
-    function activateWarkShutterAndElMotor(state:int){
-        switch (state) {
-            case 0:
-                // Остановка
-                lineBtnShutterSilosElMotor.color = "transparent"
-                break
+    // ==========================================================
+    // 6. API УПРАВЛЕНИЯ РАЗМЕРАМИ
+    // ==========================================================
+    function getPropertiesSize() {
+        return [
+            { name: "referenceWidth", value: referenceWidth, min: 50, max: 500, step: 5,
+              label: "Ширина контейнера", description: "Основная ширина виджета" },
+            { name: "referenceHeight", value: referenceHeight, min: 100, max: 800, step: 5,
+              label: "Высота контейнера", description: "Основная высота виджета" },
+            { name: "progressBarWidthRatio", value: progressBarWidthRatio, min: 0.1, max: 1.0, step: 0.01,
+              label: "Прогресс-бар: ширина", description: "Ширина прогресс-бара внутри силоса" },
+            { name: "progressBarHeightRatio", value: progressBarHeightRatio, min: 0.1, max: 1.0, step: 0.01,
+              label: "Прогресс-бар: высота", description: "Высота прогресс-бара внутри силоса" },
+            { name: "textSize", value: textSize, min: 8, max: 50, step: 1,
+              label: "Размер текста", description: "Размер шрифта названия силоса" },
+            { name: "shutterButtonHeightRatio", value: shutterButtonHeightRatio, min: 0.02, max: 0.2, step: 0.01,
+              label: "Кнопка затвора: высота", description: "Высота кнопки затвора" },
+            { name: "containerRadius", value: containerRadius, min: 0, max: 30, step: 1,
+              label: "Скругление контейнера", description: "Радиус скругления углов контейнера силоса" },
+            { name: "borderWidth", value: borderWidth, min: 0.5, max: 5, step: 0.1,
+              label: "Ширина границы контейнера", description: "Толщина линии границы силоса" }
+        ]
+    }
 
-            case 1:
-                // Запуск
-                lineBtnShutterSilosElMotor.color = "green"
-                break
-
-            case 2:
-                // Ожидание
-                lineBtnShutterSilosElMotor.color = "yellow"
-                break
-
-            case 3:
-                // Ошибка
-                lineBtnShutterSilosElMotor.color = "red"
-                break
+    function setPropertySize(name, value) {
+        if (root.hasOwnProperty(name)) {
+            root[name] = value
+        } else {
+            console.warn("Property not found:", name)
         }
     }
 }

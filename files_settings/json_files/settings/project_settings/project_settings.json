@@ -29,102 +29,16 @@
     },
     "block_graphics": {
         "GroupeCement": {
-            "scales": {
-                "asdsdd": {
-                    "componentGroupe": "GroupeCement",
-                    "geometry": {
-                        "relH": 0.1,
-                        "relW": 0.1,
-                        "relX": 0.7353556485355649,
-                        "relY": 0.37777777777777777
-                    },
-                    "id_widget": "asdsdd",
-                    "name_widget": "asd",
-                    "subtype": "scales"
-                }
-            },
             "silos_vertical": {
-                "aaaa": {
+                "asdda": {
                     "componentGroupe": "GroupeCement",
                     "geometry": {
                         "relH": 0.25,
                         "relW": 0.05,
-                        "relX": 0.6067991631799163,
-                        "relY": 0.04837962962962958
+                        "relX": 0.3855648535564854,
+                        "relY": 0.34328703703703706
                     },
-                    "id_widget": "aaaa",
-                    "name_widget": "asd",
-                    "subtype": "silos_vertical"
-                },
-                "asd": {
-                    "componentGroupe": "GroupeCement",
-                    "geometry": {
-                        "relH": 0.25,
-                        "relW": 0.05,
-                        "relX": 0.8017782426778243,
-                        "relY": 0.05023148148148145
-                    },
-                    "id_widget": "asd",
-                    "name_widget": "asd",
-                    "subtype": "silos_vertical"
-                },
-                "asdasdasd": {
-                    "componentGroupe": "GroupeCement",
-                    "geometry": {
-                        "relH": 0.25,
-                        "relW": 0.05,
-                        "relX": 0.4648535564853556,
-                        "relY": 0.04907407407407405
-                    },
-                    "id_widget": "asdasdasd",
-                    "name_widget": "asd",
-                    "subtype": "silos_vertical"
-                },
-                "asdasdasdasdasd": {
-                    "componentGroupe": "GroupeCement",
-                    "geometry": {
-                        "relH": 0.25,
-                        "relW": 0.05,
-                        "relX": 0.3842050209205022,
-                        "relY": 0.05462962962962968
-                    },
-                    "id_widget": "asdasdasdasdasd",
-                    "name_widget": "asd",
-                    "subtype": "silos_vertical"
-                },
-                "asdd": {
-                    "componentGroupe": "GroupeCement",
-                    "geometry": {
-                        "relH": 0.25,
-                        "relW": 0.05,
-                        "relX": 0.7383891213389122,
-                        "relY": 0.0523148148148148
-                    },
-                    "id_widget": "asdd",
-                    "name_widget": "asd",
-                    "subtype": "silos_vertical"
-                },
-                "qwqw": {
-                    "componentGroupe": "GroupeCement",
-                    "geometry": {
-                        "relH": 0.25,
-                        "relW": 0.05,
-                        "relX": 0.5392259414225942,
-                        "relY": 0.04699074074074077
-                    },
-                    "id_widget": "qwqw",
-                    "name_widget": "asd",
-                    "subtype": "silos_vertical"
-                },
-                "sssasa": {
-                    "componentGroupe": "GroupeCement",
-                    "geometry": {
-                        "relH": 0.25,
-                        "relW": 0.05,
-                        "relX": 0.6723849372384937,
-                        "relY": 0.052083333333333336
-                    },
-                    "id_widget": "sssasa",
+                    "id_widget": "asdda",
                     "name_widget": "asd",
                     "subtype": "silos_vertical"
                 }

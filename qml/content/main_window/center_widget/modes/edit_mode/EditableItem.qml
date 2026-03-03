@@ -9,6 +9,7 @@ import qml.content.main_window.center_widget.modes.edit_mode.dialog_resize_eleme
 Item {
     id: wrapper
 
+    property var widget: null
     // =====================================================
     // ОТНОСИТЕЛЬНАЯ ГЕОМЕТРИЯ (ЕДИНСТВЕННЫЙ ИСТОЧНИК ИСТИНЫ)
     // =====================================================
@@ -28,6 +29,7 @@ Item {
     // =====================================================
     // СЦЕНА
     // =====================================================
+    property Item scene: null
     property Item sceneContainer: null
     property var sceneController: null
 
@@ -60,18 +62,20 @@ Item {
     // =====================================================
     function setWidget(widget) {
         // удаляем старый
+        wrapper.widget = null
         for (let i = contentItem.children.length - 1; i >= 0; i--) {
             contentItem.children[i].destroy()
         }
 
         if (!widget) {
+            wrapper.widget = null
             console.error("[EditableItem] setWidget: widget is null")
             return false
         }
 
         widget.parent = contentItem
         widget.anchors.fill = contentItem
-
+        wrapper.widget = widget
         return true
     }
 
@@ -214,5 +218,6 @@ Item {
     DialogResizeElement {
         id: resizeDialog
         targetElement: wrapper
+        parent: wrapper.scene
     }
 }

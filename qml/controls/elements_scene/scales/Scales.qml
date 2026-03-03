@@ -130,10 +130,6 @@ Item {
                                         btnZeroing.checked = false
                                         root.isZeroingInProgress = false
                                     }
-
-                                    if (root.signalBus && root.id_element) {
-                                        root.signalBus.emit("handModeActivated", root.id_element, { value: checked })
-                                    }
                                 }
 
                                 CustomToolTip {

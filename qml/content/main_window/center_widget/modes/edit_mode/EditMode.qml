@@ -33,13 +33,6 @@ Item {
     // ============================================================
     // КОРНЕВОЙ КОНТЕЙНЕР СЦЕНЫ
     // ============================================================
-    // ВАЖНО:
-    // Мы разделяем сцену на слои:
-    // 1) backgroundLayer
-    // 2) gridLayer
-    // 3) elementsLayer
-    // Это предотвращает перекрытие MouseArea и проблем с drag
-    // ============================================================
     Item {
         id: sceneRoot
         anchors.fill: parent
@@ -136,6 +129,7 @@ Item {
         EditableItem {
             editMode: root.editMode
             sceneContainer: elementsLayer
+            scene: sceneRoot
         }
     }
 
