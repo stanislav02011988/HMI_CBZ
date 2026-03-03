@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import qml.content.main_window.center_widget.component.silos
+import "../silos"
 
 Item{
     id: root

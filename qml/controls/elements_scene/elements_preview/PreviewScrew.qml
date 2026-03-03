@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import qml.content.main_window.center_widget.component.screw
+import "../screw"
 
 Item{
     id: root

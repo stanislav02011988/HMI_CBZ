@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import qml.content.main_window.center_widget.component.scales
+import "../scales"
 
 Item{
     id: root

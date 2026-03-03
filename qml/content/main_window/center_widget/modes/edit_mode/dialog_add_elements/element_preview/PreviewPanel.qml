@@ -3,6 +3,8 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
+import qml.controls.elements_scene
+
 ColumnLayout {
     id: root
     Layout.preferredWidth: 300

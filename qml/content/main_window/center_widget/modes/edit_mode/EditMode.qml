@@ -8,10 +8,10 @@ import QtQuick
 import QtQuick.Controls
 
 import qml.managers
-
+import qml.controls.elements_scene
 import qml.content.main_window.center_widget.modes.edit_mode.panel_button_edit_mode
 import qml.content.main_window.center_widget.modes.edit_mode.dialog_add_elements
-import qml.content.main_window.center_widget.modes.edit_mode.dialog_add_elements.element_preview
+
 
 Item {
     id: root

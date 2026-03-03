@@ -2,7 +2,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import "component_preview"
+import "elements_preview"
 
 Item {
     id: root

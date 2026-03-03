@@ -1,0 +1,2 @@
+module qml.content.main_window.center_widget.component.silos.dialogs.dialog_confirm_delete
+DialogConfirmDelete 1.0 DialogConfirmDelete.qml

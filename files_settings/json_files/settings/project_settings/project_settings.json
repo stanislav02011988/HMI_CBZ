@@ -80,6 +80,18 @@
                     "name_widget": "asd",
                     "subtype": "silos_vertical"
                 },
+                "asdasdasdasdasd": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.3842050209205022,
+                        "relY": 0.05462962962962968
+                    },
+                    "id_widget": "asdasdasdasdasd",
+                    "name_widget": "asd",
+                    "subtype": "silos_vertical"
+                },
                 "asdd": {
                     "componentGroupe": "GroupeCement",
                     "geometry": {
