@@ -1,10 +1,10 @@
-// edit_mode_internal/item/EditableItem.qml
+// EditableItem.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
-import qml.content.main_window.center_widget.modes.edit_mode.edit_mode_internal.item.dialog_resize_element
+import qml.content.main_window.center_widget.modes.edit_mode.dialog_resize_element
 
 Item {
     id: wrapper

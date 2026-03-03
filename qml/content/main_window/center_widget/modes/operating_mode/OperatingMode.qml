@@ -5,7 +5,7 @@ import QtQuick.Controls
 import qml.settings.project_settings
 import qml.managers
 import qml.content.main_window.center_widget.modes.edit_mode.dialog_add_elements.element_preview
-import "../edit_mode/edit_mode_internal"
+import qml.content.main_window.center_widget.modes.edit_mode
 
 Item {
     id: root
@@ -33,14 +33,15 @@ Item {
         }
     }
 
+    // ============================================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
     Component.onCompleted: {
         QmlSceneManager.configure({
-            componentRegister: QmlRegisterComponentObject,
-            projectSettings: QmlProjectSettings,
+            sceneController: root,
             sceneContainer: sceneContainer,
             wrapperComponent: wrapperComponent,
-            previewComponents: previewComponents,
-            editModeRoot: root,
+            previewComponents: previewComponents,            
             editMode: root.editMode
         })
 

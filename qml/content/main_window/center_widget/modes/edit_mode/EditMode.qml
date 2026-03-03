@@ -7,9 +7,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import qml.settings.project_settings
 import qml.managers
-import "edit_mode_internal"
 
 import qml.content.main_window.center_widget.modes.edit_mode.panel_button_edit_mode
 import qml.content.main_window.center_widget.modes.edit_mode.dialog_add_elements
@@ -22,14 +20,7 @@ Item {
     // ============================================================
     // ОСНОВНЫЕ СВОЙСТВА
     // ============================================================
-
     property bool editMode: true
-
-    property var componentRegister: QmlRegisterComponentObject
-    property var projectSettings: QmlProjectSettings
-
-    // список выбранных элементов (используется менеджером)
-    property var selectedItems: []
 
     // ============================================================
     // НАСТРОЙКИ СЕТКИ
@@ -49,7 +40,6 @@ Item {
     // 3) elementsLayer
     // Это предотвращает перекрытие MouseArea и проблем с drag
     // ============================================================
-
     Item {
         id: sceneRoot
         anchors.fill: parent
@@ -102,7 +92,7 @@ Item {
         Item {
             id: elementsLayer
             anchors.fill: parent
-            z: 5
+            z: 2
         }
 
         // --------------------------------------------------------
@@ -141,9 +131,8 @@ Item {
     // ============================================================
     // Каждый элемент сцены создаётся через этот Component
     // ============================================================
-
     Component {
-        id: editableWrapperComponent
+        id: wrapperComponent
         EditableItem {
             editMode: root.editMode
             sceneContainer: elementsLayer
@@ -153,16 +142,12 @@ Item {
     // ============================================================
     // ИНИЦИАЛИЗАЦИЯ
     // ============================================================
-
     Component.onCompleted: {
-
         QmlSceneManager.configure({
-            componentRegister: componentRegister,
-            projectSettings: projectSettings,
+            sceneController: root,
             sceneContainer: elementsLayer,
-            wrapperComponent: editableWrapperComponent,
+            wrapperComponent: wrapperComponent,
             previewComponents: previewComponents,
-            editModeRoot: root,
             editMode: root.editMode
         })
 
@@ -184,20 +169,18 @@ Item {
     // ============================================================
     // ДИАЛОГ ДОБАВЛЕНИЯ ЭЛЕМЕНТА
     // ============================================================
-
     DialogAddElements {
         id: dialogAddElement
         sceneController: root
 
         onSignalAddElement: (data) => {
-            addItemToScene(data)
+            QmlSceneManager.addItemToScene(data)
         }
     }
 
     // ============================================================
     // ПАНЕЛЬ УПРАВЛЕНИЯ
     // ============================================================
-
     PanelButtonEditMode {
         anchors.left: parent.left
         anchors.top: parent.top
@@ -212,91 +195,11 @@ Item {
     // ============================================================
     // РАМКА РЕЖИМА (для визуального отличия edit режима)
     // ============================================================
-
     Rectangle {
         anchors.fill: parent
         color: "transparent"
         border.color: "green"
         border.width: 2
         z: 1000
-    }
-
-    // =========================================================================
-    // ДОБАВЛЕНИЕ ЭЛЕМЕНТА
-    // =========================================================================
-    // Фабрика для создания виджетов
-    function createWidget(type, data) {
-        const component = previewComponents.getPreviewComponent(type)
-        if (!component) {
-            console.error(`[ERR] Компонент не найден: ${type}`)
-            return null
-        }
-        return component.createObject(null, data)
-    }
-
-    // Вычисление геометрии
-    function computeGeometry(data) {
-        const isSilos = data.subtype === "silos_vertical"
-        const relW = isSilos ? 0.05 : 0.1
-        const relH = isSilos ? 0.25 : 0.1
-        const offset = (componentRegister?.count || 0) * 0.15
-        return {
-            relX: Math.min(0.7, 0.1 + (offset % 0.6)),
-            relY: Math.min(0.7, 0.15 + ((offset * 0.5) % 0.6)),
-            relW, relH
-        }
-    }
-
-    // Регистрация обёртки и подключение сигналов
-    function registerWrapper(wrapper, widget) {
-        if (!componentRegister) return true
-        if (!componentRegister.registerElement(wrapper, widget)) {
-            console.warn(`[WARN] Не удалось зарегистрировать: ${widget.id_widget}`)
-            wrapper.destroy()
-            return false
-        }
-
-        wrapper.requestSelect.connect((toggle) => QmlSceneManager.selectItem(wrapper, toggle))
-        wrapper.requestDelete.connect(() => QmlSceneManager.removeItem(wrapper))
-        return true
-    }
-
-    // Основная функция добавления
-    function addItemToScene(data) {
-        if (!data?.subtype) {
-            console.error("[ERR] Некорректные данные элемента")
-            return null
-        }
-
-        // Создаём виджет заранее
-        const widget = createWidget(data.subtype, {
-            id_widget: data.id_widget,
-            name_widget: data.name_widget,
-            componentGroupe: data.componentGroupe,
-            subtype: data.subtype
-        })
-        if (!widget) return null
-
-        // Создаём обёртку
-        const wrapper = editableWrapperComponent.createObject(elementsLayer, {
-            geometry: computeGeometry(data),
-            sceneContainer: elementsLayer,
-            sceneController: root
-        })
-
-        if (!wrapper) {
-            console.error("[ERR] Не удалось создать EditableItem")
-            widget.destroy()
-            return null
-        }
-
-        // Устанавливаем виджет внутрь обёртки
-        wrapper.setWidget(widget)
-
-        // Регистрация и подключение сигналов
-        if (!registerWrapper(wrapper, widget)) return null
-
-        console.log(`[OK] Элемент добавлен: ${data.id_widget} (${data.subtype})`)
-        return wrapper
     }
 }

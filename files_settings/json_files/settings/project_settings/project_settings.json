@@ -44,6 +44,18 @@
                 }
             },
             "silos_vertical": {
+                "aaaa": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.6067991631799163,
+                        "relY": 0.04837962962962958
+                    },
+                    "id_widget": "aaaa",
+                    "name_widget": "asd",
+                    "subtype": "silos_vertical"
+                },
                 "asd": {
                     "componentGroupe": "GroupeCement",
                     "geometry": {
@@ -53,6 +65,18 @@
                         "relY": 0.05023148148148145
                     },
                     "id_widget": "asd",
+                    "name_widget": "asd",
+                    "subtype": "silos_vertical"
+                },
+                "asdasdasd": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.4648535564853556,
+                        "relY": 0.04907407407407405
+                    },
+                    "id_widget": "asdasdasd",
                     "name_widget": "asd",
                     "subtype": "silos_vertical"
                 },
@@ -68,13 +92,25 @@
                     "name_widget": "asd",
                     "subtype": "silos_vertical"
                 },
+                "qwqw": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.5392259414225942,
+                        "relY": 0.04699074074074077
+                    },
+                    "id_widget": "qwqw",
+                    "name_widget": "asd",
+                    "subtype": "silos_vertical"
+                },
                 "sssasa": {
                     "componentGroupe": "GroupeCement",
                     "geometry": {
                         "relH": 0.25,
                         "relW": 0.05,
                         "relX": 0.6723849372384937,
-                        "relY": 0.27199074074074076
+                        "relY": 0.052083333333333336
                     },
                     "id_widget": "sssasa",
                     "name_widget": "asd",
