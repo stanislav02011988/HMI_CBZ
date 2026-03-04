@@ -27,16 +27,6 @@ Rectangle {
         anchors.topMargin: 4
         spacing: 5
 
-        // Функция для создания поля
-        function createField(labelText, valueText) {
-            var component = Qt.createComponent("ModelUser.qml");
-            var item = component.createObject(userFieldsRow, {
-                "fieldLabel": labelText,
-                "fieldValue": valueText
-            });
-            return item;
-        }
-
         // Но проще — использовать Repeater с моделью
         Repeater {
             model: [

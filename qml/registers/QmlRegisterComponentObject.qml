@@ -1,4 +1,4 @@
-// qml/managers/QmlRegisterComponentObject.qml
+// qml/registers/QmlRegisterComponentObject.qml
 pragma Singleton
 import QtQuick
 

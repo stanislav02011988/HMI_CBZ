@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material
 
-import qml.managers
+import qml.registers
 
 ColumnLayout {
     id: root

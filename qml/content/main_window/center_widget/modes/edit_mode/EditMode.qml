@@ -1,9 +1,3 @@
-// ============================================================================
-// EditMode.qml
-// Режим редактирования сцены
-// Полностью самодостаточная версия без EditModeInternal
-// ============================================================================
-
 import QtQuick
 import QtQuick.Controls
 
@@ -11,7 +5,6 @@ import qml.managers
 import qml.controls.elements_scene
 import qml.content.main_window.center_widget.modes.edit_mode.panel_button_edit_mode
 import qml.content.main_window.center_widget.modes.edit_mode.dialog_add_elements
-
 
 Item {
     id: root
@@ -23,6 +16,22 @@ Item {
     property bool editMode: true
 
     // ============================================================
+    // СВОЙСТВА ДОСТУПНЫЕ ИЗ ВНЕ
+    // ============================================================
+    property alias viewport: viewport
+    property alias world: world
+
+    // ==============================
+    // Параметры камеры
+    // ==============================
+    property real zoom: 1.0
+    property real minZoom: 0.2
+    property real maxZoom: 5.0
+
+    property real offsetX: 0
+    property real offsetY: 0
+
+    // ============================================================
     // НАСТРОЙКИ СЕТКИ
     // ============================================================
     property bool gridEnabled: false
@@ -30,23 +39,23 @@ Item {
     property string gridColor: "#1a1a2e"
     property real gridOpacity: 0.3
 
-    // ============================================================
-    // КОРНЕВОЙ КОНТЕЙНЕР СЦЕНЫ
-    // ============================================================
+    // ==============================
+    // VIEWPORT
+    // ==============================
+
     Item {
-        id: sceneRoot
+        id: viewport
         anchors.fill: parent
         clip: true
 
         // --------------------------------------------------------
-        // СЕТКА (рисуется поверх фона)
+        // СЕТКА
         // --------------------------------------------------------
         Item {
             id: gridLayer
             anchors.fill: parent
             z: 1
 
-            // Вертикальные линии
             Repeater {
                 id: verticalRepeater
                 model: root.gridEnabled
@@ -62,7 +71,6 @@ Item {
                 }
             }
 
-            // Горизонтальные линии
             Repeater {
                 id: horizontalRepeater
                 model: root.gridEnabled
@@ -79,31 +87,111 @@ Item {
             }
         }
 
-        // --------------------------------------------------------
-        // СЛОЙ ЭЛЕМЕНТОВ (ВСЕ EditableItem создаются здесь)
-        // --------------------------------------------------------
+        // ==========================
+        // WORLD
+        // ==========================
         Item {
-            id: elementsLayer
-            anchors.fill: parent
-            z: 2
+            id: world
+            x: root.offsetX
+            y: root.offsetY
+            width: 100000
+            height: 100000
+            scale: root.zoom
+            transformOrigin: Item.TopLeft
         }
 
-        // --------------------------------------------------------
-        // КЛИК ПО ФОНУ (СБРОС ВЫДЕЛЕНИЯ)
-        // --------------------------------------------------------
+        // ==========================
+        // УПРАВЛЕНИЕ МЫШЬЮ
+        // ==========================
         MouseArea {
+            id: mouseArea
+            visible: editMode
             anchors.fill: parent
-            z: 0
+            hoverEnabled: false
+            acceptedButtons: Qt.LeftButton
             propagateComposedEvents: true
 
-            onClicked: {
-                QmlSceneManager.deselectAll()
+            property point lastPos
+            property bool panning: false
+
+            cursorShape: panning
+                         ? Qt.ClosedHandCursor
+                         : Qt.ArrowCursor
+
+            onPressed: (mouse) => {
+
+                const ctrl = mouse.modifiers & Qt.ControlModifier
+
+                // Ctrl + ЛКМ → панорама
+                if (ctrl && mouse.button === Qt.LeftButton) {
+                    panning = true
+                    lastPos = Qt.point(mouse.x, mouse.y)
+                    mouse.accepted = true
+                    return
+                }
+
+                // ЛКМ без Ctrl → пока НЕ принимаем
+                mouse.accepted = false
+            }
+
+            onReleased: (mouse) => {
+                if (mouse.button === Qt.LeftButton)
+                    panning = false
+            }
+
+            onPositionChanged: (mouse) => {
+
+                if (!panning)
+                    return
+
+                let dx = mouse.x - lastPos.x
+                let dy = mouse.y - lastPos.y
+
+                root.offsetX += dx
+                root.offsetY += dy
+
+                lastPos = Qt.point(mouse.x, mouse.y)
+            }
+
+            onWheel: (wheel) => {
+
+                if (!(wheel.modifiers & Qt.ControlModifier))
+                    return
+
+                wheel.accepted = true
+
+                let oldZoom = root.zoom
+                let factor = 1.15
+
+                if (wheel.angleDelta.y > 0)
+                    root.zoom *= factor
+                else
+                    root.zoom /= factor
+
+                root.zoom = Math.max(root.minZoom,
+                                     Math.min(root.maxZoom, root.zoom))
+
+                let mouseX = wheel.x
+                let mouseY = wheel.y
+
+                let worldX = (mouseX - root.offsetX) / oldZoom
+                let worldY = (mouseY - root.offsetY) / oldZoom
+
+                root.offsetX = mouseX - worldX * root.zoom
+                root.offsetY = mouseY - worldY * root.zoom
+            }
+
+            onClicked: (mouse) => {
+                if (mouse.button === Qt.LeftButton &&
+                    !(mouse.modifiers & Qt.ControlModifier)) {
+                    QmlSceneManager.deselectAll()
+                }
             }
         }
     }
 
     // ============================================================
-    // КЛАВИАТУРА
+    // КЛАВИАТУРА (отслеживание Ctrl для курсора)
     // ============================================================
     focus: true
     Keys.onPressed: (event) => {
@@ -128,8 +216,8 @@ Item {
         id: wrapperComponent
         EditableItem {
             editMode: root.editMode
-            sceneContainer: elementsLayer
-            scene: sceneRoot
+            sceneContainer: world
+            scene: viewport
         }
     }
 
@@ -139,7 +227,7 @@ Item {
     Component.onCompleted: {
         QmlSceneManager.configure({
             sceneController: root,
-            sceneContainer: elementsLayer,
+            sceneContainer: world,
             wrapperComponent: wrapperComponent,
             previewComponents: previewComponents,
             editMode: root.editMode
@@ -148,25 +236,12 @@ Item {
         QmlSceneManager.loadScene()
     }
 
-    // =========================================================================
-    // ИЗМЕНЕНИЕ НАСТРОЕК СЕТКИ
-    // =========================================================================
-    function toggleGrid(enabled) {
-        root.gridEnabled = enabled
-        // console.log(` Сетка: ${enabled ? "включена" : "выключена"}`)
-    }
-
-    function setGridSpacing(spacing) {
-        root.gridSpacing = Math.max(10, Math.min(100, spacing))
-    }
-
     // ============================================================
     // ДИАЛОГ ДОБАВЛЕНИЯ ЭЛЕМЕНТА
     // ============================================================
     DialogAddElements {
         id: dialogAddElement
         sceneController: root
-
         onSignalAddElement: (data) => {
             QmlSceneManager.addItemToScene(data)
         }
@@ -186,6 +261,18 @@ Item {
         onSignalSave: QmlSceneManager.saveScene()
     }
 
+    // =========================================================================
+    // ИЗМЕНЕНИЕ НАСТРОЕК СЕТКИ
+    // =========================================================================
+    function toggleGrid(enabled) {
+        root.gridEnabled = enabled
+        // console.log(` Сетка: ${enabled ? "включена" : "выключена"}`)
+    }
+
+    function setGridSpacing(spacing) {
+        root.gridSpacing = Math.max(10, Math.min(100, spacing))
+    }
+
     // ============================================================
     // РАМКА РЕЖИМА (для визуального отличия edit режима)
     // ============================================================
@@ -194,6 +281,7 @@ Item {
         color: "transparent"
         border.color: "green"
         border.width: 2
+        radius: 4
         z: 1000
     }
 }

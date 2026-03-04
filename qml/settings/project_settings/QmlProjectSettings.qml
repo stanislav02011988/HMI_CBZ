@@ -34,13 +34,17 @@ QtObject {
     property string second_name: SettingsProject.itemsFileSettingsDict.block_user.second_name
     property string position_users: SettingsProject.itemsFileSettingsDict.block_user.position_users
     property string access_group: SettingsProject.itemsFileSettingsDict.block_user.access_group
-    property bool access: { if (SettingsProject.itemsFileSettingsDict.block_user.access_group === "admin") { return true } else { return false }}
 
-    function saveBlockUserSettings(dict_user){ SettingsProject.save_block_user_settings_project(dict_user) }
+    function saveBlockUserSettings(dict_user){ SettingsProject.save_block_user_settings_project(dict_user) }    
 
     //======== Сохранение и Загрузка данных Центральной Сцены Элементов QmlProjectSettings ========
     function saveBlockGraphics(dict_scene){ SettingsProject.save_block_graphics(dict_scene) }
     function loadBlockGraphics() { return SettingsProject.get_block_graphics() }
+
+    //======== Сохранение и Загрузка данных камеры сцены и зум QmlProjectSettings =====================================
+    function saveCameraParams(cameraData) { SettingsProject.save_camera_params(cameraData) }
+    function loadCameraParams() { return SettingsProject.load_camera_params() }
+    function resetCameraParams() { return SettingsProject.reset_camera_params() }
 
 
     Component.onCompleted: {

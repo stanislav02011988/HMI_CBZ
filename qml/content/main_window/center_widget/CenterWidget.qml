@@ -3,8 +3,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
-import qml.settings.project_settings
 import qml.managers
+import qml.settings.project_settings
 
 import qml.content.main_window.center_widget.modes.operating_mode
 import qml.content.main_window.center_widget.modes.edit_mode
@@ -13,7 +13,9 @@ Item {
     id: centerWidget
     anchors.fill: parent
 
+    property bool isActivateEditMode: QmlSceneManager.isActivateEditMode
     property bool editMode: false
+
     property alias mode: modeLoader.item
     signal sceneSaveRequested(var data)
 
@@ -23,12 +25,13 @@ Item {
         sourceComponent: editMode ? editModeComponent : operatingModeComponent
     }
 
-    Component { id: editModeComponent; EditMode { editMode: editMode} }
-    Component { id: operatingModeComponent; OperatingMode { editMode: editMode } }
+    Component { id: editModeComponent; EditMode { editMode: centerWidget.editMode } }
+    Component { id: operatingModeComponent; OperatingMode { editMode: centerWidget.editMode } }
 
     // === КНОПКА ПЕРЕКЛЮЧЕНИЯ (ПОСЛЕ Loader, с высоким z) ===
     Button {
         id: modeToggleButton
+        visible: centerWidget.isActivateEditMode
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 12

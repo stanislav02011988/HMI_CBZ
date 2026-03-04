@@ -22,7 +22,10 @@ Module {
     Method { name: "checking_file_path"; type: "void" }
     Method { name: "get_block_graphics"; type: "void" }
     Method { name: "get_parametrs_qml_module"; type: "void" }
+    Method { name: "load_camera_params"; type: "Optional"
+                Parameter { name: "default"; type: "Any" } }
     Method { name: "load_file_settings"; type: "void" }
+    Method { name: "reset_camera_params"; type: "bool" }
     Method { name: "save_block_graphics"; type: "void"
                 Parameter { name: "graphics_dict"; type: "var" } }
     Method { name: "save_block_installation_settings"; type: "void"
@@ -31,6 +34,8 @@ Module {
                 Parameter { name: "usFormat"; type: "bool" } }
     Method { name: "save_block_user_settings_project"; type: "void"
                 Parameter { name: "dict_user"; type: "var" } }
+    Method { name: "save_camera_params"; type: "bool"
+                Parameter { name: "camera_data"; type: "var" } }
     Method { name: "save_theme"; type: "void"
                 Parameter { name: "name_theme"; type: "var" } }
                                     }

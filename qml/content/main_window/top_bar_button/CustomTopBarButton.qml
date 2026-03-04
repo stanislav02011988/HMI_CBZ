@@ -3,7 +3,9 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
+import qml.settings.project_settings
 import qml.settings.menager_theme
+import qml.managers
 
 import qml.controls.switch
 import qml.controls.menu_bar
@@ -49,10 +51,38 @@ Item {
                 height: bg.height
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                accessUser: QmlProjectSettings.access_group
                 onMenuActionTriggered: (action) => {
-                    console.log("Действие:", action)
-                    if (action === "file_exit") {
-                        Qt.quit()
+                    switch (action) {
+                        case "file_new":
+                            console.log("Создать новый файл")
+                            // сюда код для нового файла
+                            break
+
+                        case "file_open":
+                            console.log("Открыть файл")
+                            // сюда код для открытия файла
+                            break
+
+                        case "file_exit":
+                            Qt.quit()
+                            break
+
+                        case "edit_copy":
+                            console.log("Копировать")
+                            break
+
+                        case "edit_paste":
+                            console.log("Вставить")
+                            break
+
+                        case "edit_mode_scene":
+                            QmlSceneManager.activateEditMode()
+                            break
+
+                        default:
+                            console.log("Неизвестное действие:", action)
+                            break
                     }
                 }
             }

@@ -52,9 +52,10 @@
         <file>qml/content/main_window/MainWindow.qml</file>
     </qresource>
     <qresource prefix="/">
-        <file>qml/managers/QmlRegisterComponentObject.qml</file>
         <file>qml/managers/QmlSceneManager.qml</file>
         <file>qml/content/main_window/center_widget/modes/edit_mode/EditableItem.qml</file>
+        <file>qml/managers/QmlSceneLogicManager.qml</file>
+        <file>qml/registers/QmlRegisterComponentObject.qml</file>
     </qresource>
     <qresource prefix="/svg_icon_btn">
         <file>res/svg/svg_image_btn/reset/reset_a.svg</file>

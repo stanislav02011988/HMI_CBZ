@@ -8,7 +8,14 @@ Item {
     width: parent ? parent.width : 600
     height: 40  // ← фиксируем высоту top bar (обычно 30–50 px)
 
-    property var menuModel: [
+    signal menuActionTriggered(string action)
+
+    property string accessUser: "user"
+
+    // ------------------------------------------------------------
+    // БАЗОВОЕ МЕНЮ
+    // ------------------------------------------------------------
+    property var baseMenuModel: [
         {
             label: "Файл",
             items: [
@@ -33,7 +40,32 @@ Item {
         }
     ]
 
-    signal menuActionTriggered(string action)
+    // ------------------------------------------------------------
+    // МЕНЮ РЕДАКТИРОВАНИЯ
+    // ------------------------------------------------------------
+    property var editMenu: {
+        return {
+            label: "Режим редактирования",
+            items: [
+                { text: "Cхемы Сцены", action: "edit_mode_scene" },
+                { text: "Cхемы Логики", action: "edit_mode_logic" },
+                { text: "Cхемы ПЛК", action: "edit_mode_plc" }
+            ]
+        }
+    }
+
+    // ------------------------------------------------------------
+    // ДИНАМИЧЕСКАЯ МОДЕЛЬ (реактивная!)
+    // ------------------------------------------------------------
+    property var finalMenuModel: []
+
+    onAccessUserChanged: {
+        finalMenuModel = accessUser === "admin" ? baseMenuModel.concat([editMenu]) : baseMenuModel
+    }
+
+    Component.onCompleted: {
+        finalMenuModel = accessUser === "admin" ? baseMenuModel.concat([editMenu]) : baseMenuModel
+    }
 
     RowLayout {
         anchors.left: parent.left
@@ -42,7 +74,7 @@ Item {
         spacing: 4
 
         Repeater {
-            model: root.menuModel
+            model: root.finalMenuModel
 
             Item {
                 // 🔑 КЛЮЧЕВОЕ: не задаём preferredWidth!
@@ -89,8 +121,8 @@ Item {
                     closePolicy: Popup.CloseOnPressOutside
 
                     background: Rectangle {
-                        color: "transparent"
-                        border.color: "red"
+                        color: "#ffffff"
+                        border.color: "#cccccc"
                         radius: 4
                     }
 

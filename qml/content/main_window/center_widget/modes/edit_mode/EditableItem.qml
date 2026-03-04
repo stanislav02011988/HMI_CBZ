@@ -25,7 +25,7 @@ Item {
     property var state: ({ isSelected: false, editMode: false })
     property bool isSelected: state.isSelected
     property bool editMode: state.editMode
-
+    property bool ctrlPressed: false
     // =====================================================
     // СЦЕНА
     // =====================================================
@@ -36,18 +36,16 @@ Item {
     // =====================================================
     // СИГНАЛЫ
     // =====================================================
-
     signal requestDelete()
     signal requestSelect(bool toggle)
 
     // =====================================================
-    // ПЕРЕВОД RELATIVE
+    // ПЕРЕВОД RELATIVE В ПИКСЕЛИ
     // =====================================================
-
-    x: sceneContainer ? relX * sceneContainer.width : 0
-    y: sceneContainer ? relY * sceneContainer.height : 0
-    width: sceneContainer ? relW * sceneContainer.width : 0
-    height: sceneContainer ? relH * sceneContainer.height : 0
+    x: sceneController?.viewport ? relX * sceneController.viewport.width : 0
+    y: sceneController?.viewport ? relY * sceneController.viewport.height : 0
+    width: sceneController?.viewport ? relW * sceneController.viewport.width : 0
+    height: sceneController?.viewport ? relH * sceneController.viewport.height : 0
 
     // =====================================================
     // КОНТЕЙНЕР ДЛЯ ВИДЖЕТА
@@ -103,6 +101,7 @@ Item {
     // =====================================================
     MouseArea {
         id: hoverArea
+        visible: editMode
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -111,7 +110,6 @@ Item {
         cursorShape: (editMode && isSelected) ? Qt.SizeAllCursor : Qt.ArrowCursor
 
         onClicked: (mouse) => {
-
             if (!editMode)
                 return
 
@@ -126,15 +124,19 @@ Item {
                 mouse.accepted = true
             }
         }
+        onPressed: (mouse) => {
+            mouse.accepted = true
+        }
     }
 
     // =====================================================
-    // ПЕРЕТАСКИВАНИЕ
+    // ПЕРЕТАСКИВАНИЕ (только в editMode)
     // =====================================================
     MouseArea {
         anchors.fill: parent
+        visible: editMode
         enabled: editMode && isSelected
-        propagateComposedEvents: false
+        propagateComposedEvents: true
         cursorShape: (editMode && isSelected) ? Qt.SizeAllCursor : Qt.ArrowCursor
 
         property real dragOffsetX: 0
@@ -146,19 +148,18 @@ Item {
         }
 
         onPositionChanged: (mouse) => {
-
-            if (!pressed || !sceneContainer)
+            if (!pressed || !sceneController || !sceneController.viewport)
                 return
 
             let newX = wrapper.x + mouse.x - dragOffsetX
             let newY = wrapper.y + mouse.y - dragOffsetY
 
-            // ограничение внутри сцены
-            newX = Math.max(0, Math.min(sceneContainer.width  - wrapper.width,  newX))
-            newY = Math.max(0, Math.min(sceneContainer.height - wrapper.height, newY))
+            // Ограничение внутри viewport
+            newX = Math.max(0, Math.min(sceneController.viewport.width - wrapper.width, newX))
+            newY = Math.max(0, Math.min(sceneController.viewport.height - wrapper.height, newY))
 
-            relX = newX / sceneContainer.width
-            relY = newY / sceneContainer.height
+            relX = newX / sceneController.viewport.width
+            relY = newY / sceneController.viewport.height
         }
     }
 

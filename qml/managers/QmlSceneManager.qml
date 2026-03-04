@@ -1,7 +1,9 @@
+// qml/managers/QmlSceneLogicManager.qml
 pragma Singleton
 import QtQuick
 
 import qml.managers
+import qml.registers
 import qml.settings.project_settings
 
 QtObject {
@@ -17,6 +19,15 @@ QtObject {
     // =====================================================
     property var componentRegister: QmlRegisterComponentObject
     property var projectSettings: QmlProjectSettings
+
+    // =====================================================
+    // Появление кнопки для редактирования главной сцены
+    // =====================================================
+    property bool isActivateEditMode: false
+    function activateEditMode() {
+        const newMode = !isActivateEditMode
+        isActivateEditMode = newMode
+    }
 
     property var sceneController: null
     property Item sceneContainer: null
@@ -68,7 +79,8 @@ QtObject {
             relY: data.geometry.relY,
             relW: data.geometry.relW,
             relH: data.geometry.relH,
-            sceneContainer: sceneContainer
+            sceneContainer: sceneContainer,
+            sceneController: sceneController
         })
 
         if (!wrapper) {
@@ -110,7 +122,6 @@ QtObject {
     // LOAD
     // =====================================================
     function loadScene() {
-
         clearScene()
 
         if (!projectSettings)
@@ -127,25 +138,26 @@ QtObject {
                 }
             }
         }
+
+        loadCamera()
     }
 
     // =====================================================
     // SAVE
     // =====================================================
     function saveScene() {
-
         if (!componentRegister || !projectSettings)
             return
 
         const data = componentRegister.exportSceneData()
         projectSettings.saveBlockGraphics(data)
+        saveCamera()
     }
 
     // =====================================================
     // CLEAR
     // =====================================================
     function clearScene() {
-
         deselectAll()
 
         if (componentRegister)
@@ -163,7 +175,6 @@ QtObject {
     // ВЫДЕЛЕНИЕ
     // =====================================================
     function deselectAll() {
-
         if (!selectedItems || selectedItems.length === 0)
             return
 
@@ -176,7 +187,6 @@ QtObject {
     }
 
     function selectItem(wrapper, toggle) {
-
         if (!wrapper)
             return
 
@@ -186,19 +196,14 @@ QtObject {
         toggle = toggle || false
 
         if (toggle && selectedItems.indexOf(wrapper) !== -1) {
-
             wrapper.isSelected = false
             selectedItems.splice(selectedItems.indexOf(wrapper), 1)
 
         } else if (toggle) {
-
             wrapper.isSelected = true
             selectedItems.push(wrapper)
-
         } else {
-
             deselectAll()
-
             wrapper.isSelected = true
             selectedItems.push(wrapper)
         }
@@ -211,6 +216,14 @@ QtObject {
     // ДОБАВЛЕНИЕ ЭЛЕМЕНТА
     // =========================================================================
     function addItemToScene(data) {
+        console.log("[DEBUG] sceneController:", sceneController)
+        console.log("[DEBUG] viewport:", sceneController?.viewport)
+        console.log("[DEBUG] viewport.width:", sceneController?.viewport?.width)
+        console.log("[DEBUG] viewport.height:", sceneController?.viewport?.height)
+        console.log("[DEBUG] zoom:", sceneController?.zoom)
+        console.log("[DEBUG] offsetX:", sceneController?.offsetX)
+        console.log("[DEBUG] offsetY:", sceneController?.offsetY)
+
         if (!data?.subtype) {
             console.error("[ERR] Некорректные данные элемента")
             return null
@@ -225,11 +238,21 @@ QtObject {
         })
         if (!widget) return null
 
+        // Вычисляем геометрию с учётом камеры
+        const geometry = computeGeometry(
+            data,
+            sceneController.viewport,    // viewport.width/height
+            sceneController.zoom,        // зум
+            sceneController.offsetX,     // смещение X
+            sceneController.offsetY      // смещение Y
+        )
+
         // Создаём обёртку
         const wrapper = wrapperComponent.createObject(sceneContainer, {
-            geometry: computeGeometry(data),
+            geometry: geometry,
             sceneContainer: sceneContainer,
-            sceneController: sceneController
+            sceneController: sceneController,
+            editMode: editMode
         })
 
         if (!wrapper) {
@@ -258,20 +281,45 @@ QtObject {
         return component.createObject(null, data)
     }
 
-    // Вычисление геометрии
-    function computeGeometry(data) {
+    // =========================================================================
+    // ВЫЧИСЛЕНИЕ ГЕОМЕТРИИ
+    // =========================================================================
+    function computeGeometry(data, viewport, zoom, offsetX, offsetY) {
+        // Защита от невалидных данных
+        if (!viewport || viewport.width <= 0 || viewport.height <= 0) {
+            console.error("[ERR] computeGeometry: invalid viewport")
+            return { relX: 0.1, relY: 0.1, relW: 0.1, relH: 0.1 }
+        }
+
+        if (zoom <= 0) {
+            console.error("[ERR] computeGeometry: invalid zoom")
+            zoom = 1.0
+        }
+
         const isSilos = data.subtype === "silos_vertical"
         const relW = isSilos ? 0.05 : 0.1
         const relH = isSilos ? 0.25 : 0.1
+
+        // Смещение для каскадного размещения
         const offset = (componentRegister?.count || 0) * 0.15
+
+        // === 1. Позиция в координатах viewport (экрана) ===
+        const screenX = viewport.width * Math.min(0.7, 0.1 + (offset % 0.6))
+        const screenY = viewport.height * Math.min(0.7, 0.15 + ((offset * 0.5) % 0.6))
+
+        // === 2. Относительные координаты (0.0–1.0) ОТНОСИТЕЛЬНО VIEWPORT ===
+        // НЕ конвертируем в мировые! Храним как есть.
         return {
-            relX: Math.min(0.7, 0.1 + (offset % 0.6)),
-            relY: Math.min(0.7, 0.15 + ((offset * 0.5) % 0.6)),
-            relW, relH
+            relX: screenX / viewport.width,      // ~0.1–0.7
+            relY: screenY / viewport.height,     // ~0.15–0.7
+            relW: relW,                           // 0.05 или 0.1
+            relH: relH                            // 0.25 или 0.1
         }
     }
 
+    // =========================================================================
     // Регистрация обёртки и подключение сигналов
+    // =========================================================================
     function registerWrapper(wrapper, widget) {
         if (!componentRegister) return true
         if (!componentRegister.registerElement(wrapper, widget)) {
@@ -283,5 +331,37 @@ QtObject {
         wrapper.requestSelect.connect((toggle) => selectItem(wrapper, toggle))
         wrapper.requestDelete.connect(() => removeItem(wrapper))
         return true
+    }
+
+    // =========================================================================
+    // Сохранение настроек камеры
+    // =========================================================================
+    function saveCamera() {
+        if (!sceneController || !projectSettings)
+            return
+
+        projectSettings.saveCameraParams({
+            zoom: sceneController.zoom,
+            offsetX: sceneController.offsetX,
+            offsetY: sceneController.offsetY
+        })
+    }
+
+    // =========================================================================
+    // Загрузка настроек камеры
+    // =========================================================================
+    function loadCamera() {
+
+        if (!sceneController || !projectSettings)
+            return
+
+        const cam = projectSettings.loadCameraParams()
+
+        if (!cam)
+            return
+
+        sceneController.zoom    = cam.zoom
+        sceneController.offsetX = cam.offsetX
+        sceneController.offsetY = cam.offsetY
     }
 }

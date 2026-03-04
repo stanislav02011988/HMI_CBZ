@@ -2,7 +2,6 @@
 // SilosVertical.qml
 // Production-версия с адаптивной системой масштабирования
 // ===============================================================
-
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -65,7 +64,7 @@ Item {
 
     property string id_widget: ""
     property string name_widget: ""
-    property real level_cement_silos: 0
+    property real level_cement_silos: 0.5
 
     property string id_valve_air: ""
     property string name_valve_air: ""
@@ -171,6 +170,7 @@ Item {
                 BtnShutterModeToggle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: parent.height * shutterButtonHeightRatio
+                    controlMode: true
                 }
             }
         }

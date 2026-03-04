@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
+from typing import Any, Optional, Dict, List
+
 from PySide6.QtCore import QObject, Slot, Signal, Property, QFileSystemWatcher, QTimer
-from PySide6.QtQml import QQmlPropertyMap
+from PySide6.QtQml import QQmlPropertyMap, QJSValue
 
 from python.py_utils.decorators.decorators_qml_registration_module.decorators_qml_registration_module import QmlRegistrationModule
 
@@ -215,3 +217,105 @@ class SettingsProject(QObject):
         ) or {}
 
         return items.get("block_graphics", {})
+
+    # =====================================================
+    # КАМЕРА - СОХРАНЕНИЕ
+    # =====================================================
+    @Slot("QVariant")
+    def save_camera_params(self, camera_data) -> bool:
+        try:
+            # Универсальное преобразование
+            if hasattr(camera_data, "toVariant"):
+                camera_data = camera_data.toVariant()
+
+            if not isinstance(camera_data, dict):
+                raise TypeError(
+                    f"camera_data must be dict, got {type(camera_data)}"
+                )
+
+            items = self._json_menager.read_json_file(
+                self._file_path,
+                self._file_name
+            ) or {}
+
+            if "block_graphics" not in items:
+                items["block_graphics"] = {}
+
+            items["block_graphics"]["Camera_Settings"] = {
+                "zoom": float(camera_data.get("zoom", 1.0)),
+                "offsetX": float(camera_data.get("offsetX", 0)),
+                "offsetY": float(camera_data.get("offsetY", 0))
+            }
+
+            self._json_menager.write_json_file(
+                path_folder=self._file_path,
+                file_name=self._file_name,
+                items=items
+            )
+
+            return True
+
+        except Exception as e:
+            print(f"[ERR] save_camera_params: {e}")
+            return False
+
+
+
+    # =====================================================
+    # КАМЕРА - ЗАГРУЗКА
+    # =====================================================
+    @Slot(result="QVariant")
+    def load_camera_params(self, default: Any = None) -> Optional[dict]:
+        try:
+            items = self._json_menager.read_json_file(
+                self._file_path,
+                self._file_name
+            ) or {}
+
+            # Проверяем наличие внутри block_graphics
+            if "block_graphics" not in items:
+                return default
+
+            if "Camera_Settings" not in items["block_graphics"]:
+                return default
+
+            camera_data = items["block_graphics"]["Camera_Settings"]
+
+            return {
+                "zoom": float(camera_data.get("zoom", 1.0)),
+                "offsetX": float(camera_data.get("offsetX", 0)),
+                "offsetY": float(camera_data.get("offsetY", 0))
+            }
+
+        except Exception as e:
+            print(f"[ERR] load_camera_params: {e}")
+            return default
+
+
+    # =====================================================
+    # КАМЕРА - СБРОС
+    # =====================================================
+    @Slot()
+    def reset_camera_params(self) -> bool:
+        try:
+            items = self._json_menager.read_json_file(
+                self._file_path,
+                self._file_name
+            ) or {}
+
+            if "block_graphics" in items and \
+               "Camera_Settings" in items["block_graphics"]:
+
+                del items["block_graphics"]["Camera_Settings"]
+
+                self._json_menager.write_json_file(
+                    path_folder=self._file_path,
+                    file_name=self._file_name,
+                    items=items
+                )
+
+            return True
+
+        except Exception as e:
+            print(f"[ERR] reset_camera_params: {e}")
+            return False

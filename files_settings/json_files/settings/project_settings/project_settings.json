@@ -30,19 +30,52 @@
     "block_graphics": {
         "GroupeCement": {
             "silos_vertical": {
-                "asdda": {
+                "222": {
                     "componentGroupe": "GroupeCement",
                     "geometry": {
                         "relH": 0.25,
                         "relW": 0.05,
-                        "relX": 0.3855648535564854,
-                        "relY": 0.34328703703703706
+                        "relX": 0.47512279425140996,
+                        "relY": 0.21292270531400956
                     },
-                    "id_widget": "asdda",
+                    "id_widget": "222",
+                    "name_widget": "2222222",
+                    "subtype": "silos_vertical"
+                },
+                "asd": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.41663056184054936,
+                        "relY": 0.21316425120772933
+                    },
+                    "id_widget": "asd",
                     "name_widget": "asd",
                     "subtype": "silos_vertical"
                 }
             }
+        },
+        "GroupeWater": {
+            "silos_vertical": {
+                "dffa": {
+                    "componentGroupe": "GroupeWater",
+                    "geometry": {
+                        "relH": 0.25,
+                        "relW": 0.05,
+                        "relX": 0.35466010721757324,
+                        "relY": 0.21383712121212115
+                    },
+                    "id_widget": "dffa",
+                    "name_widget": "asdasd",
+                    "subtype": "silos_vertical"
+                }
+            }
+        },
+        "Camera_Settings": {
+            "zoom": 0.6575162324319881,
+            "offsetX": 748.0999672139716,
+            "offsetY": -87.46968548479313
         }
     }
 }

@@ -11,11 +11,42 @@ Item {
     id: root
     anchors.fill: parent
 
-    property bool editMode
+    property bool editMode: false
 
+    // ==============================
+    // Параметры камеры
+    // ==============================
+    property real zoom: 1.0
+    property real minZoom: 0.2
+    property real maxZoom: 5.0
+
+    property real offsetX: 0
+    property real offsetY: 0
+
+    // === ДОБАВИТЬ: доступ из QmlSceneManager ===
+    property alias viewport: viewport
+    property alias world: world
+
+    // ==============================
+    // VIEWPORT
+    // ==============================
     Item {
-        id: sceneContainer
+        id: viewport
         anchors.fill: parent
+        clip: true
+
+        // ==========================
+        // WORLD (двигаем и масштабируем)
+        // ==========================
+        Item {
+            id: world
+            x: root.offsetX
+            y: root.offsetY
+            width: 100000
+            height: 100000
+            scale: root.zoom
+            transformOrigin: Item.TopLeft
+        }
     }
 
     // =========================================================================
@@ -30,6 +61,8 @@ Item {
         id: wrapperComponent
         EditableItem {
             editMode: root.editMode
+            sceneContainer: world
+            sceneController: root
         }
     }
 
@@ -39,12 +72,24 @@ Item {
     Component.onCompleted: {
         QmlSceneManager.configure({
             sceneController: root,
-            sceneContainer: sceneContainer,
+            sceneContainer: world,
             wrapperComponent: wrapperComponent,
-            previewComponents: previewComponents,            
+            previewComponents: previewComponents,
             editMode: root.editMode
         })
 
         QmlSceneManager.loadScene()
+    }
+
+    // ============================================================
+    // РАМКА РЕЖИМА (для визуального отличия edit режима)
+    // ============================================================
+    Rectangle {
+        anchors.fill: parent
+        color: "transparent"
+        border.color: "gray"
+        border.width: 1
+        radius: 4
+        z: 1000
     }
 }

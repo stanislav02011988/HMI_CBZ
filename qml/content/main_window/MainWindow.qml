@@ -54,6 +54,12 @@ Window {
             }
 
             LayoutItemProxy {
+                target: panelControls
+                height: 100
+                Layout.fillWidth: true
+            }
+
+            LayoutItemProxy {
                 target: bottom_bar
                 height: 40
                 Layout.fillWidth: true
@@ -65,10 +71,9 @@ Window {
 
     CustomTopBar { id: customTopBar }
 
-    CenterWidget {
-        id: centerWidget
-        anchors.fill: parent
-    }
+    CenterWidget { id: centerWidget; anchors.fill: parent }
+
+    Rectangle { id: panelControls; color: "green";}
 
     Rectangle {
         id: bottom_bar
