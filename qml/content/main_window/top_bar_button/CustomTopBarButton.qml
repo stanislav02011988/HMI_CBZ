@@ -3,9 +3,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
+import qml.managers
 import qml.settings.project_settings
 import qml.settings.menager_theme
-import qml.managers
+import qml.utils.menadger_windows
 
 import qml.controls.switch
 import qml.controls.menu_bar
@@ -70,14 +71,14 @@ Item {
 
                         case "edit_copy":
                             console.log("Копировать")
-                            break
-
-                        case "edit_paste":
-                            console.log("Вставить")
-                            break
+                            break                        
 
                         case "edit_mode_scene":
                             QmlSceneManager.activateEditMode()
+                            break
+
+                        case "edit_mode_logic":
+                            MenagerWindows.showWindow("qrc:/qml/content/logic_window/LogicMapWindow.qml")
                             break
 
                         default:

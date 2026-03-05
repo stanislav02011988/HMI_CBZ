@@ -41,6 +41,7 @@ from python.py_settings_project.settings_project import SettingsProject
 from python.py_menager_theme.menager_theme import MenagerTheme
 
 from python.py_register_component_object.register_component_object import RegisterComponentObject
+from python.py_bus_manager.bus_manager import BusManager
 
 class Project:
     def __init__(self):
@@ -66,13 +67,16 @@ class Project:
         self.settings_project = SettingsProject(self._file_path, self._file_name, self.db_menager, self.menager_json)
         self.menager_theme = MenagerTheme()
 
-        self.register_component_object = RegisterComponentObject()
+        self.bus_manager = BusManager()
+        self.register_component_object = RegisterComponentObject()        
 
         # --- Активация регистрации Qml модулей ----
         self.register_qml_module_auth_menager()
         self.register_qml_module_settings_project()
         self.register_qml_module_menager_theme()
         self.register_qml_module_time_menager()
+
+        self.register_qml_bus_manager()
         self.register_qml_register_component_object()
 
         # --- 3. Приложение ---
@@ -91,14 +95,17 @@ class Project:
 
     def register_qml_module_menager_theme(self):
         try:
-                path_file = self.menager_json.read_json_file(self._file_path, self._file_name)
-                self.menager_theme.load_theme(path_file["block_theme_app"]["theme_path"])
-                self.qml_registration_module.registration_module(self.menager_theme)
+            path_file = self.menager_json.read_json_file(self._file_path, self._file_name)
+            self.menager_theme.load_theme(path_file["block_theme_app"]["theme_path"])
+            self.qml_registration_module.registration_module(self.menager_theme)
         except Exception as e:
             print(f"[main.py] : 68 ->  Ошибка в функции 'def register_qml_module_menager_theme(self)': {e}")
 
     def register_qml_module_time_menager(self):
         self.qml_registration_module.registration_module(self.time_menager)
+
+    def register_qml_bus_manager(self):
+        self.qml_registration_module.registration_module(self.bus_manager)
 
     def register_qml_register_component_object(self):
         self.qml_registration_module.registration_module(self.register_component_object)
@@ -107,6 +114,7 @@ class Project:
         """Загружаем QML."""
         # qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
         qml_file = self.base_path / "qml/content/main_window/MainWindow.qml"
+        # qml_file = self.base_path / "qml/content/edit_logic_window/LogicMapWindow.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

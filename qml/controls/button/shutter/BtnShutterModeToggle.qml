@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
+import qml.system
+
 Button {
     id: root
     implicitWidth: 140
@@ -14,7 +16,7 @@ Button {
     /* =========================================================
      * РЕЖИМЫ
      * ========================================================= */
-    // false = Автоматический режим , true =Ручной режим
+    // true = Автоматический режим , false =Ручной режим
     property bool controlMode: false
 
     // false = Грубо, true = Точно

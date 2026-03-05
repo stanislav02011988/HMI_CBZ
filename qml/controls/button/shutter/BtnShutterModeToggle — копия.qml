@@ -1,120 +1,162 @@
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
-import Qt5Compat.GraphicalEffects
 
-import qml.controls.button
-import qml.controls.button.shutter
-import qml.controls.button.valve
-import qml.controls.progress_bar
-import qml.controls.tool_tip
-
-import qml.utils.controllers_signals
-
-Item {
+Button {
     id: root
+    implicitWidth: 140
+    implicitHeight: 48
+    focusPolicy: Qt.NoFocus
 
-    // === Базовые единицы для внутренних элементов ===
-        // Рассчитываем от ФАКТИЧЕСКИХ размеров компонента (которые задаёт лейаут)
-    readonly property real baseUnitW: width > 0 ? width / 80 : 1
-    readonly property real baseUnitH: height > 0 ? height / 80 : 1
+    property string id_shutter_silos: ""
+    property string name_shutter_silos: ""
 
-    property bool manualModeEnabled: ControllersSignalsCementScales.handModeChanged
-    property bool deActivateShnek: false
+    /* =========================================================
+     * РЕЖИМЫ
+     * ========================================================= */
+    // false = Автоматический режим , true =Ручной режим
+    property bool controlMode: false
 
-    // --- состояния открытия затвора Силоса---
-    // 0=закрыто, 1=открыто, 2=ожидание PLC, 3=ошибка
-    property int statusShutterSilos: 0
-    property int statusShutterScales: 0
+    // false = Грубо, true = Точно
+    property bool dosageMode: false
 
+    /* =========================================================
+     * СОСТОЯНИЕ ЗАТВОРА
+     * 0 = CLOSED
+     * 1 = OPENED
+     * 2 = WAIT
+     * 3 = ERROR
+     * ========================================================= */
+    property int state: 0
 
-    Item {
+    /* =========================================================
+     * СИГНАЛЫ
+     * ========================================================= */
+    signal manualCoarseOpenRequest()
+    signal manualFineOpenRequest()
+    signal signalStateShutter(state:int)
+    /* =========================================================
+     * API ДЛЯ КОНТРОЛЛЕРА / PLC
+     * ========================================================= */
+    function setClosed() { state = 0; root.signalStateShutter(state) }
+    function setOpened() { state = 1; root.signalStateShutter(state) }
+    function setWait()   { state = 2; root.signalStateShutter(state) }
+    function setError()  { state = 3; root.signalStateShutter(state) }
+
+    /* =========================================================
+     * ДОСТУПНОСТЬ UI
+     * ========================================================= */
+    // AUTO → полный запрет взаимодействия
+    enabled: controlMode && state !== 2
+    hoverEnabled: controlMode
+
+    /* =========================================================
+     * ВИЗУАЛЬНЫЕ ПАРАМЕТРЫ
+     * ========================================================= */
+    property real separation: {
+        switch (state) {
+        case 1:   // OPENED
+            return dosageMode ? 4 : 6
+        case 2:   // WAIT
+            return 3
+        case 3:   // ERROR
+            return 2
+        default:  // CLOSED
+            return 0
+        }
+    }
+
+    property color currentColor: {
+        switch (state) {
+        case 1:   // OPENED
+            return dosageMode ? "blue" : "green"
+        case 2:   // WAIT
+            return "yellow"
+        case 3:   // ERROR
+            return "red"
+        default:  // CLOSED
+            return "#a8a8a8"
+        }
+    }
+
+    Behavior on separation { NumberAnimation { duration: 200; easing.type: Easing.InOutQuad } }
+    Behavior on currentColor { ColorAnimation { duration: 120 } }
+
+    /* =========================================================
+     * ЛОГИКА КЛИКА (ТОЛЬКО MANUAL)
+     * ========================================================= */
+    onClicked: {
+        if (!controlMode)    // AUTO
+            return
+
+        if (dosageMode)
+            manualFineOpenRequest()
+        else
+            manualCoarseOpenRequest()
+
+        setWait()
+    }
+
+    /* =========================================================
+     * СБРОС ПРИ ВКЛЮЧЕНИИ MANUAL
+     * ========================================================= */
+    onControlModeChanged: {
+        if (controlMode)   // MANUAL
+            setClosed()
+    }
+
+    /* =========================================================
+     * ФОН / ТРЕУГОЛЬНИКИ (БЕЗ ИЗМЕНЕНИЙ)
+     * ========================================================= */
+    background: Item {
         anchors.fill: parent
 
-        DropShadow {
-            anchors.fill: bgElMotor
-            source: bgElMotor
-            radius: Math.max(4, baseUnitW * 3)
-            samples: 16
-            color: "#60000000"
-            horizontalOffset: Math.max(1, baseUnitW * 1.5)
-            verticalOffset: Math.max(1, baseUnitH * 1.5)
-        }
+        Canvas {
+            id: canvas
+            anchors.fill: parent
 
-        // === ЭЛЕКТРОДВИГАТЕЛЬ ===
-        Rectangle {
-            id: bgElMotor
-            anchors.fill: parent  // Заполняем ВЕСЬ доступный размер компонента
-            color: "transparent"
-            visible: true
-
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: baseUnitH * 1
-
-                // Верхняя линия
-                Rectangle {
-                    Layout.preferredWidth: parent.width * 0.1
-                    Layout.preferredHeight: parent.height * 0.2
-                    Layout.alignment: Qt.AlignHCenter
-                    radius: baseUnitW * 1
-                    color: {
-                        if (root.statusShutterSilos === 0){ return "transparent" }
-                        else if (root.statusShutterSilos === 1) { return "green" }
-                        else if (root.statusShutterSilos === 2) { return "yellow" }
-                        else if (root.statusShutterSilos === 3) { return "red" }
-                    }
-                }
-
-                // Корпус электродвигателя с кнопкой
-                Rectangle {
-                    Layout.preferredWidth: parent.width * 0.6
-                    Layout.preferredHeight: parent.height * 0.4
-                    Layout.alignment: Qt.AlignHCenter
-                    color: "transparent"
-                    radius: baseUnitW * 15
-                    border.color: "#777777"
-                    border.width: baseUnitW * 2
-
-                    CustomToggleButton {
-                        anchors.centerIn: parent
-                        width: parent.width * 0.5
-                        height: parent.height * 0.54
-                        m_radius: width / 2
-
-                        m_background_color: "transparent"
-                        m_color_hovered: "#888"
-                        m_color_checked: "#666666"
-
-                        // Доступна ТОЛЬКО в ручном режиме
-                        enabled: root.manualModeEnabled
-                        checked: root.manualModeEnabled ? root.deActivateShnek : true
-                    }
-                }
-
-                // Нижняя линия
-                Rectangle {
-                    Layout.preferredWidth: parent.width * 0.1
-                    Layout.preferredHeight: parent.height * 0.2
-                    Layout.alignment: Qt.AlignHCenter
-                    radius: baseUnitW * 1
-                    color: {
-                        if (root.statusShutterScales === 0){ return "transparent" }
-                        else if (root.statusShutterScales === 1) { return "green" }
-                        else if (root.statusShutterScales === 2) { return "yellow" }
-                        else if (root.statusShutterScales === 3) { return "red" }
-                    }
-                }
-
-                // === Теругольный затвор цементного шнека ===
-                BtnShutterModeToggle {
-                    Layout.preferredWidth: parent.width * 0.3
-                    Layout.preferredHeight: parent.height * 0.1
-                    Layout.alignment: Qt.AlignHCenter
-                    visible: true
-                }
+            function gradient(ctx, color, x1, y1, x2, y2) {
+                const g = ctx.createLinearGradient(x1, y1, x2, y2)
+                g.addColorStop(0, color)
+                g.addColorStop(1, Qt.darker(color, 1.3))
+                return g
             }
+
+            onPaint: {
+                const ctx = getContext("2d")
+                ctx.clearRect(0, 0, width, height)
+
+                const cx = width / 2
+
+                // левый треугольник
+                ctx.beginPath()
+                ctx.moveTo(cx - root.separation, 0)
+                ctx.lineTo(cx - root.separation, height)
+                ctx.lineTo(0, 0)
+                ctx.closePath()
+                ctx.fillStyle = gradient(ctx, root.currentColor, 0, 0, width / 2, height)
+                ctx.fill()
+
+                // правый треугольник
+                ctx.beginPath()
+                ctx.moveTo(cx + root.separation, 0)
+                ctx.lineTo(cx + root.separation, height)
+                ctx.lineTo(width, 0)
+                ctx.closePath()
+                ctx.fillStyle = gradient(ctx, root.currentColor, width, 0, width / 2, height)
+                ctx.fill()
+            }
+
+            Connections {
+                target: root
+                function onSeparationChanged() { canvas.requestPaint() }
+                function onCurrentColorChanged() { canvas.requestPaint() }
+                function onStateChanged() { canvas.requestPaint() }
+            }
+
+            Component.onCompleted: requestPaint()
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
         }
     }
 }

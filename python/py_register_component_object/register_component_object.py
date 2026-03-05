@@ -4,9 +4,7 @@
 Хранит ссылки на все созданные виджеты и позволяет быстро найти элемент по ID
 """
 from PySide6.QtCore import QObject, Signal, Slot, Property
-from PySide6.QtQml import QJSValue
 from typing import Dict, Any, List, Optional
-import datetime
 
 from python.py_utils.decorators.decorators_qml_registration_module.decorators_qml_registration_module import QmlRegistrationModule
 

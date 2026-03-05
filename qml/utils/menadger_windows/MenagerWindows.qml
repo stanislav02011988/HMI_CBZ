@@ -26,4 +26,13 @@ QtObject {
             }
         }
     }
+
+    function showWindow(windowComponentUrl){
+        var obj = Qt.createComponent(windowComponentUrl)
+        if (obj.status === Component.Ready) {
+            obj.createObject(null)
+        } else {
+            console.log(obj.errorString())
+        }
+    }
 }
