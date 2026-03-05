@@ -1,4 +1,4 @@
-// logic/LogicMapWindow.qml
+// qml\content\logic_window\logic\LogicMapWindow.qml
 
 import QtQuick
 import QtQuick.Controls
@@ -6,7 +6,11 @@ import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Controls.Material
 
-import "./components"
+import "component/top_bar"
+import "component/left_panel"
+import "component/scene"
+import "component/status_bar"
+import "component/right_panel"
 
 Window {
     id: root

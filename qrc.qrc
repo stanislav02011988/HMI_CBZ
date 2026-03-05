@@ -60,6 +60,19 @@
         <file>qml/system/ReactiveElement.qml</file>
         <file>qml/content/logic_window/logic/LogicMapWindow.qml</file>
         <file>qml/content/logic_window/edit_logic/EditLogicMapWindow.qml</file>
+        <file>qml/content/logic_window/logic/component/top_bar/LogicTopBar.qml</file>
+        <file>qml/content/logic_window/logic/component/status_bar/LogicStatusBar.qml</file>
+        <file>qml/content/logic_window/logic/component/left_panel/LogicLeftPanel.qml</file>
+        <file>qml/content/logic_window/logic/component/scene/LogicScene.qml</file>
+        <file>qml/content/logic_window/logic/component/right_panel/LogicRightPanel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/ProjectTreePanel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/StandardBlocksPanel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/SceneBlocksPanel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/top_bar/LogicTopBar.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/LogicLeftPanel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/right_panel/LogicRightPanel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/scene/LogicScene.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/status_bar/LogicStatusBar.qml</file>
     </qresource>
     <qresource prefix="/svg_icon_btn">
         <file>res/svg/svg_image_btn/reset/reset_a.svg</file>

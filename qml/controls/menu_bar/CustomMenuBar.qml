@@ -37,6 +37,12 @@ Item {
                 { text: "О программе", action: "help_about" },
                 { text: "Руководство пользователя", action: "help_manual" }
             ]
+        },
+        {
+            label: "Диагностика",
+            items: [
+                { text: "Карта логики", action: "logic_map" }
+            ]
         }
     ]
 

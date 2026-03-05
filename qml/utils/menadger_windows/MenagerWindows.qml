@@ -18,6 +18,7 @@ QtObject {
                 else { root.currentWindow.show() }
             }
         }  else {
+            console.warn(comp.errorString())
             if (dialog) {
                 dialog.close()
                 dialog.showDialog("error", "[WindowManager.qml] : 13", "Ошибка загрузки окна", "Файл отсутствует или повреждён:\n" + windowComponentUrl + "\n" + comp.errorString())
@@ -32,7 +33,7 @@ QtObject {
         if (obj.status === Component.Ready) {
             obj.createObject(null)
         } else {
-            console.log(obj.errorString())
+            console.warn(obj.errorString())
         }
     }
 }

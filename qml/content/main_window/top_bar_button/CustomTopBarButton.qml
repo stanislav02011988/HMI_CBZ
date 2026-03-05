@@ -69,16 +69,16 @@ Item {
                             Qt.quit()
                             break
 
-                        case "edit_copy":
-                            console.log("Копировать")
-                            break                        
-
                         case "edit_mode_scene":
                             QmlSceneManager.activateEditMode()
                             break
 
+                        case "logic_map":
+                            MenagerWindows.showWindow("qrc:/qml/content/logic_window/logic/LogicMapWindow.qml")
+                            break
+
                         case "edit_mode_logic":
-                            MenagerWindows.showWindow("qrc:/qml/content/logic_window/LogicMapWindow.qml")
+                            MenagerWindows.showWindow("qrc:/qml/content/logic_window/edit_logic/EditLogicMapWindow.qml")
                             break
 
                         default:
