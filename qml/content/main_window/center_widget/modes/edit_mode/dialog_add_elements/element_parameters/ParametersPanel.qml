@@ -15,14 +15,15 @@ ColumnLayout {
     signal closeRequested()
     signal addRequested(var dataList)
 
-    property var sceneController: null
-
     // Статус
     property string statusMessage: ""
     property bool isSaving: false
 
     property bool isVisible: false
     property string selectedSubtypeId: ""
+
+    property string nameElement: ""
+    property real levelPreSilos: 0
 
     // Итоговые данные с параметрами
     property var dataList: ({
@@ -87,6 +88,7 @@ ColumnLayout {
                         border.color: activeFocus ? "#2196F3" : "#555555"
                         border.width: 1
                     }
+                    onTextChanged: { nameElement = text }
                 }
             }
 
@@ -111,6 +113,43 @@ ColumnLayout {
                     text: "Используется для связи с ПЛК и конфигурации"
                     color: "#777777"
                     font.pixelSize: 11
+                }
+            }
+
+            ColumnLayout {
+                visible: selectedSubtypeId.includes("silos")
+                Layout.fillWidth: true
+                spacing: 6
+                Label { text: "Уровень заполнения"; color: "#bbbbbb"; font.pixelSize: 13 }
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 12
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0; to: 1; value: root.levelPreSilos
+                        stepSize: 0.01
+                        onValueChanged: root.levelPreSilos = value
+                        wheelEnabled: true
+                        background: Rectangle {
+                            y: parent.height/2 - height/2
+                            width: parent.width; height: 4; radius: 2
+                            color: "#444444"
+                        }
+                        handle: Rectangle {
+                            x: parent.leftPadding + (parent.availableWidth - width) * parent.visualPosition
+                            y: parent.height/2 - height/2
+                            width: 18; height: 18; radius: 9
+                            color: "#2196F3"
+                            border.color: "white"; border.width: 2
+                        }
+                    }
+                    Text {
+                        text: Math.round(root.levelPreSilos * 100) + "%"
+                        color: "#2196F3"
+                        font.pixelSize: 14
+                        font.bold: true
+                        Layout.alignment: Qt.AlignVCenter
+                    }
                 }
             }
 

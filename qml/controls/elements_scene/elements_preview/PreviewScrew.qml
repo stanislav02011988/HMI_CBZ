@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import "../screw"
+import "../elements/screw"
 
 Item{
     id: root
@@ -11,8 +11,6 @@ Item{
 
     Component {
         id: screw
-        Screw {
-            anchors.fill: parent
-        }
+        Screw {}
     }
 }

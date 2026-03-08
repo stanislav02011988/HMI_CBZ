@@ -1,6 +1,6 @@
 // qml/system/ReactiveElement.qml
 import QtQuick
-import system 1.0
+import system
 
 Item {
 

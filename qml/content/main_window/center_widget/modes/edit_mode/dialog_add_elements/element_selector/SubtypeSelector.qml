@@ -20,6 +20,9 @@ ColumnLayout {
             if (root.selectedType === "screw") return "Типы шнеков"
             if (root.selectedType === "scales") return "Типы весов"
             if (root.selectedType === "pipes") return "Типы труб"
+            if (root.selectedType === "shutter") return "Типы Затворов"
+            if (root.selectedType === "valve") return "Типы Клапанов"
+            if (root.selectedType === "tubing") return "Типы Трубы"
             return "Виды элементов"
         }
         font.bold: true

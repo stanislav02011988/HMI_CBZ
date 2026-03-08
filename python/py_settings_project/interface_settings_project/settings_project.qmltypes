@@ -38,6 +38,9 @@ Module {
                 Parameter { name: "camera_data"; type: "var" } }
     Method { name: "save_theme"; type: "void"
                 Parameter { name: "name_theme"; type: "var" } }
+    Method { name: "update_element_in_config"; type: "bool"
+                Parameter { name: "id_widget"; type: "str" }
+                Parameter { name: "update_data"; type: "Dict" } }
                                     }
 
 }

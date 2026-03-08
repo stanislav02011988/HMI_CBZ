@@ -112,9 +112,9 @@ class Project:
 
     def _load_main_qml(self):
         """Загружаем QML."""
-        # qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
-        qml_file = self.base_path / "qml/content/main_window/MainWindow.qml"
-        # qml_file = self.base_path / "qml/content/edit_logic_window/LogicMapWindow.qml"
+        qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
+        # qml_file = self.base_path / "qml/content/main_window/MainWindow.qml"
+        # qml_file = self.base_path / "qml/content/logic_window/edit_logic/EditLogicMapWindow.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

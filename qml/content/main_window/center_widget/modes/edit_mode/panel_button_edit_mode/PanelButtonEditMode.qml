@@ -75,7 +75,7 @@ Item {
             Button {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 30
-                text: "Сохранить все в файл"
+                text: "Сохранить сцену CTRL+S"
                 onClicked: root.signalSave()
             }
         }

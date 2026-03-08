@@ -57,36 +57,15 @@ QtObject {
     //  - нормализовать формат
     //  - добавлять кэширование
 
-    function registerElement(wrapper, widgetRef) {
-        return backend.registerElement(wrapper, widgetRef)
-    }
-
-    function unregisterElement(wrapper) {
-        return backend.unregisterElement(wrapper)
-    }
-
-    function getElementById(id) {
-        return backend.getElementById(id)
-    }
-
-    function getElementWrapper(id) {
-        return backend.getElementWrapper(id)
-    }
-
-    function getElementWidgetRef(id) {
-        return backend.getElementWidgetRef(id)
-    }
+    function registerElement(wrapper, widgetRef) { return backend.registerElement(wrapper, widgetRef) }
+    function unregisterElement(wrapper) { return backend.unregisterElement(wrapper) }
+    function getElementById(id) { return backend.getElementById(id) }
+    function getElementWrapper(id) { return backend.getElementWrapper(id) }
+    function getElementWidgetRef(id) { return backend.getElementWidgetRef(id) }
     function getElementByWrapper(wrapper){ return backend.getElementByWrapper(wrapper) }
-
-    function getAllIds() {
-        return backend.getAllIds()
-    }
-
-    function exportSceneData() {
-        return backend.exportSceneData()
-    }
-
+    function getAllIds() { return backend.getAllIds() }
+    function exportSceneData() { return backend.exportSceneData() }
+    function exportElementData(id_widget){ return backend.exportElementData(id_widget) }
     function clear() { backend.clear() }
-
     function contains(id) { return backend.contains(id) }
 }

@@ -16,7 +16,7 @@ Button {
     // === Размеры ===
     property int m_radius: Math.round(baseUnit * 1.5)
     property int iconSize: Math.round(baseUnit * 6)
-    readonly property real iconScale: 0.65
+    property real iconScale: 0.65
     property bool adaptiveIcon: true
 
     property int fontSize: Math.round(baseUnit * 3)
@@ -176,18 +176,6 @@ Button {
             width: root.displayIconSize
             height: root.displayIconSize
 
-            Image {
-                id: iconImage
-                anchors.centerIn: parent
-                width: parent.width * 0.88
-                height: parent.height * 0.88
-                source: root.iconSource
-                sourceSize: Qt.size(width, height)
-                fillMode: Image.PreserveAspectFit
-                smooth: true
-                visible: false
-            }
-
             Rectangle {
                 anchors.fill: parent
                 color: "transparent"
@@ -212,6 +200,7 @@ Button {
             }
 
             Image {
+                id: iconImage
                 anchors.centerIn: parent
                 width: parent.width * 0.88
                 height: parent.height * 0.88

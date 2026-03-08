@@ -40,6 +40,7 @@ QtObject {
     //======== Сохранение и Загрузка данных Центральной Сцены Элементов QmlProjectSettings ========
     function saveBlockGraphics(dict_scene){ SettingsProject.save_block_graphics(dict_scene) }
     function loadBlockGraphics() { return SettingsProject.get_block_graphics() }
+    function updateBlockGraphicsOneElement (id_widget, dict_scene) { SettingsProject.update_element_in_config(id_widget, dict_scene) }
 
     //======== Сохранение и Загрузка данных камеры сцены и зум QmlProjectSettings =====================================
     function saveCameraParams(cameraData) { SettingsProject.save_camera_params(cameraData) }

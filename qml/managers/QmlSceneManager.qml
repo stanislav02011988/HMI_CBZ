@@ -1,4 +1,4 @@
-// qml/managers/QmlSceneLogicManager.qml
+// qml/managers/QmlSceneManager.qml
 pragma Singleton
 import QtQuick
 
@@ -51,6 +51,30 @@ QtObject {
     }
 
     // =====================================================
+    // LOAD
+    // =====================================================
+    function loadScene() {
+        clearScene()
+
+        if (!projectSettings)
+            return
+
+        const sceneData = projectSettings.loadBlockGraphics()
+        if (!sceneData)
+            return
+
+        for (let group in sceneData) {
+            for (let subtype in sceneData[group]) {
+                for (let id in sceneData[group][subtype]) {
+                    createObject(sceneData[group][subtype][id])
+                }
+            }
+        }
+
+        loadCamera()
+    }
+
+    // =====================================================
     // СОЗДАНИЕ ЭЛЕМЕНТА
     // =====================================================
     function createObject(data) {
@@ -73,6 +97,8 @@ QtObject {
 
         if (!widget)
             return
+
+        widget.importProperties(data.sizeProperties)
 
         const wrapper = wrapperComponent.createObject(sceneContainer, {
             relX: data.geometry.relX,
@@ -119,30 +145,6 @@ QtObject {
     }
 
     // =====================================================
-    // LOAD
-    // =====================================================
-    function loadScene() {
-        clearScene()
-
-        if (!projectSettings)
-            return
-
-        const sceneData = projectSettings.loadBlockGraphics()
-        if (!sceneData)
-            return
-
-        for (let group in sceneData) {
-            for (let subtype in sceneData[group]) {
-                for (let id in sceneData[group][subtype]) {
-                    createObject(sceneData[group][subtype][id])
-                }
-            }
-        }
-
-        loadCamera()
-    }
-
-    // =====================================================
     // SAVE
     // =====================================================
     function saveScene() {
@@ -152,6 +154,17 @@ QtObject {
         const data = componentRegister.exportSceneData()
         projectSettings.saveBlockGraphics(data)
         saveCamera()
+    }
+
+    // =====================================================
+    // SAVE One Element
+    // =====================================================
+    function saveOneElement(id_widget) {
+        if (!componentRegister || !projectSettings)
+            return
+
+        const data = componentRegister.exportElementData(id_widget)
+        projectSettings.updateBlockGraphicsOneElement(id_widget, data)
     }
 
     // =====================================================
@@ -195,17 +208,27 @@ QtObject {
 
         toggle = toggle || false
 
-        if (toggle && selectedItems.indexOf(wrapper) !== -1) {
-            wrapper.isSelected = false
-            selectedItems.splice(selectedItems.indexOf(wrapper), 1)
+        const wasSelected = selectedItems.indexOf(wrapper) !== -1
 
-        } else if (toggle) {
-            wrapper.isSelected = true
-            selectedItems.push(wrapper)
+        if (toggle) {
+            // Shift/Ctrl + клик → переключаем состояние элемента
+            if (wasSelected) {
+                // Снимаем выделение
+                wrapper.isSelected = false
+                selectedItems.splice(selectedItems.indexOf(wrapper), 1)
+            } else {
+                // Добавляем к выделению
+                wrapper.isSelected = true
+                selectedItems.push(wrapper)
+            }
         } else {
-            deselectAll()
-            wrapper.isSelected = true
-            selectedItems.push(wrapper)
+            // Обычный клик → только этот элемент выделен
+            if (!wasSelected) {
+                deselectAll()
+                wrapper.isSelected = true
+                selectedItems.push(wrapper)
+            }
+            // Если уже выделен — оставляем как есть (не снимаем!)
         }
 
         if (wrapper.forceActiveFocus)
@@ -216,14 +239,6 @@ QtObject {
     // ДОБАВЛЕНИЕ ЭЛЕМЕНТА
     // =========================================================================
     function addItemToScene(data) {
-        console.log("[DEBUG] sceneController:", sceneController)
-        console.log("[DEBUG] viewport:", sceneController?.viewport)
-        console.log("[DEBUG] viewport.width:", sceneController?.viewport?.width)
-        console.log("[DEBUG] viewport.height:", sceneController?.viewport?.height)
-        console.log("[DEBUG] zoom:", sceneController?.zoom)
-        console.log("[DEBUG] offsetX:", sceneController?.offsetX)
-        console.log("[DEBUG] offsetY:", sceneController?.offsetY)
-
         if (!data?.subtype) {
             console.error("[ERR] Некорректные данные элемента")
             return null
@@ -240,6 +255,7 @@ QtObject {
 
         // Вычисляем геометрию с учётом камеры
         const geometry = computeGeometry(
+            widget,
             data,
             sceneController.viewport,    // viewport.width/height
             sceneController.zoom,        // зум
@@ -284,7 +300,7 @@ QtObject {
     // =========================================================================
     // ВЫЧИСЛЕНИЕ ГЕОМЕТРИИ
     // =========================================================================
-    function computeGeometry(data, viewport, zoom, offsetX, offsetY) {
+    function computeGeometry(widget, data, viewport, zoom, offsetX, offsetY) {
         // Защита от невалидных данных
         if (!viewport || viewport.width <= 0 || viewport.height <= 0) {
             console.error("[ERR] computeGeometry: invalid viewport")
@@ -296,9 +312,15 @@ QtObject {
             zoom = 1.0
         }
 
-        const isSilos = data.subtype === "silos_vertical"
-        const relW = isSilos ? 0.05 : 0.1
-        const relH = isSilos ? 0.25 : 0.1
+        // Значения по умолчанию
+        let relW = 0.01
+        let relH = 0.01
+
+        if (widget && widget.implicitWidth > 0 && widget.implicitHeight > 0) {
+
+            relW = widget.implicitWidth / viewport.width
+            relH = widget.implicitHeight / viewport.height
+        }
 
         // Смещение для каскадного размещения
         const offset = (componentRegister?.count || 0) * 0.15

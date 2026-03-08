@@ -133,11 +133,83 @@ class RegisterComponentObject(QObject):
         return list(self._elements_by_id.keys())
 
     # =========================================================================
+    # ВСПОМОГАТЕЛЬНЫЙ МЕТОД ЭКСПОРТА
+    # =========================================================================
+    def _export_element_data(self, record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Экспортирует данные ОДНОГО элемента в формате, совместимом с exportSceneData()
+        Возвращает структуру:
+        {
+            "id_widget": str,
+            "name_widget": str,
+            "componentGroupe": str,
+            "subtype": str,
+            "geometry": { "relX": float, "relY": float, "relW": float, "relH": float },
+            "sizeProperties": dict
+        }
+        """
+        widget = record.get("widgetRef")
+        wrapper = record.get("wrapperRef")
+
+        if not widget or not wrapper:
+            return None
+
+        # Базовые свойства
+        element_id = widget.property("id_widget")
+        if not element_id:
+            return None
+
+        group = widget.property("componentGroupe")
+        subtype = widget.property("subtype")
+        name = widget.property("name_widget")
+
+        # Геометрия обёртки
+        geometry = {
+            "relX": wrapper.property("relX"),
+            "relY": wrapper.property("relY"),
+            "relW": wrapper.property("relW"),
+            "relH": wrapper.property("relH")
+        }
+
+        # Свойства размеров виджета
+        size_props = {}
+        if hasattr(widget, "exportPropertiesSize"):
+            try:
+                size_props = widget.exportPropertiesSize()
+            except Exception as e:
+                print(f"[WARN] exportPropertiesSize failed for {element_id}: {e}")
+
+        return {
+            "id_widget": element_id,
+            "name_widget": name,
+            "componentGroupe": group,
+            "subtype": subtype,
+            "geometry": geometry,
+            "sizeProperties": size_props
+        }
+
+    # =========================================================================
+    # EXPORT ОДНОГО ЭЛЕМЕНТА (публичный слот для QML)
+    # =========================================================================
+    @Slot(str, result="QVariant")
+    def exportElementData(self, id_widget: str) -> Dict[str, Any]:
+        """
+        Экспортирует данные конкретного элемента по его ID
+        Используется для частичного сохранения без перезаписи всей сцены
+        """
+        record = self._elements_by_id.get(id_widget)
+        if not record:
+            print(f"[WARN] exportElementData: элемент не найден - {id_widget}")
+            return {}
+
+        data = self._export_element_data(record)
+        return data if data else {}
+
+    # =========================================================================
     # EXPORT
     # =========================================================================
     @Slot(result="QVariant")
     def exportSceneData(self):
-
         result = {}
 
         for record in self._elements_list:
@@ -155,6 +227,17 @@ class RegisterComponentObject(QObject):
             if subtype not in result[group]:
                 result[group][subtype] = {}
 
+            # =====================================================
+            # SIZE PROPERTIES
+            # =====================================================
+            size_props = {}
+
+            if hasattr(widget, "exportPropertiesSize"):
+                try:
+                    size_props = widget.exportPropertiesSize()
+                except Exception:
+                    size_props = {}
+
             result[group][subtype][element_id] = {
                 "id_widget": element_id,
                 "name_widget": widget.property("name_widget"),
@@ -165,10 +248,12 @@ class RegisterComponentObject(QObject):
                     "relY": wrapper.property("relY"),
                     "relW": wrapper.property("relW"),
                     "relH": wrapper.property("relH")
-                }
+                },
+                "sizeProperties": size_props
             }
 
         return result
+
 
     # =========================================================================
     # Очистка

@@ -7,6 +7,9 @@ import QtQuick.Controls.Material
 Button {
     id: root
 
+    // === Режим переключателя ===
+    checkable: false
+
     property int m_width: 30
     property int m_height: 30
     property int m_raduis: 6

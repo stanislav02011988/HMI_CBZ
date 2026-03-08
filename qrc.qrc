@@ -67,12 +67,27 @@
         <file>qml/content/logic_window/logic/component/right_panel/LogicRightPanel.qml</file>
         <file>qml/content/logic_window/edit_logic/component/left_panel/panels/ProjectTreePanel.qml</file>
         <file>qml/content/logic_window/edit_logic/component/left_panel/panels/StandardBlocksPanel.qml</file>
-        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/SceneBlocksPanel.qml</file>
         <file>qml/content/logic_window/edit_logic/component/top_bar/LogicTopBar.qml</file>
         <file>qml/content/logic_window/edit_logic/component/left_panel/LogicLeftPanel.qml</file>
         <file>qml/content/logic_window/edit_logic/component/right_panel/LogicRightPanel.qml</file>
         <file>qml/content/logic_window/edit_logic/component/scene/LogicScene.qml</file>
         <file>qml/content/logic_window/edit_logic/component/status_bar/LogicStatusBar.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/scene/grid_layer/GridLayer.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/scene/panel_btn/PanelBauttons.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneListElementPanel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneElementsModel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneTreeDelegate.qml</file>
+        <file>qml/controls/elements_scene/elements/shutter/Shutter.qml</file>
+        <file>qml/controls/elements_scene/elements_preview/PreviewShutter.qml</file>
+        <file>qml/content/main_window/center_widget/modes/edit_mode/dialog_add_elements/element_selector/models_element/ShutterSubtypes.qml</file>
+        <file>qml/controls/elements_scene/elements/valve/ValveAir.qml</file>
+        <file>qml/content/main_window/center_widget/modes/edit_mode/dialog_add_elements/element_selector/models_element/ValveSubtypes.qml</file>
+        <file>qml/controls/elements_scene/elements_preview/PreviewValve.qml</file>
+        <file>qml/content/main_window/center_widget/modes/edit_mode/status_bar/StatusBar.qml</file>
+        <file>qml/controls/elements_scene/elements/tubing/TubingVertical.qml</file>
+        <file>qml/controls/elements_scene/elements_preview/PreviewTubing.qml</file>
+        <file>qml/content/main_window/center_widget/modes/edit_mode/dialog_add_elements/element_selector/models_element/TubingSubtypes.qml</file>
+        <file>qml/controls/elements_scene/elements/tubing/TubingHorizontal.qml</file>
     </qresource>
     <qresource prefix="/svg_icon_btn">
         <file>res/svg/svg_image_btn/reset/reset_a.svg</file>

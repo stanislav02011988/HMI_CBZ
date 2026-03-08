@@ -1,3 +1,4 @@
+// qml\content\logic_window\edit_logic\component\status_bar\LogicStatusBar.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts

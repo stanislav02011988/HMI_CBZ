@@ -1,8 +1,10 @@
+// qml\content\logic_window\edit_logic\component\left_panel\LogicLeftPanel.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 import "panels"
+import "panels/scene_list_element_panel"
 
 Rectangle {
 
@@ -23,7 +25,7 @@ Rectangle {
             Layout.preferredHeight: parent.height / 3
         }
 
-        SceneBlocksPanel {
+        SceneListElementPanel {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }

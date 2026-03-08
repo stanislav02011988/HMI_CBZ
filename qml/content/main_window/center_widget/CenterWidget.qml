@@ -17,7 +17,6 @@ Item {
     property bool editMode: false
 
     property alias mode: modeLoader.item
-    signal sceneSaveRequested(var data)
 
     Loader {
         id: modeLoader
@@ -44,9 +43,8 @@ Item {
         font.pixelSize: 13
         font.bold: true
         onClicked: {
-            // 🔑 КРИТИЧЕСКИ ВАЖНО: сначала меняем свойство, потом логируем
             const newMode = !centerWidget.editMode
-            centerWidget.editMode = newMode
+            centerWidget.editMode = newMode            
         }
         background: Rectangle {
             radius: 6

@@ -1,16 +1,16 @@
 import QtQuick
 import QtQuick.Layouts
 
-import "../elements/scales"
+import "../elements/shutter"
 
 Item{
     id: root
     visible: false
 
-    property alias scales: scales
+    property alias shutter: shutter
 
     Component {
-        id: scales
-        Scales { }
+        id: shutter
+        Shutter {}
     }
 }

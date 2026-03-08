@@ -13,6 +13,19 @@ ColumnLayout {
     property bool isVisible: false
     property string selectedSubtypeId: ""
 
+    property string elementName: ""
+    onElementNameChanged: {
+        if (previewLoader.item && previewLoader.item.hasOwnProperty("name_widget")) {
+            previewLoader.item.name_widget = elementName
+        }
+    }
+    property string levelSilos: ""
+    onLevelSilosChanged: {
+        if (previewLoader.item && previewLoader.item.hasOwnProperty("level_silos")) {
+            previewLoader.item.level_silos = levelSilos
+        }
+    }
+
     visible: root.isVisible
 
     PreviewComponents { id: previewComponents }
@@ -34,11 +47,32 @@ ColumnLayout {
         border.width: 1
 
         Loader {
-            anchors.fill: parent
-            anchors.margins: 30
+            id: previewLoader
+            anchors.centerIn: parent
             sourceComponent: previewComponents.getPreviewComponent(root.selectedSubtypeId)
+            onLoaded: {
+                    if (item && item.hasOwnProperty("name_widget")) {
+                        item.name_widget = root.elementName
+                    }
+                    if (item && item.hasOwnProperty("level_silos")) {
+                        item.level_silos = root.levelSilos
+                    }
+                }
+            scale: {
+                if (!item || !parent) return 1.0
+
+                const maxWidth = parent.width * 0.85
+                const maxHeight = parent.height * 0.85
+
+                if (item.implicitWidth <= maxWidth && item.implicitHeight <= maxHeight)
+                    return 1.0
+
+                const scaleX = maxWidth / item.implicitWidth
+                const scaleY = maxHeight / item.implicitHeight
+                return Math.min(scaleX, scaleY)
+            }
         }
     }
 
-    function resetPreviewPanel() { root.selectedSubtypeId = "" }
+    function resetPreviewPanel() { root.selectedSubtypeId = ""; previewLoader.scale = 1.0 }
 }

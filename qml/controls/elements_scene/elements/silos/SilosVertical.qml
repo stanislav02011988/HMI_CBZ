@@ -9,9 +9,6 @@ import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
 import qml.controls.button
-import qml.controls.button.toggle_button
-import qml.controls.button.shutter
-import qml.controls.button.valve
 import qml.controls.progress_bar
 import qml.controls.tool_tip
 import qml.controls.drop_shadow
@@ -23,7 +20,10 @@ Item {
     // 1. ЭТАЛОННЫЙ РАЗМЕР (Reference Geometry)
     // ==========================================================
     property real referenceWidth: 120
-    property real referenceHeight: 320
+    property real referenceHeight: 240
+
+    implicitWidth: referenceWidth
+    implicitHeight: referenceHeight
 
     // ==========================================================
     // 2. МАСШТАБИРОВАНИЕ
@@ -45,14 +45,7 @@ Item {
     property real progressBarWidthRatio: 0.35
     property real progressBarHeightRatio: 0.9
     property real progressPadding: 4
-
-    property real valveWidthRatio: 0.3
-    property real valveHeightRatio: 0.1
-
-    property real shutterButtonHeightRatio: 0.06
-
-    property real connectorLineWidthRatio: 0.05
-    property real connectorLineHeightRatio: 0.15
+    property real progressBarSpasing: 0.01
 
     property int textSize: 14
 
@@ -64,7 +57,7 @@ Item {
 
     property string id_widget: ""
     property string name_widget: ""
-    property real level_cement_silos: 0.5
+    property real level_silos: 0
 
     property string id_valve_air: ""
     property string name_valve_air: ""
@@ -72,105 +65,76 @@ Item {
     // ==========================================================
     // 5. ОСНОВНОЙ КОНТЕЙНЕР С ТЕНЬЮ
     // ==========================================================
-    Item {
+    layer.enabled: true
+    layer.effect: DropShadow {
+        color: "#60000000"
+        radius: shadowRadius
+        horizontalOffset: shadowOffsetX * scale
+        verticalOffset: shadowOffsetY * scale
+    }
+
+    Rectangle {
+        id: silosContainer
         anchors.fill: parent
+        color: "transparent"
 
-        DropShadow {
-            anchors.fill: silosContainer
-            source: silosContainer
-            radius: shadowRadius * scale
-            samples: 16
-            color: "#60000000"
-            horizontalOffset: shadowOffsetX * scale
-            verticalOffset: shadowOffsetY * scale
-        }
-
-        Rectangle {
-            id: silosContainer
+        ColumnLayout {
             anchors.fill: parent
-            color: "transparent"
+            spacing: 4 * scale
 
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 4 * scale
+            // ==================================================
+            // ТЕЛО СИЛОСА
+            // ==================================================
+            Rectangle {
+                id: silosBody
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                // ==================================================
-                // ТЕЛО СИЛОСА
-                // ==================================================
-                Rectangle {
-                    id: silosBody
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                radius: containerRadius * scale
+                border.color: "#504e4e"
+                border.width: borderWidth * scale
+                color: "transparent"
 
-                    radius: containerRadius * scale
-                    border.color: "#504e4e"
-                    border.width: borderWidth * scale
-                    color: "transparent"
-
-                    RowLayout {
-                        anchors.fill: parent
-                        spacing: 0
-
-                        // ==========================================
-                        // ПРОГРЕСС-БАР
-                        // ==========================================
-                        CustomProgressBar {
-                            Layout.preferredWidth: parent.width * progressBarWidthRatio
-                            Layout.preferredHeight: parent.height * progressBarHeightRatio
-                            vertical: true
-                            visible_border_progress: true
-                            borderRadius: containerRadius * scale
-                            padding: progressPadding * scale
-                            value: root.level_cement_silos
-                        }
-
-                        // ==========================================
-                        // НАЗВАНИЕ СИЛОСА
-                        // ==========================================
-                        Rectangle {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            color: "transparent"
-                            clip: true
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: root.name_widget
-                                font.pixelSize: textSize * scale
-                                font.bold: true
-                                color: "#333333"
-
-                                rotation: -90
-                                transformOrigin: Item.Bottom
-                            }
-                        }
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: 0
+                    // ==========================================
+                    // Положение прогресса смещение
+                    // ==========================================
+                    Item { Layout.fillHeight: true; Layout.preferredWidth: parent.width * progressBarSpasing}
+                    // ==========================================
+                    // ПРОГРЕСС-БАР
+                    // ==========================================
+                    CustomProgressBar {
+                        Layout.preferredWidth: parent.width * progressBarWidthRatio
+                        Layout.preferredHeight: parent.height * progressBarHeightRatio
+                        vertical: true
+                        visible_border_progress: true
+                        borderRadius: containerRadius * scale
+                        padding: progressPadding * scale
+                        value: root.level_silos
                     }
 
                     // ==========================================
-                    // КЛАПАН ВОЗДУХА
+                    // НАЗВАНИЕ СИЛОСА
                     // ==========================================
                     Rectangle {
-                        width: silosBody.width * valveWidthRatio
-                        height: silosBody.height * valveHeightRatio
-                        anchors.right: silosBody.right
-                        anchors.bottom: silosBody.bottom
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
                         color: "transparent"
+                        clip: true
 
-                        BtnValveAir {
-                            anchors.fill: parent
-                            id_valve_air: root.id_valve_air
-                            name_valve_air: root.name_valve_air
+                        Text {
+                            anchors.centerIn: parent
+                            text: root.name_widget
+                            font.pixelSize: textSize * scale
+                            font.bold: true
+                            color: "#333333"
+
+                            rotation: -90
+                            transformOrigin: Item.Bottom
                         }
                     }
-                }
-
-                // ==================================================
-                // КНОПКА ЗАТВОРА
-                // ==================================================
-                BtnShutterModeToggle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: parent.height * shutterButtonHeightRatio
-                    controlMode: true
                 }
             }
         }
@@ -189,10 +153,10 @@ Item {
               label: "Прогресс-бар: ширина", description: "Ширина прогресс-бара внутри силоса" },
             { name: "progressBarHeightRatio", value: progressBarHeightRatio, min: 0.1, max: 1.0, step: 0.01,
               label: "Прогресс-бар: высота", description: "Высота прогресс-бара внутри силоса" },
+            { name: "progressBarSpasing", value: progressBarSpasing, min: 0.01, max: 1, step: 0.01,
+              label: "Прогресс-бар: положение", description: "Положение" },
             { name: "textSize", value: textSize, min: 8, max: 50, step: 1,
               label: "Размер текста", description: "Размер шрифта названия силоса" },
-            { name: "shutterButtonHeightRatio", value: shutterButtonHeightRatio, min: 0.02, max: 0.2, step: 0.01,
-              label: "Кнопка затвора: высота", description: "Высота кнопки затвора" },
             { name: "containerRadius", value: containerRadius, min: 0, max: 30, step: 1,
               label: "Скругление контейнера", description: "Радиус скругления углов контейнера силоса" },
             { name: "borderWidth", value: borderWidth, min: 0.5, max: 5, step: 0.1,
@@ -205,6 +169,32 @@ Item {
             root[name] = value
         } else {
             console.warn("Property not found:", name)
+        }
+    }
+
+    // ==========================================================
+    // 7. EXPORT / IMPORT СВОЙСТВ
+    // ==========================================================
+    function exportPropertiesSize() {
+        var props = getPropertiesSize()
+        var result = {}
+
+        for (var i = 0; i < props.length; i++) {
+            var p = props[i]
+            result[p.name] = root[p.name]
+        }
+
+        return result
+    }
+
+    function importProperties(data) {
+        if (!data)
+            return
+
+        for (let key in data) {
+            if (root.hasOwnProperty(key)) {
+                root[key] = data[key]
+            }
         }
     }
 }

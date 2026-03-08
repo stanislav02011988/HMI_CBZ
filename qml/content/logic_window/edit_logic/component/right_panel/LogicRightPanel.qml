@@ -1,3 +1,5 @@
+// qml\content\logic_window\edit_logic\component\right_panel\LogicRightPanel.qml
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts

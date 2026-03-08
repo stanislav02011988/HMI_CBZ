@@ -4,14 +4,17 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
+
+import qml.managers
 import qml.content.main_window.center_widget.modes.edit_mode.dialog_resize_element
 
 Item {
     id: wrapper
 
     property var widget: null
+
     // =====================================================
-    // ОТНОСИТЕЛЬНАЯ ГЕОМЕТРИЯ (ЕДИНСТВЕННЫЙ ИСТОЧНИК ИСТИНЫ)
+    // ОТНОСИТЕЛЬНАЯ ГЕОМЕТРИЯ
     // =====================================================
     property var geometry: ({ relX: 0.1, relY: 0.1, relW: 0.2, relH: 0.2 })
     property real relX: geometry.relX
@@ -25,7 +28,7 @@ Item {
     property var state: ({ isSelected: false, editMode: false })
     property bool isSelected: state.isSelected
     property bool editMode: state.editMode
-    property bool ctrlPressed: false
+
     // =====================================================
     // СЦЕНА
     // =====================================================
@@ -40,7 +43,7 @@ Item {
     signal requestSelect(bool toggle)
 
     // =====================================================
-    // ПЕРЕВОД RELATIVE В ПИКСЕЛИ
+    // ПЕРЕВОД В ПИКСЕЛИ
     // =====================================================
     x: sceneController?.viewport ? relX * sceneController.viewport.width : 0
     y: sceneController?.viewport ? relY * sceneController.viewport.height : 0
@@ -77,12 +80,6 @@ Item {
         return true
     }
 
-    Component.onDestruction: {
-        for (let i = contentItem.children.length - 1; i >= 0; i--) {
-            contentItem.children[i].destroy()
-        }
-    }
-
     // =====================================================
     // РАМКА ВЫДЕЛЕНИЯ
     // =====================================================
@@ -90,76 +87,93 @@ Item {
         anchors.fill: parent
         color: "transparent"
         border.width: editMode && (isSelected || hoverArea.containsMouse) ? 2 : 0
-        border.color: isSelected ? "dodgerblue"
-                                 : (hoverArea.containsMouse ? "gray" : "transparent")
-        visible: editMode
+        border.color: isSelected ? "dodgerblue" : (hoverArea.containsMouse ? "gray" : "transparent")
+        visible: editMode && isSelected
         z: 100
     }
 
     // =====================================================
-    // ОБЛАСТЬ ВЫДЕЛЕНИЯ
+    // ОБЛАСТЬ ВЫДЕЛЕНИЯ (множественное выделение и добавление выделения или снятие выделение элемента Shift+клик)
     // =====================================================
+
     MouseArea {
         id: hoverArea
-        visible: editMode
         anchors.fill: parent
+        visible: editMode
+        enabled: editMode
         hoverEnabled: true
+
         acceptedButtons: Qt.LeftButton | Qt.RightButton
-        propagateComposedEvents: true
-
-        cursorShape: (editMode && isSelected) ? Qt.SizeAllCursor : Qt.ArrowCursor
-
-        onClicked: (mouse) => {
-            if (!editMode)
-                return
-
-            if (mouse.button === Qt.LeftButton) {
-                const toggle = mouse.modifiers & Qt.ControlModifier
-                wrapper.requestSelect(toggle)
-                mouse.accepted = true
-            }
-
-            if (mouse.button === Qt.RightButton) {
-                contextMenu.popup()
-                mouse.accepted = true
-            }
-        }
-        onPressed: (mouse) => {
-            mouse.accepted = true
-        }
-    }
-
-    // =====================================================
-    // ПЕРЕТАСКИВАНИЕ (только в editMode)
-    // =====================================================
-    MouseArea {
-        anchors.fill: parent
-        visible: editMode
-        enabled: editMode && isSelected
-        propagateComposedEvents: true
-        cursorShape: (editMode && isSelected) ? Qt.SizeAllCursor : Qt.ArrowCursor
+        cursorShape: isSelected ? Qt.SizeAllCursor : Qt.ArrowCursor
 
         property real dragOffsetX: 0
         property real dragOffsetY: 0
+        property bool dragging: false
 
         onPressed: (mouse) => {
+
+            if (mouse.button !== Qt.LeftButton)
+                return
+
             dragOffsetX = mouse.x
             dragOffsetY = mouse.y
+            dragging = false
+
+            const shift = mouse.modifiers & Qt.ShiftModifier
+
+            if (shift) {
+                const toggle = mouse.modifiers & Qt.ShiftModifier
+                wrapper.requestSelect(toggle)
+                mouse.accepted = true
+            }
+        }
+
+        onClicked: (mouse) => {
+
+            if (mouse.button === Qt.RightButton && QmlSceneManager.selectedItems.length < 2) {
+                contextMenu.popup()
+                mouse.accepted = true
+                return
+            }
         }
 
         onPositionChanged: (mouse) => {
-            if (!pressed || !sceneController || !sceneController.viewport)
+
+            if (!(mouse.buttons & Qt.LeftButton))
                 return
 
-            let newX = wrapper.x + mouse.x - dragOffsetX
-            let newY = wrapper.y + mouse.y - dragOffsetY
+            if (!sceneController || !sceneController.viewport)
+                return
 
-            // Ограничение внутри viewport
-            newX = Math.max(0, Math.min(sceneController.viewport.width - wrapper.width, newX))
-            newY = Math.max(0, Math.min(sceneController.viewport.height - wrapper.height, newY))
+            const deltaX = mouse.x - dragOffsetX
+            const deltaY = mouse.y - dragOffsetY
 
-            relX = newX / sceneController.viewport.width
-            relY = newY / sceneController.viewport.height
+            if (!dragging) {
+                if (Math.abs(deltaX) < 2 && Math.abs(deltaY) < 2)
+                    return
+                dragging = true
+            }
+
+            const itemsToMove = QmlSceneManager.selectedItems.length > 1 ? QmlSceneManager.selectedItems.slice() : [wrapper]
+
+            for (let i = 0; i < itemsToMove.length; i++) {
+
+                const item = itemsToMove[i]
+                if (!item || !item.sceneController || !item.sceneController.viewport)
+                    continue
+
+                   const viewport = item.sceneController.viewport
+
+                   let newX = item.x + deltaX
+                   let newY = item.y + deltaY
+
+                   item.relX = newX / viewport.width
+                   item.relY = newY / viewport.height
+            }
+        }
+
+        onReleased: () => {
+            dragging = false
         }
     }
 
@@ -169,32 +183,53 @@ Item {
     focus: isSelected
 
     Keys.onPressed: (event) => {
+            if (!editMode || !isSelected || !sceneContainer || !sceneController?.viewport)
+                return
 
-        if (!editMode || !isSelected || !sceneContainer)
-            return
+            const step = 0.01
+            let changed = false
 
-        const step = 0.01
-        let changed = false
+            // Определяем, какие элементы перемещать: все выделенные или только текущий
+            const itemsToMove = QmlSceneManager.selectedItems.length > 1
+                              ? QmlSceneManager.selectedItems.slice()
+                              : [wrapper]
 
-        switch (event.key) {
-        case Qt.Key_Left:  relX -= step; changed = true; break
-        case Qt.Key_Right: relX += step; changed = true; break
-        case Qt.Key_Up:    relY -= step; changed = true; break
-        case Qt.Key_Down:  relY += step; changed = true; break
-        case Qt.Key_Delete:
-            requestDelete()
-            changed = true
-            break
+            switch (event.key) {
+            case Qt.Key_Left:
+                itemsToMove.forEach(item => {
+                    item.relX = Math.max(0, item.relX - step)
+                })
+                changed = true
+                break
+            case Qt.Key_Right:
+                itemsToMove.forEach(item => {
+                    item.relX = Math.min(1 - item.relW, item.relX + step)
+                })
+                changed = true
+                break
+            case Qt.Key_Up:
+                itemsToMove.forEach(item => {
+                    item.relY = Math.max(0, item.relY - step)
+                })
+                changed = true
+                break
+            case Qt.Key_Down:
+                itemsToMove.forEach(item => {
+                    item.relY = Math.min(1 - item.relH, item.relY + step)
+                })
+                changed = true
+                break
+            case Qt.Key_Delete:
+                // Удаляем ТОЛЬКО текущий элемент (как в проводнике Windows)
+                requestDelete()
+                changed = true
+                break
+            }
+
+            if (changed) {
+                event.accepted = true
+            }
         }
-
-        if (changed) {
-
-            relX = Math.max(0, Math.min(1 - relW, relX))
-            relY = Math.max(0, Math.min(1 - relH, relY))
-
-            event.accepted = true
-        }
-    }
 
     // =====================================================
     // КОНТЕКСТНОЕ МЕНЮ
@@ -203,13 +238,13 @@ Item {
         id: contextMenu
 
         MenuItem {
-            text: "Удалить"
-            onTriggered: wrapper.requestDelete()
+            text: "Изменить размеры..."
+            onTriggered: resizeDialog.open()
         }
 
         MenuItem {
-            text: "Изменить размеры..."
-            onTriggered: resizeDialog.open()
+            text: "Удалить"
+            onTriggered: wrapper.requestDelete()
         }
     }
 

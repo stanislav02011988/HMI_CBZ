@@ -81,8 +81,12 @@ ColumnLayout {
         Layout.fillHeight: true
         model: root.selectedType === "silos" ? listModel.silosSubtypesModel :
                 root.selectedType === "screw" ? listModel.screwSubtypesModel :
-               root.selectedType === "scales" ? listModel.scalesSubtypesModel :
-               root.selectedType === "pipes" ? listModel.pipesSubtypesModel : null
+                root.selectedType === "scales" ? listModel.scalesSubtypesModel :
+                root.selectedType === "pipes" ? listModel.pipesSubtypesModel :
+                root.selectedType === "shutter" ? listModel.shutterSubtypesModel :
+                root.selectedType === "valve" ? listModel.valveSubtypesModel :
+                root.selectedType === "tubing" ? listModel.tubingSubtypesModel :
+                null
         selectedIndex: root.selectedSubtypeIndex
         selectedType: root.selectedType
         onSubtypeSelected: (index, subtypeId) => {

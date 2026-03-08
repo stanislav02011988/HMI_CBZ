@@ -1,4 +1,4 @@
 Это только начала разработки. ничего тольком не отлажено!
 Не большое демо!
-https://disk.yandex.ru/i/xqy5QgVPiAvM8Q
+https://disk.yandex.ru/i/wDQJTayfwEOc7w
 !!!!!!!!

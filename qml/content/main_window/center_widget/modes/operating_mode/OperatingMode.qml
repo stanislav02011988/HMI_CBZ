@@ -38,12 +38,15 @@ Item {
         // ==========================
         // WORLD (двигаем и масштабируем)
         // ==========================
+        // ==========================
+        // WORLD
+        // ==========================
         Item {
             id: world
             x: root.offsetX
             y: root.offsetY
-            width: 100000
-            height: 100000
+            width: viewport.width
+            height: viewport.height
             scale: root.zoom
             transformOrigin: Item.TopLeft
         }

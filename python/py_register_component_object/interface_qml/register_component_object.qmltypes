@@ -21,6 +21,8 @@ Module {
     Signal { name: "registryChanged" }
     Property { name: "count"; type: "int"; isWritable: false; notify: "registryChanged" }
     Method { name: "clear"; type: "void" }
+    Method { name: "exportElementData"; type: "Dict"
+                Parameter { name: "id_widget"; type: "str" } }
     Method { name: "exportSceneData"; type: "void" }
     Method { name: "getAllIds"; type: "List" }
     Method { name: "getElementById"; type: "Optional"

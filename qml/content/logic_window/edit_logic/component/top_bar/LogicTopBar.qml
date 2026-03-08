@@ -1,3 +1,4 @@
+// content\logic_window\edit_logic\component\top_bar\LogicTopBar.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts

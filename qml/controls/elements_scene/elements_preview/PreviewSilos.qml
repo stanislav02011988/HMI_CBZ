@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import "../silos"
+import "../elements/silos"
 
 Item{
     id: root
@@ -11,8 +11,6 @@ Item{
 
     Component {
         id: silos_vertical
-        SilosVertical {
-            anchors.fill: parent
-        }
+        SilosVertical { }
     }
 }
