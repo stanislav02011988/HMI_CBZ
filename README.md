@@ -2,3 +2,10 @@
 Не большое демо!
 https://disk.yandex.ru/i/wDQJTayfwEOc7w
 !!!!!!!!
+
+Стэк технологий:
+Редактор Qt Creator Desctop Qt 6.10.0 MinGW 64-bit
+Язык разметки Qt Qml
+Ядро Python 3.12.7 (PySide 6)
+Бибилотека с работай БД - sqlalchemy
+Ядро работы с протоколом связи EtherCat - pysoem. По мере разработки будут больше добавлять виды протоколов связи.
