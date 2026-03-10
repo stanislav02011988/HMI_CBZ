@@ -12,23 +12,17 @@ QtObject {
     // ============================================================
     // BACKEND LINK
     // ============================================================
-    // Ссылка на Python singleton.
-    // Это НЕ создание объекта, а ссылка на уже зарегистрированный instance.
     readonly property var backend: BackendModule.RegisterComponentObject
 
 
     // ============================================================
     // DERIVED / PUBLIC PROPERTIES
     // ============================================================
-
-    // Проксируем count для удобства биндингов в UI
     readonly property int count: backend.count
-
 
     // ============================================================
     // PUBLIC SIGNALS (Proxy layer)
     // ============================================================
-
     signal elementAdded(string id)
     signal elementRemoved(string id)
     signal registryChanged()
@@ -37,9 +31,6 @@ QtObject {
     // ============================================================
     // SIGNAL FORWARDING
     // ============================================================
-    // Пробрасываем сигналы из Python singleton в QML wrapper.
-    // Это позволяет UI НЕ знать о backend напрямую.
-
     Component.onCompleted: {
         backend.elementAdded.connect(root.elementAdded)
         backend.elementRemoved.connect(root.elementRemoved)

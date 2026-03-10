@@ -45,18 +45,36 @@ Item {
     property real spacing: 4
     property real margin: 4
 
-    property real heightTruncatedCone: 0.2
-    property int sizeTextTrancatedCone: 10
-    property int sizeText2TrancatedCone: 10
+    property int heightTruncatedCone: 30
+    property int borderWidthTrancatedCone: 2
+    property int sizeTextTrancatedCone: 20
+    property int sizeText2TrancatedCone: 14
     property real levelTrancatedCone: 0.5
 
     property int buttonSize: 20
+    property int borderWidthBtn: 1
+    property int spacingBtn: 4
+    property int radiusBtn: 4
     property real iconScale: 0.5
 
     property real sizePanelTextWidth: 30
     property real sizePanelTextHeight: 30
     property int sizePanelText1: 10
     property int sizePanelText2: 8
+    property int panelTextBorderWidth: 1
+    property int paddingPanelLeft: 40
+    property int paddingPanelRight: 40
+    property int radiusPanel: 4
+
+    property int widthProgressBar: 180
+    property int heightProgressBar: 20
+    property int borderWidthProgressBar: 2
+    property int borderRadiusProgressBar: 4
+
+    property int state_width_and_height: 20
+    property int state_size_text: 10
+    property int stateRadius: 4
+    property int stateBorderWidth: 1
 
     // ==========================================================
     // 4. БИЗНЕС СВОЙСТВА
@@ -114,7 +132,7 @@ Item {
                         Layout.topMargin: margin * scale
 
                         Item {
-                            Layout.preferredWidth: spacing * scale
+                            Layout.preferredWidth: spacingBtn * scale
                             Layout.preferredHeight: 1
                         }
 
@@ -127,6 +145,8 @@ Item {
                             iconSource: checked
                                 ? "qrc:/svg_icon_btn/res/svg/svg_image_btn/hand/hand-point-right.svg"
                                 : "qrc:/svg_icon_btn/res/svg/svg_image_btn/hand/hand.svg"
+                            m_borderWidth: borderWidthBtn * scale
+                            m_radius: radiusBtn * scale
                             m_background_color: "transparent"
                             m_color_hovered: "#888"
                             m_color_checked: "#666666"
@@ -161,7 +181,7 @@ Item {
                         }
 
                         Item {
-                            Layout.preferredWidth: spacing * scale
+                            Layout.preferredWidth: spacingBtn * scale
                             Layout.preferredHeight: 1
                         }
 
@@ -171,6 +191,9 @@ Item {
                             Layout.preferredWidth: buttonSize * scale
                             Layout.preferredHeight: buttonSize * scale
                             iconSource: "qrc:/svg_icon_btn/res/svg/svg_image_btn/reset/reset_a.svg"
+                            m_borderWidth: borderWidthBtn * scale
+                            m_radius: radiusBtn * scale
+
                             m_background_color: "transparent"
                             m_color_hovered: "#888"
                             m_color_checked: "#666666"
@@ -252,7 +275,7 @@ Item {
                         }
 
                         Item {
-                            Layout.preferredWidth: spacing * scale
+                            Layout.preferredWidth: spacingBtn * scale
                             Layout.preferredHeight: 1
                         }
 
@@ -264,6 +287,9 @@ Item {
                             iconSource: checked
                                 ? "qrc:/svg_icon_btn/res/svg/svg_image_btn/zeroing/zeroing_out_a.svg"
                                 : "qrc:/svg_icon_btn/res/svg/svg_image_btn/zeroing/zeroing_out_init.svg"
+                            m_borderWidth: borderWidthBtn * scale
+                            m_radius: radiusBtn * scale
+
                             m_background_color: "transparent"
                             m_color_hovered: "#888"
                             m_color_checked: "#666666"
@@ -322,7 +348,7 @@ Item {
                         }
 
                         Item {
-                            Layout.fillWidth: true
+                            Layout.preferredWidth: paddingPanelLeft * scale
                             Layout.preferredHeight: 1
                         }
 
@@ -331,9 +357,9 @@ Item {
                             Layout.preferredWidth: scale * sizePanelTextWidth
                             Layout.preferredHeight: scale * sizePanelTextHeight
                             color: "transparent"
-                            radius: scale * 1.2
+                            radius: scale * radiusPanel
                             border.color: "#777777"
-                            border.width: Math.max(1, scale * 0.4)
+                            // border.width: panelTextBorderWidth * scale
 
                             ColumnLayout {
                                 anchors.fill: parent
@@ -344,9 +370,11 @@ Item {
                                     Layout.fillHeight: true
                                     color: "transparent"
                                     border.color: "#777777"
-                                    border.width: Math.max(1, scale * 0.3)
-                                    radius: scale * 0.8
-                                    anchors.margins: scale * 0.4
+                                    border.width: panelTextBorderWidth * scale
+                                    radius: scale * radiusPanel
+                                    bottomLeftRadius: 0
+                                    bottomRightRadius: 0
+                                    anchors.margins: scale * radiusPanel
 
                                     Text {
                                         text: "1546.8"
@@ -361,12 +389,12 @@ Item {
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
                                     color: "#e0e0e0"
-                                    radius: scale * 1.0
+                                    radius: scale * radiusPanel
                                     border.color: "#777777"
-                                    border.width: Math.max(1, scale * 0.3)
+                                    border.width: panelTextBorderWidth * scale
                                     topRightRadius: 0
                                     topLeftRadius: 0
-                                    anchors.margins: scale * 0.4
+                                    anchors.margins: scale * radiusPanel
 
                                     Text {
                                         text: "380.8"
@@ -380,7 +408,7 @@ Item {
                         }
 
                         Item {
-                            Layout.fillWidth: true
+                            Layout.preferredWidth: paddingPanelRight * scale
                             Layout.preferredHeight: 1
                         }
 
@@ -390,6 +418,9 @@ Item {
                             Layout.preferredWidth: buttonSize * scale
                             Layout.preferredHeight: buttonSize * scale
                             iconSource: "qrc:/svg_icon_btn/res/svg/svg_image_btn/setting/setting_d.svg"
+                            m_borderWidth: borderWidthBtn * scale
+                            m_radius: radiusBtn * scale
+
                             m_background_color: "transparent"
                             m_color_hovered: "#888"
                             m_color_checked: "#666666"
@@ -422,18 +453,18 @@ Item {
                         Layout.fillHeight: true
 
                         Rectangle {
-                            Layout.preferredWidth: buttonSize * scale
-                            Layout.preferredHeight: buttonSize * scale
+                            Layout.preferredWidth: state_width_and_height * scale
+                            Layout.preferredHeight: state_width_and_height * scale
                             color: "transparent"
                             border.color: "#777777"
-                            border.width: Math.max(1, scale * 0.6)
-                            radius: scale * 4
+                            border.width: stateBorderWidth * scale
+                            radius: scale * stateRadius
                             Layout.margins: margin * 2
 
                             Text {
                                 text: "1"
                                 anchors.centerIn: parent
-                                font.pixelSize: Math.max(12, scale * 5)
+                                font.pixelSize: state_size_text * scale
                                 font.family: "Times New Roman"
                                 color: "#333333"
                             }
@@ -441,9 +472,11 @@ Item {
 
                         CustomProgressBar {
                             id: customProgressBarScales
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: buttonSize * scale
+                            Layout.preferredWidth: widthProgressBar * scale
+                            Layout.preferredHeight: heightProgressBar * scale
                             visible_border_progress: true
+                            borderRadius: borderRadiusProgressBar * scale
+                            borderWidth: borderWidthProgressBar * scale
                             blockSpacing: -5
                             padding: 4
                             textPosition: "none"
@@ -462,8 +495,8 @@ Item {
             // === Усечённый конус ===
             TruncatedCone {
                 Layout.fillWidth: true
-                Layout.preferredHeight: root.height * heightTruncatedCone
-                borderWidth: Math.max(2, scale * 0.5)
+                Layout.preferredHeight: scale * heightTruncatedCone
+                borderWidth: borderWidthTrancatedCone * scale
                 borderColor: "#777777"
                 liquidColor: "#d55f6d7a"
                 fillColor: "#00e6e6e6"
@@ -510,42 +543,267 @@ Item {
     // 6. API РЕДАКТОРА Размеры элементов
     // ==========================================================
     function getPropertiesSize() {
-
         return [
+            {
+                idGroupeProperty: "box",
+                nameGroupeProperty: "Свойства линий",
+                name: "containerRadius",
+                value: containerRadius,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Радиус"
+            },
+            {
+                idGroupeProperty: "box",
+                nameGroupeProperty: "Свойства линий",
+                name: "borderWidth",
+                value: borderWidth,
+                min: 0,
+                max: 100,
+                step: 0.1,
+                label: "Толщина линии"
+            },
 
-            { name: "heightTruncatedCone", value: heightTruncatedCone, min: 0.1, max: 1, step: 0.01,
-              label: "Высота", description: "Высота усеченого конуса" },
+            // Группа: Дисплей панели
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "sizePanelTextWidth",
+                value: sizePanelTextWidth,
+                min: 10,
+                max: 500,
+                step: 1,
+                label: "Ширина текстовой панели"
+            },
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "sizePanelTextHeight",
+                value: sizePanelTextHeight,
+                min: 10,
+                max: 500,
+                step: 1,
+                label: "Высота текстовой панели"
+            },
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "panelTextBorderWidth",
+                value: panelTextBorderWidth,
+                min: 0,
+                max: 50,
+                step: 1,
+                label: "Толщина линии панели"
+            },
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "radiusPanel",
+                value: radiusPanel,
+                min: 0,
+                max: 50,
+                step: 1,
+                label: "Радиус панели"
+            },
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "paddingPanelLeft",
+                value: paddingPanelLeft,
+                min: 0,
+                max: 500,
+                step: 1,
+                label: "Отступ панели с лева"
+            },
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "paddingPanelRight",
+                value: paddingPanelRight,
+                min: 0,
+                max: 500,
+                step: 1,
+                label: "Отступ панели с права"
+            },
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "sizePanelText1",
+                value: sizePanelText1,
+                min: 4,
+                max: 50,
+                step: 1,
+                label: "Размер шрифта 1 текстовой панели"
+            },
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "sizePanelText2",
+                value: sizePanelText2,
+                min: 4,
+                max: 50,
+                step: 1,
+                label: "Размер шрифта 2 текстовой панели"
+            },
+                    // Кнопки управления
+            {
+                idGroupeProperty: "button_control",
+                nameGroupeProperty: "Свойства кнопок управления",
+                name: "buttonSize",
+                value: buttonSize,
+                min: 10,
+                max: 500,
+                step: 1,
+                label: "Размер кнопок управления"
+            },
+            {
+                idGroupeProperty: "button_control",
+                nameGroupeProperty: "Свойства кнопок управления",
+                name: "borderWidthBtn",
+                value: borderWidthBtn,
+                min: 0,
+                max: 50,
+                step: 1,
+                label: "Толщина линии"
+            },
+            {
+                idGroupeProperty: "button_control",
+                nameGroupeProperty: "Свойства кнопок управления",
+                name: "radiusBtn",
+                value: radiusBtn,
+                min: 0,
+                max: 500,
+                step: 1,
+                label: "Радиус закругления углов"
+            },
+            {
+                idGroupeProperty: "button_control",
+                nameGroupeProperty: "Свойства кнопок управления",
+                name: "spacingBtn",
+                value: spacingBtn,
+                min: 0,
+                max: 500,
+                step: 1,
+                label: "Зазор между кнопками"
+            },
 
-            { name: "sizeTextTrancatedCone", value: sizeTextTrancatedCone, min: 5, max: 100, step: 1,
-              label: "Размер шрифта", description: "Усеченный конус - размер шрифта первого текста" },
+            // Группа: Прогресс-бар
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "widthProgressBar",
+                value: widthProgressBar,
+                min: 1,
+                max: 500,
+                step: 1,
+                label: "Ширина"
+            },
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "heightProgressBar",
+                value: heightProgressBar,
+                min: 1,
+                max: 500,
+                step: 1,
+                label: "Высота"
+            },
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "borderRadiusProgressBar",
+                value: borderRadiusProgressBar,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Радиус прогресс бара"
+            },
 
-            { name: "sizeText2TrancatedCone", value: sizeText2TrancatedCone, min: 5, max: 26, step: 1,
-              label: "Размер шрифта", description: "Усеченный конус - размер шрифта второго текста" },
+                    // Панель Стадии выполнения
+            {
+                idGroupeProperty: "stateWark",
+                nameGroupeProperty: "Свойства стадии выполенения",
+                name: "state_width_and_height",
+                value: state_width_and_height,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Размер контура стадии выполнения"
+            },
+            {
+                idGroupeProperty: "stateWark",
+                nameGroupeProperty: "Свойства стадии выполенения",
+                name: "state_size_text",
+                value: state_size_text,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Размер текста"
+            },
+            {
+                idGroupeProperty: "stateWark",
+                nameGroupeProperty: "Свойства стадии выполенения",
+                name: "stateBorderWidth",
+                value: stateBorderWidth,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Толщина линии контура стадии выполенения"
+            },
+            {
+                idGroupeProperty: "stateWark",
+                nameGroupeProperty: "Свойства стадии выполенения",
+                name: "stateRadius",
+                value: stateRadius,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Радиус контура стадии"
+            },
 
-            { name: "levelTrancatedCone", value: levelTrancatedCone, min: 0, max: 1, step: 0.01,
-              label: "Уровень заполнения", description: "Уровень заполнения усеченного конуса" },
-
-            { name: "buttonSize", value: buttonSize, min: 10, max: 60, step: 1,
-              label: "Размер", description: "Размер кнопок" },
-
-            { name: "sizePanelTextWidth", value: sizePanelTextWidth, min: 1, max: 60, step: 1,
-              label: "Ширина", description: "Ширина панели текста" },
-
-            { name: "sizePanelTextHeight", value: sizePanelTextHeight, min: 1, max: 60, step: 1,
-              label: "Высота", description: "Высота панели текста" },
-
-            { name: "sizePanelText1", value: sizePanelText1, min: 1, max: 60, step: 1,
-              label: "Размер шрифта", description: "Размер текста в панели" },
-
-            { name: "sizePanelText2", value: sizePanelText2, min: 1, max: 60, step: 1,
-              label: "Размер шрифта", description: "Размер текста в панели" },
-
-            { name: "containerRadius", value: containerRadius, min: 0, max: 30, step: 1,
-              label: "Радиус", description: "Радиус скругления границы виджета" },
-
-            { name: "borderWidth", value: borderWidth, min: 0.5, max: 5, step: 0.1,
-              label: "Толщина линии", description: "Толщина линии виджета" }
-        ]
+                    // Усеченый конус
+            {
+                idGroupeProperty: "trancatedcone",
+                nameGroupeProperty: "Свойства усеченного конуса",
+                name: "heightTruncatedCone",
+                value: heightTruncatedCone,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Высота конуса"
+            },
+            {
+                idGroupeProperty: "trancatedcone",
+                nameGroupeProperty: "Свойства усеченного конуса",
+                name: "borderWidthTrancatedCone",
+                value: borderWidthTrancatedCone,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Толщина линии контура"
+            },
+            {
+                idGroupeProperty: "trancatedcone",
+                nameGroupeProperty: "Свойства усеченного конуса",
+                name: "sizeTextTrancatedCone",
+                value: sizeTextTrancatedCone,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Размер шрифта первого текста"
+            },
+            {
+                idGroupeProperty: "trancatedcone",
+                nameGroupeProperty: "Свойства усеченного конуса",
+                name: "sizeText2TrancatedCone",
+                value: sizeText2TrancatedCone,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Размер шрифта второго текста"
+            },
+        ];
     }
 
     function setPropertySize(name, value) {

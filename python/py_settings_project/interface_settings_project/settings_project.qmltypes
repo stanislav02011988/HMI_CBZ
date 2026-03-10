@@ -19,28 +19,20 @@ Module {
                                         Signal { name: "signalLoadFile" }
     Signal { name: "signalErrorLoad" }
     Property { name: "itemsFileSettingsDict"; type: "QQmlPropertyMap*"; isWritable: false; notify: "signalLoadFile" }
-    Method { name: "checking_file_path"; type: "void" }
-    Method { name: "get_block_graphics"; type: "void" }
+    Method { name: "add_project"; type: "bool"
+                Parameter { name: "dict_data"; type: "var" } }
     Method { name: "get_parametrs_qml_module"; type: "void" }
-    Method { name: "load_camera_params"; type: "Optional"
-                Parameter { name: "default"; type: "Any" } }
     Method { name: "load_file_settings"; type: "void" }
-    Method { name: "reset_camera_params"; type: "bool" }
-    Method { name: "save_block_graphics"; type: "void"
-                Parameter { name: "graphics_dict"; type: "var" } }
+    Method { name: "remove_project"; type: "bool"
+                Parameter { name: "id_uuic"; type: "str" } }
     Method { name: "save_block_installation_settings"; type: "void"
                 Parameter { name: "dict_installation"; type: "var" } }
     Method { name: "save_block_settings_time_us_format"; type: "void"
                 Parameter { name: "usFormat"; type: "bool" } }
     Method { name: "save_block_user_settings_project"; type: "void"
                 Parameter { name: "dict_user"; type: "var" } }
-    Method { name: "save_camera_params"; type: "bool"
-                Parameter { name: "camera_data"; type: "var" } }
     Method { name: "save_theme"; type: "void"
                 Parameter { name: "name_theme"; type: "var" } }
-    Method { name: "update_element_in_config"; type: "bool"
-                Parameter { name: "id_widget"; type: "str" }
-                Parameter { name: "update_data"; type: "Dict" } }
                                     }
 
 }

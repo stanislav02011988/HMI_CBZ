@@ -1,0 +1,66 @@
+{
+    "id_uuic": "8f08725a-b280-4c66-b799-8e2e4e7af97f",
+    "installationName": "EUROMIX",
+    "typeInstallation": "4000",
+    "numberINF": "565465",
+    "numberInstallation": "56456456",
+    "yearInstallation": "2313",
+    "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\Euromix4000\\EUROMIX.json",
+    "previewInstallation": "file:///F:/__QtQml_Python_HMI_Euromix/HMI_CBZ/res/image/foto_installation/BENNINGHOVEN/MBA200/zavod.jpg",
+    "user": "Неберикутя Станислав Александрович",
+    "position_users": "Старший механик",
+    "created": "2026-03-10T20:20:50.233817",
+    "last_saved": "2026-03-10T20:20:50.233817",
+    "scene": {
+        "GroupeCement": {
+            "scales": {
+                "dadadad": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.13175230566534915,
+                        "relW": 0.12552301255230125,
+                        "relX": 0.43462343096234307,
+                        "relY": 0.272068511198946
+                    },
+                    "id_widget": "dadadad",
+                    "name_widget": "asdas",
+                    "sizeProperties": {
+                        "borderRadiusProgressBar": 4,
+                        "borderWidth": 2.0,
+                        "borderWidthBtn": 1,
+                        "borderWidthTrancatedCone": 2,
+                        "buttonSize": 20,
+                        "containerRadius": 6,
+                        "heightProgressBar": 20,
+                        "heightTruncatedCone": 30,
+                        "paddingPanelLeft": 40,
+                        "paddingPanelRight": 40,
+                        "panelTextBorderWidth": 1,
+                        "radiusBtn": 4,
+                        "radiusPanel": 4,
+                        "sizePanelText1": 10,
+                        "sizePanelText2": 8,
+                        "sizePanelTextHeight": 30.0,
+                        "sizePanelTextWidth": 30.0,
+                        "sizeText2TrancatedCone": 14,
+                        "sizeTextTrancatedCone": 20,
+                        "spacingBtn": 4,
+                        "stateBorderWidth": 1,
+                        "stateRadius": 4,
+                        "state_size_text": 10,
+                        "state_width_and_height": 20,
+                        "widthProgressBar": 180
+                    },
+                    "subtype": "scales"
+                }
+            }
+        },
+        "Camera_Settings": {
+            "zoom": 1.0,
+            "offsetX": 0.0,
+            "offsetY": 0.0
+        }
+    },
+    "nodes": {},
+    "connections": {}
+}

@@ -20,8 +20,11 @@ Item {
     property int blockCount: 5    // количество квадратиков в прогрессе
     property int blockSpacing: 4
 
-    property real borderRadius: 6
+    property int borderRadius: 4
+    property int borderWidth: 2
     property real padding: 6
+
+    property int sizeText: 16
 
     implicitWidth: vertical ? 40 : 300
     implicitHeight: vertical ? 300 : 40
@@ -54,9 +57,9 @@ Item {
         id: borderRect
         anchors.fill: parent
         color: "transparent"
-        radius: 4
+        radius: root.borderRadius
         visible: root.visible_border_progress
-        border.width: 2
+        border.width: root.borderWidth
         border.color: animation_border ? root.currentColor : "#777777"
         // border.color: root.currentColor
 
@@ -129,7 +132,7 @@ Item {
         visible: root.textPosition !== "none"   // "none" — скрыть текст
         text: Math.round(root.value * 100) + "%"
         font.bold: true
-        font.pixelSize: 16
+        font.pixelSize: root.sizeText
         // color: root.currentColor
         color: "black"
 
@@ -152,11 +155,11 @@ Item {
                 anchors.centerIn = borderRect
                 break
             case "right":
-                // справа и чуть ниже верхней границы (как ты просил)
+                // справа и чуть ниже верхней границы
                 anchors.left = borderRect.right
                 anchors.top = borderRect.top
                 anchors.leftMargin = 8
-                anchors.topMargin = 8
+                anchors.topMargin = 0
                 break
             case "left":
                 anchors.right = borderRect.left

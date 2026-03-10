@@ -42,10 +42,13 @@ Item {
     property real shadowOffsetX: 2
     property real shadowOffsetY: 2
 
-    property real progressBarWidthRatio: 0.35
-    property real progressBarHeightRatio: 0.9
-    property real progressPadding: 4
-    property real progressBarSpasing: 0.01
+    property real widthProgressBar: 40
+    property real heightProgressBar: 200
+    property real paddingProgressBar: 4
+    property real spasingProgressBar: 0
+    property real borderWidthProgressBar: 2
+    property int borderRadiusProgressBar: 4
+    property int sizeTextProgressBar: 16
 
     property int textSize: 14
 
@@ -96,43 +99,63 @@ Item {
                 color: "transparent"
 
                 RowLayout {
+                    id: rew
                     anchors.fill: parent
                     spacing: 0
                     // ==========================================
                     // Положение прогресса смещение
                     // ==========================================
-                    Item { Layout.fillHeight: true; Layout.preferredWidth: parent.width * progressBarSpasing}
+                    Item {
+                        Layout.fillHeight: true;
+                        Layout.preferredWidth: spasingProgressBar * scale
+                    }
+
                     // ==========================================
                     // ПРОГРЕСС-БАР
                     // ==========================================
                     CustomProgressBar {
-                        Layout.preferredWidth: parent.width * progressBarWidthRatio
-                        Layout.preferredHeight: parent.height * progressBarHeightRatio
+                        Layout.preferredWidth: widthProgressBar * scale
+                        Layout.preferredHeight: heightProgressBar * scale
+                        parent: rew
                         vertical: true
                         visible_border_progress: true
-                        borderRadius: containerRadius * scale
-                        padding: progressPadding * scale
-                        value: root.level_silos
+                        borderRadius: borderRadiusProgressBar * scale
+                        padding: paddingProgressBar * scale
+                        borderWidth: borderWidthProgressBar * scale
+                        sizeText: sizeTextProgressBar * scale
                     }
 
                     // ==========================================
                     // НАЗВАНИЕ СИЛОСА
                     // ==========================================
-                    Rectangle {
+                    ColumnLayout{
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        color: "transparent"
-                        clip: true
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: root.name_widget
-                            font.pixelSize: textSize * scale
-                            font.bold: true
-                            color: "#333333"
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 20
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                            color: "transparent"
+                            clip: true
+                        }
 
-                            rotation: -90
-                            transformOrigin: Item.Bottom
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            color: "transparent"
+                            clip: true
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: root.name_widget
+                                font.pixelSize: textSize * scale
+                                font.bold: true
+                                color: "#333333"
+
+                                rotation: -90
+                                transformOrigin: Item.Center
+                            }
                         }
                     }
                 }
@@ -141,27 +164,105 @@ Item {
     }
 
     // ==========================================================
-    // 6. API УПРАВЛЕНИЯ РАЗМЕРАМИ
+    // 6. API УПРАВЛЕНИЯ РАЗМЕРАМИ С ГРУППИРОВКОЙ
     // ==========================================================
     function getPropertiesSize() {
         return [
-            { name: "referenceWidth", value: referenceWidth, min: 50, max: 500, step: 5,
-              label: "Ширина контейнера", description: "Основная ширина виджета" },
-            { name: "referenceHeight", value: referenceHeight, min: 100, max: 800, step: 5,
-              label: "Высота контейнера", description: "Основная высота виджета" },
-            { name: "progressBarWidthRatio", value: progressBarWidthRatio, min: 0.1, max: 1.0, step: 0.01,
-              label: "Прогресс-бар: ширина", description: "Ширина прогресс-бара внутри силоса" },
-            { name: "progressBarHeightRatio", value: progressBarHeightRatio, min: 0.1, max: 1.0, step: 0.01,
-              label: "Прогресс-бар: высота", description: "Высота прогресс-бара внутри силоса" },
-            { name: "progressBarSpasing", value: progressBarSpasing, min: 0.01, max: 1, step: 0.01,
-              label: "Прогресс-бар: положение", description: "Положение" },
-            { name: "textSize", value: textSize, min: 8, max: 50, step: 1,
-              label: "Размер текста", description: "Размер шрифта названия силоса" },
-            { name: "containerRadius", value: containerRadius, min: 0, max: 30, step: 1,
-              label: "Скругление контейнера", description: "Радиус скругления углов контейнера силоса" },
-            { name: "borderWidth", value: borderWidth, min: 0.5, max: 5, step: 0.1,
-              label: "Ширина границы контейнера", description: "Толщина линии границы силоса" }
-        ]
+            {
+                idGroupeProperty: "box",
+                nameGroupeProperty: "Свойства линий",
+                name: "containerRadius",
+                value: containerRadius,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Радиус"
+            },
+            {
+                idGroupeProperty: "box",
+                nameGroupeProperty: "Свойства линий",
+                name: "borderWidth",
+                value: borderWidth,
+                min: 0,
+                max: 100,
+                step: 0.1,
+                label: "Толщина линии"
+            },
+
+            // Группа: Текст
+            {
+                idGroupeProperty: "text",
+                nameGroupeProperty: "Свойства текста название элемента",
+                name: "textSize",
+                value: textSize,
+                min: 8,
+                max: 50,
+                step: 1,
+                label: "Размер шрифта"
+            },
+
+            // Группа: Прогресс-бар
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "widthProgressBar",
+                value: widthProgressBar,
+                min: 1,
+                max: 500,
+                step: 1,
+                label: "Ширина"
+            },
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "heightProgressBar",
+                value: heightProgressBar,
+                min: 1,
+                max: 500,
+                step: 1,
+                label: "Высота"
+            },
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "spasingProgressBar",
+                value: spasingProgressBar,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Положение"
+            },
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "borderWidthProgressBar",
+                value: borderWidthProgressBar,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Толщина линии прогресса"
+            },
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "borderRadiusProgressBar",
+                value: borderRadiusProgressBar,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Радиус скругления контура"
+            },
+            {
+                idGroupeProperty: "progressBar",
+                nameGroupeProperty: "Свойства прогресс-бара",
+                name: "sizeTextProgressBar",
+                value: sizeTextProgressBar,
+                min: 0,
+                max: 100,
+                step: 1,
+                label: "Размер текста процентов"
+            }
+        ];
     }
 
     function setPropertySize(name, value) {
@@ -173,7 +274,7 @@ Item {
     }
 
     // ==========================================================
-    // 7. EXPORT / IMPORT СВОЙСТВ
+    // 7. EXPORT / IMPORT СВОЙСТВ РАМЕРОВ
     // ==========================================================
     function exportPropertiesSize() {
         var props = getPropertiesSize()
@@ -198,3 +299,4 @@ Item {
         }
     }
 }
+

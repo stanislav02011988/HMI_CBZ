@@ -45,6 +45,8 @@ class MenagerTheme(QObject):
             path = path.replace("qrc:/json_file_theme/", "", 1)
         return path
 
+
+
     def _update_watcher(self, new_file_path: str):
         """Обновляет наблюдение за файлом темы."""
         if self._current_file_path and self._current_file_path in self._watcher.files():
@@ -81,6 +83,19 @@ class MenagerTheme(QObject):
 
         # Обновляем кэш ключей
         self._colors_keys = list(new_keys)
+
+    def _do_reload_theme(self):
+        """Перезагружает тему из файла при его изменении."""
+        if not self._current_file_path or not Path(self._current_file_path).exists():
+            return
+        try:
+            with open(self._current_file_path, "r", encoding="utf-8") as f:
+                new_theme = json.load(f)
+            self._update_colors_from_dict(new_theme)
+            self.themeChanged.emit()
+        except Exception as e:
+            print(f"[ThemeManager] Ошибка перезагрузки темы: {e}")
+
 
     @Slot(str)
     def load_theme(self, qrc_theme_path: str):
@@ -132,16 +147,4 @@ class MenagerTheme(QObject):
 
     @Property(QQmlPropertyMap, notify=themeChanged)
     def colorsDict(self):
-        return self._colors
-
-    def _do_reload_theme(self):
-        """Перезагружает тему из файла при его изменении."""
-        if not self._current_file_path or not Path(self._current_file_path).exists():
-            return
-        try:
-            with open(self._current_file_path, "r", encoding="utf-8") as f:
-                new_theme = json.load(f)
-            self._update_colors_from_dict(new_theme)
-            self.themeChanged.emit()
-        except Exception as e:
-            print(f"[ThemeManager] Ошибка перезагрузки темы: {e}")
+        return self._colors    

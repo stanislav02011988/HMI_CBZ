@@ -19,6 +19,7 @@ QtObject {
     // =====================================================
     property var componentRegister: QmlRegisterComponentObject
     property var projectSettings: QmlProjectSettings
+    property var projectManager: QmlProjectManager
 
     // =====================================================
     // Появление кнопки для редактирования главной сцены
@@ -33,6 +34,7 @@ QtObject {
     property Item sceneContainer: null
     property Component wrapperComponent: null
     property var previewComponents: null
+    property rect panelRect: Qt.rect(0,0,0,0)
 
     // =====================================================
     // ВНУТРЕННЕЕ СОСТОЯНИЕ
@@ -47,6 +49,7 @@ QtObject {
         sceneContainer    = cfg.sceneContainer || null
         wrapperComponent  = cfg.wrapperComponent || null
         previewComponents = cfg.previewComponents || null
+        panelRect = cfg.panelRect || Qt.rect(0,0,0,0)
         editMode          = cfg.editMode || false
     }
 
@@ -55,23 +58,22 @@ QtObject {
     // =====================================================
     function loadScene() {
         clearScene()
-
-        if (!projectSettings)
+        if (!projectManager)
             return
 
-        const sceneData = projectSettings.loadBlockGraphics()
+        const sceneData = projectManager.dataElementScaene
         if (!sceneData)
             return
-
+        // console.log("SCENE DATA:", JSON.stringify(sceneData, null, 2))
         for (let group in sceneData) {
             for (let subtype in sceneData[group]) {
                 for (let id in sceneData[group][subtype]) {
-                    createObject(sceneData[group][subtype][id])
+                    createObject(sceneData[group][subtype][id])                    
                 }
             }
         }
 
-        loadCamera()
+        loadCamera(sceneData["Camera_Settings"])
     }
 
     // =====================================================
@@ -130,7 +132,6 @@ QtObject {
     // УДАЛЕНИЕ
     // =====================================================
     function removeItem(wrapper) {
-
         if (!wrapper)
             return
 
@@ -148,23 +149,23 @@ QtObject {
     // SAVE
     // =====================================================
     function saveScene() {
-        if (!componentRegister || !projectSettings)
+        if (!componentRegister || !projectManager)
             return
 
         const data = componentRegister.exportSceneData()
-        projectSettings.saveBlockGraphics(data)
+        projectManager.saveSceneElements(data)
         saveCamera()
     }
 
     // =====================================================
     // SAVE One Element
     // =====================================================
-    function saveOneElement(id_widget) {
-        if (!componentRegister || !projectSettings)
+    function updateOneElement(id_widget) {
+        if (!componentRegister || !projectManager)
             return
 
         const data = componentRegister.exportElementData(id_widget)
-        projectSettings.updateBlockGraphicsOneElement(id_widget, data)
+        projectManager.updateSceneOneElement(id_widget, data)
     }
 
     // =====================================================
@@ -322,20 +323,25 @@ QtObject {
             relH = widget.implicitHeight / viewport.height
         }
 
-        // Смещение для каскадного размещения
-        const offset = (componentRegister?.count || 0) * 0.15
+        // =========================================
+        // Центр viewport
+        // =========================================
 
-        // === 1. Позиция в координатах viewport (экрана) ===
-        const screenX = viewport.width * Math.min(0.7, 0.1 + (offset % 0.6))
-        const screenY = viewport.height * Math.min(0.7, 0.15 + ((offset * 0.5) % 0.6))
+        const centerScreenX = viewport.width / 2
+        const centerScreenY = viewport.height / 2
 
-        // === 2. Относительные координаты (0.0–1.0) ОТНОСИТЕЛЬНО VIEWPORT ===
-        // НЕ конвертируем в мировые! Храним как есть.
+        // =========================================
+        // Перевод в координаты мира
+        // =========================================
+
+        const worldX = (centerScreenX - offsetX - 800) / zoom
+        const worldY = (centerScreenY - offsetY - 200) / zoom
+
         return {
-            relX: screenX / viewport.width,      // ~0.1–0.7
-            relY: screenY / viewport.height,     // ~0.15–0.7
-            relW: relW,                           // 0.05 или 0.1
-            relH: relH                            // 0.25 или 0.1
+            relX: worldX / viewport.width,
+            relY: worldY / viewport.height,
+            relW: relW,
+            relH: relH
         }
     }
 
@@ -359,10 +365,10 @@ QtObject {
     // Сохранение настроек камеры
     // =========================================================================
     function saveCamera() {
-        if (!sceneController || !projectSettings)
+        if (!sceneController || !projectManager)
             return
 
-        projectSettings.saveCameraParams({
+        projectManager.saveCameraParams({
             zoom: sceneController.zoom,
             offsetX: sceneController.offsetX,
             offsetY: sceneController.offsetY
@@ -372,18 +378,16 @@ QtObject {
     // =========================================================================
     // Загрузка настроек камеры
     // =========================================================================
-    function loadCamera() {
-
-        if (!sceneController || !projectSettings)
+    function loadCamera(dataCamera) {
+        if (!sceneController || !projectManager)
             return
 
-        const cam = projectSettings.loadCameraParams()
-
-        if (!cam)
+        // const cam = projectManager.loadCameraParams()
+        if (!dataCamera)
             return
 
-        sceneController.zoom    = cam.zoom
-        sceneController.offsetX = cam.offsetX
-        sceneController.offsetY = cam.offsetY
+        sceneController.zoom    = dataCamera.zoom
+        sceneController.offsetX = dataCamera.offsetX
+        sceneController.offsetY = dataCamera.offsetY
     }
 }

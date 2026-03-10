@@ -364,6 +364,7 @@ Item {
             sceneContainer: world,
             wrapperComponent: wrapperComponent,
             previewComponents: previewComponents,
+            panelRect: root.panelRect,
             editMode: root.editMode
         })
 
@@ -384,7 +385,14 @@ Item {
     // ============================================================
     // ПАНЕЛЬ УПРАВЛЕНИЯ
     // ============================================================
+    property rect panelRect: Qt.rect(
+        panelButtons.x,
+        panelButtons.y,
+        panelButtons.width,
+        panelButtons.height
+    )
     PanelButtonEditMode {
+        id: panelButtons
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.margins: 15

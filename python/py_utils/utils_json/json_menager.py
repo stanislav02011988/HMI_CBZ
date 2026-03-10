@@ -11,14 +11,22 @@ class Menager_Json:
         return os.path.normpath(os.path.join(path, file_name))
 
     def write_json_file(self, path_folder, file_name, items):
-        # WRITE JSON FILE
-        with open(self._joing_path_file(path_folder, file_name), "w", encoding='utf-8') as write:
-            json.dump(items, write, indent=4, ensure_ascii=False)
+        if not file_name:
+            with open(path_folder, "w", encoding='utf-8') as write:
+                json.dump(items, write, indent=4, ensure_ascii=False)
+        else:
+            with open(self._joing_path_file(path_folder, file_name), "w", encoding='utf-8') as write:
+                json.dump(items, write, indent=4, ensure_ascii=False)
 
     def read_json_file(self, path_folder, file_name):
-        with open(self._joing_path_file(path_folder, file_name), "r", encoding='utf-8') as reader:
-            items = json.loads(reader.read())
-        return items
+        if not file_name:
+            with open(path_folder, "r", encoding='utf-8') as reader:
+                items = json.loads(reader.read())
+            return items
+        else:
+            with open(self._joing_path_file(path_folder, file_name), "r", encoding='utf-8') as reader:
+                items = json.loads(reader.read())
+            return items
 
     def update_json_file(self, path_folder, file_name, items):
         with open(self._joing_path_file(path_folder, file_name), 'r+', encoding='utf-8') as f:

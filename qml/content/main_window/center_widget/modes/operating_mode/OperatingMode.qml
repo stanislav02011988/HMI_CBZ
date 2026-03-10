@@ -80,7 +80,6 @@ Item {
             previewComponents: previewComponents,
             editMode: root.editMode
         })
-
         QmlSceneManager.loadScene()
     }
 

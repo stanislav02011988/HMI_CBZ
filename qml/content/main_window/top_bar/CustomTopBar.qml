@@ -36,17 +36,17 @@ Item {
 
             ConteinerClock {}
 
-            ConteinerDay {}
-
-            ConteinerDataInstallation {}
+            ConteinerDay {}            
 
             ConteinerDataUser {}
 
-            Rectangle {
-                color: "#00ffffff"
-                radius: 4
-                border.color: "transparent"
-                border.width: 1
+            ConteinerDataInstallation {}
+
+            Item {
+                // color: "#00ffffff"
+                // radius: 4
+                // border.color: "transparent"
+                // border.width: 1
 
                 Layout.fillHeight: true
                 Layout.fillWidth: true

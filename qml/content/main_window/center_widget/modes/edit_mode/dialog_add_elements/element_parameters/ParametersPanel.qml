@@ -55,11 +55,13 @@ ColumnLayout {
             // ГРУППА
             ColumnLayout {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 spacing: 6
                 Label { text: "Группа элемента *"; color: "#bbbbbb"; font.pixelSize: 13 }
                 ComboBox {
                     id: comboGroup
                     Layout.fillWidth: true
+                    Layout.preferredHeight: 40
                     model: ["Блок цемента", "Блок воды", "Блок химии", "Блок смесителя", "Прочие"]
                     currentIndex: -1
                     font.pixelSize: 14

@@ -15,6 +15,7 @@ Button {
 
     // === Размеры ===
     property int m_radius: Math.round(baseUnit * 1.5)
+    property real m_borderWidth: 1
     property int iconSize: Math.round(baseUnit * 6)
     property real iconScale: 0.65
     property bool adaptiveIcon: true
@@ -165,7 +166,7 @@ Button {
         }
 
         border.color: root.m_borderColor
-        border.width: 1.3
+        border.width: root.m_borderWidth
         opacity: root.enabled ? 1.0 : 0.65
     }
 

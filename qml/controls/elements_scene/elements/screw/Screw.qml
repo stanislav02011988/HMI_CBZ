@@ -65,7 +65,6 @@ Item {
         spacing: 0
 
         Rectangle {
-
             id: body
 
             implicitWidth: referenceWidth * widthContainer

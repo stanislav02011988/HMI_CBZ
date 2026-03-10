@@ -5,6 +5,7 @@ import Qt5Compat.GraphicalEffects
 
 import qml.controls.flip_clock
 import qml.controls.button
+import qml.managers
 import qml.settings.project_settings
 
 Rectangle {
@@ -17,11 +18,11 @@ Rectangle {
 
     // Массив исходных данных
     readonly property var rawData: [
-        { label: qsTr("Название Установки"), value: QmlProjectSettings.name_installation },
-        { label: qsTr("Тип установки"), value: QmlProjectSettings.type_installation },
-        { label: qsTr("Инв.№"), value: QmlProjectSettings.inf_number },
-        { label: qsTr("Зав.№"), value: QmlProjectSettings.installation_number },
-        { label: qsTr("Год выпуска"), value: QmlProjectSettings.year_installation }
+        { label: qsTr("Название Установки"), value: QmlProjectManager.installationName },
+        { label: qsTr("Тип установки"), value: QmlProjectManager.typeInstallation },
+        { label: qsTr("Инв.№"), value: QmlProjectManager.numberINF },
+        { label: qsTr("Зав.№"), value: QmlProjectManager.numberInstallation },
+        { label: qsTr("Год выпуска"), value: QmlProjectManager.yearInstallation }
     ]
 
     // Отфильтрованная модель: только непустые значения

@@ -1,4 +1,4 @@
-# backend/managers/component_object_register.py
+# python\py_register_component_object\register_component_object.py
 """
 Менеджер регистрации компонентов сцены
 Хранит ссылки на все созданные виджеты и позволяет быстро найти элемент по ID

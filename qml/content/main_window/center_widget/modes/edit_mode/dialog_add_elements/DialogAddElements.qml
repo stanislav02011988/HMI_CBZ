@@ -8,7 +8,7 @@ import Qt5Compat.GraphicalEffects
 import qml.settings.menager_theme
 import qml.controls.button
 
-import qml.content.main_window.center_widget.modes.edit_mode.dialog_add_elements.element_selector
+import "./element_selector"
 import "./element_preview"
 import "./element_parameters"
 
@@ -134,6 +134,7 @@ Popup {
                         }
                         onSelectionCleared: () => {
                             root.isVisibleParamentrsElement = false
+                            root.resetForm()
                         }
                         onAddRequested: root.addElementToScene(paramsPanel.dataList)
                     }
@@ -154,7 +155,7 @@ Popup {
                         isVisible: root.isVisibleParamentrsElement
 
                         onAddRequested: (dataList) => { root.addElementToScene(dataList); root.resetForm() }
-                        onCloseRequested: { root.resetForm(); root.close() }
+                        onCloseRequested: { root.close() }
                         onNameElementChanged: { previewPanel.elementName = nameElement }
                         onLevelPreSilosChanged: {previewPanel.levelSilos = levelPreSilos}
                     }
@@ -195,4 +196,5 @@ Popup {
     }
 
     onOpened: root.resetForm()
+    onClosed: root.resetForm()
 }

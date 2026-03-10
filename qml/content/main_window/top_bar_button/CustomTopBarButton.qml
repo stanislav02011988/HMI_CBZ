@@ -55,9 +55,8 @@ Item {
                 accessUser: QmlProjectSettings.access_group
                 onMenuActionTriggered: (action) => {
                     switch (action) {
-                        case "file_new":
-                            console.log("Создать новый файл")
-                            // сюда код для нового файла
+                        case "project_manager_open":
+                            MenagerWindows.showWindow("qrc:/qml/content/project_manage_window/ProjectManagerWindow.qml")
                             break
 
                         case "file_open":

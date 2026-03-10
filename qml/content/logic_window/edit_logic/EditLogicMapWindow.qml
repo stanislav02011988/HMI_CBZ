@@ -5,6 +5,8 @@ import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Controls.Material
 
+import qml.managers
+
 import "component/top_bar"
 import "component/left_panel"
 import "component/scene"
@@ -20,8 +22,16 @@ Window {
     title: "Logic Map"
     color: "#81848c"
 
+    property string projectFilePath: ""
+
     property real leftPanelWidth: 320
     property real rightPanelWidth: 340
+
+    // Component.onCompleted: {
+    //     if (projectFilePath !== "") {
+    //         QmlLogicProjectManager.loadLogicProjectManager(projectFilePath)
+    //     }
+    // }
 
     ColumnLayout {
         anchors.fill: parent

@@ -6,7 +6,7 @@ import QtQuick.Layouts
 Item {
     id: root
     width: parent ? parent.width : 600
-    height: 40  // ← фиксируем высоту top bar (обычно 30–50 px)
+    height: 40
 
     signal menuActionTriggered(string action)
 
@@ -19,16 +19,8 @@ Item {
         {
             label: "Файл",
             items: [
-                { text: "Новый", action: "file_new" },
-                { text: "Открыть", action: "file_open" },
+                { text: "Управление проектами", action: "project_manager_open" },
                 { text: "Выход", action: "file_exit" }
-            ]
-        },
-        {
-            label: "Правка",
-            items: [
-                { text: "Копировать", action: "edit_copy" },
-                { text: "Вставить", action: "edit_paste" }
             ]
         },
         {
@@ -83,10 +75,8 @@ Item {
             model: root.finalMenuModel
 
             Item {
-                // 🔑 КЛЮЧЕВОЕ: не задаём preferredWidth!
-                // Вместо этого — вычисляем по содержимому
                 Layout.fillHeight: true
-                Layout.minimumWidth: labelText.implicitWidth + 24  // 12px слева + 12px справа
+                Layout.minimumWidth: labelText.implicitWidth + 24
 
                 Rectangle {
                     id: buttonBg
@@ -169,14 +159,14 @@ Item {
                                     }
                                 }
                                 //----- Сепораторатор
-                                // Rectangle {
-                                //     anchors.bottom: parent.bottom
-                                //     height: 1
-                                //     width: parent.width
-                                //     color: "#dddddd"
-                                //     // Теперь используем itemCount из Popup
-                                //     visible: index < popup.itemCount - 1
-                                // }
+                                Rectangle {
+                                    anchors.bottom: parent.bottom
+                                    height: 1
+                                    width: parent.width
+                                    color: "#dddddd"
+                                    // Теперь используем itemCount из Popup
+                                    visible: index < popup.itemCount - 1
+                                }
                             }
                         }
                     }

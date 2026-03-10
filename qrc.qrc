@@ -54,7 +54,7 @@
     <qresource prefix="/">
         <file>qml/managers/QmlSceneManager.qml</file>
         <file>qml/content/main_window/center_widget/modes/edit_mode/EditableItem.qml</file>
-        <file>qml/managers/QmlSceneLogicManager.qml</file>
+        <file>qml/managers/QmlProjectManager.qml</file>
         <file>qml/registers/QmlRegisterComponentObject.qml</file>
         <file>qml/system/QmlBusManager.qml</file>
         <file>qml/system/ReactiveElement.qml</file>
@@ -76,7 +76,7 @@
         <file>qml/content/logic_window/edit_logic/component/scene/panel_btn/PanelBauttons.qml</file>
         <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneListElementPanel.qml</file>
         <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneElementsModel.qml</file>
-        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneTreeDelegate.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneElementDelegate.qml</file>
         <file>qml/controls/elements_scene/elements/shutter/Shutter.qml</file>
         <file>qml/controls/elements_scene/elements_preview/PreviewShutter.qml</file>
         <file>qml/content/main_window/center_widget/modes/edit_mode/dialog_add_elements/element_selector/models_element/ShutterSubtypes.qml</file>
@@ -88,6 +88,12 @@
         <file>qml/controls/elements_scene/elements_preview/PreviewTubing.qml</file>
         <file>qml/content/main_window/center_widget/modes/edit_mode/dialog_add_elements/element_selector/models_element/TubingSubtypes.qml</file>
         <file>qml/controls/elements_scene/elements/tubing/TubingHorizontal.qml</file>
+        <file>qml/content/main_window/center_widget/modes/edit_mode/dialog_resize_element/ResizePropertiesModel.qml</file>
+        <file>qml/content/main_window/center_widget/modes/edit_mode/dialog_resize_element/ResizePropertyDelegate.qml</file>
+        <file>qml/content/project_manage_window/ProjectManagerWindow.qml</file>
+        <file>qml/content/project_manage_window/dialog_new_project/DialogNewProject.qml</file>
+        <file>qml/content/project_manage_window/ProjectModel.qml</file>
+        <file>qml/content/project_manage_window/ProjectDelegate.qml</file>
     </qresource>
     <qresource prefix="/svg_icon_btn">
         <file>res/svg/svg_image_btn/reset/reset_a.svg</file>

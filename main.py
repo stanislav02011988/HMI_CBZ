@@ -41,6 +41,7 @@ from python.py_settings_project.settings_project import SettingsProject
 from python.py_menager_theme.menager_theme import MenagerTheme
 
 from python.py_register_component_object.register_component_object import RegisterComponentObject
+from python.py_project_manager.project_manager import ProjectManager
 from python.py_bus_manager.bus_manager import BusManager
 
 class Project:
@@ -67,6 +68,7 @@ class Project:
         self.settings_project = SettingsProject(self._file_path, self._file_name, self.db_menager, self.menager_json)
         self.menager_theme = MenagerTheme()
 
+        self.project_manager = ProjectManager(self.menager_json)
         self.bus_manager = BusManager()
         self.register_component_object = RegisterComponentObject()        
 
@@ -76,6 +78,7 @@ class Project:
         self.register_qml_module_menager_theme()
         self.register_qml_module_time_menager()
 
+        self.register_qml_project_manager()
         self.register_qml_bus_manager()
         self.register_qml_register_component_object()
 
@@ -103,6 +106,9 @@ class Project:
 
     def register_qml_module_time_menager(self):
         self.qml_registration_module.registration_module(self.time_menager)
+
+    def register_qml_project_manager(self):
+        self.qml_registration_module.registration_module(self.project_manager)
 
     def register_qml_bus_manager(self):
         self.qml_registration_module.registration_module(self.bus_manager)

@@ -1,330 +1,234 @@
-// qml/content/logic_window/edit_logic/component/left_panel/SceneElementsModel.qml
+// qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneElementsModel.qml
 import QtQuick
+import QtQuick.Controls
 import qml.registers
 
 QtObject {
     id: root
 
-    // =========================================================================
-    // PUBLIC PROPERTIES
-    // =========================================================================
-    property var flatModel: []          // Плоский список видимых элементов
-    property var treeData: []           // Полная структура дерева
-    property var selectedElement: null
-    property int countElementsScene: QmlRegisterComponentObject.count
+    // =================================================
+    // DATA
+    // =================================================
+    property var treeData: []          // иерархическая структура групп и виджетов
+    property var flatModel: []         // "виртуальный" плоский список для ListView
+    property string searchText: ""     // текст поиска
+    property var selectedElement: null // выбранный элемент
+    property int countElementsScene: backend.count
 
-    // Сигналы
+    readonly property var backend: QmlRegisterComponentObject
+    property var nodeMap: {}           // карта id → node для O(1) поиска
+
     signal elementClicked(var elementData)
-    signal modelRefreshed()
     signal modelChanged()
 
-    // =========================================================================
-    // BACKEND LINK
-    // =========================================================================
-    readonly property var backend: QmlRegisterComponentObject
+    // =================================================
+    // SEARCH TIMER (debounce)
+    // =================================================
+    property Timer searchTimer: Timer {
+        id: searchTimer
+        interval: 120
+        repeat: false
+        onTriggered: rebuildFlatModel()
+    }
 
-    // =========================================================================
-    // INITIALIZATION
-    // =========================================================================
+    // =================================================
+    // INIT
+    // =================================================
     Component.onCompleted: {
-        // console.log("[SceneElementsModel] Component.onCompleted")
         refreshModel()
-        backend.registryChanged.connect(refreshModel)
+
+        if (backend && backend.registryChanged)
+            backend.registryChanged.connect(refreshModel)
     }
 
-    // =========================================================================
-    // PUBLIC METHODS
-    // =========================================================================
+    // =================================================
+    // REFRESH MODEL
+    // =================================================
     function refreshModel() {
-        // console.log("[SceneElementsModel] refreshModel()")
         treeData = buildTreeData()
-        flatModel = buildFlatModel(treeData)
-        // console.log("[SceneElementsModel] flatModel.length:", flatModel.length)
-        modelRefreshed()
-        modelChanged()
+        rebuildNodeMap(treeData) // строим карту id → node для быстрого поиска
+        rebuildFlatModel()
     }
 
+    // =================================================
+    // SEARCH
+    // =================================================
+    function setSearch(text) {
+        var newText = text.toLowerCase()
+        if (newText === searchText)
+            return
+
+        searchText = newText
+        searchTimer.restart()
+    }
+
+    // =================================================
+    // SELECT
+    // =================================================
     function selectElement(elementData) {
         selectedElement = elementData
         elementClicked(elementData)
     }
 
+    // =================================================
+    // EXPAND / COLLAPSE
+    // =================================================
     function toggleExpand(index) {
-        if (index < 0 || index >= flatModel.length) {
-            // console.log("[toggleExpand] Invalid index:", index, "flatModel.length:", flatModel.length)
+        var item = flatModel[index]
+        if (!item || !item.hasChildren)
             return
-        }
 
-        var flatItem = flatModel[index]
-        // console.log("[toggleExpand] Flat item:", flatItem.name, "hasChildren:", flatItem.hasChildren)
+        var node = nodeMap[item.id] // быстрый поиск через map
+        if (!node)
+            return
 
-        if (flatItem.hasChildren) {
-            var treeNode = findNodeInTree(treeData, flatItem.id)
-            if (treeNode) {
-                treeNode.expanded = !treeNode.expanded
-                // console.log("[toggleExpand] Tree node:", treeNode.name, "expanded:", treeNode.expanded)
-            }
-
-            flatModel = buildFlatModel(treeData)
-            modelChanged()
-        }
+        node.expanded = !node.expanded
+        rebuildFlatModel()
     }
 
     function expandAll() {
         setExpanded(treeData, true)
-        flatModel = buildFlatModel(treeData)
-        modelChanged()
+        rebuildFlatModel()
     }
 
     function collapseAll() {
         setExpanded(treeData, false)
-        flatModel = buildFlatModel(treeData)
-        modelChanged()
+        rebuildFlatModel()
     }
 
-    // =========================================================================
-    // FIND NODE IN TREE
-    // =========================================================================
-    function findNodeInTree(nodeList, targetId) {
-        for (var i = 0; i < nodeList.length; i++) {
-            var node = nodeList[i]
-            if (node.id === targetId) {
-                return node
-            }
-            if (node.children && node.children.length > 0) {
-                var found = findNodeInTree(node.children, targetId)
-                if (found) return found
-            }
-        }
-        return null
-    }
-
-    // =========================================================================
-    // BUILD TREE DATA (2 уровня: Группа → Виджет)
-    // =========================================================================
+    // =================================================
+    // BUILD TREE
+    // =================================================
     function buildTreeData() {
         var result = []
-        var allIds = backend.getAllIds()
+        var ids = backend.getAllIds()
         var groups = {}
 
-        // console.log("[buildTreeData] Processing", allIds.length, "widgets")
-
-        for (var i = 0; i < allIds.length; i++) {
-            var id = allIds[i]
+        for (var i = 0; i < ids.length; i++) {
+            var id = ids[i]
             var record = backend.getElementById(id)
-
-            if (!record || !record.widgetRef) {
-                console.log("[buildTreeData] Skip id:", id)
+            if (!record || !record.widgetRef)
                 continue
-            }
 
             var widget = record.widgetRef
             var wrapper = record.wrapperRef
+            var groupName = widget.componentGroupe || "Default"
 
-            var groupName = widget.componentGroupe || "DefaultGroup"
-            var widgetName = widget.name_widget || id
-            var subType = widget.subtype || "unknown"
-
-            // console.log("[buildTreeData] Widget:", id, "group:", groupName, "subtype:", subType)
-
-            if (!groups[groupName]) {
+            if (!groups[groupName])
                 groups[groupName] = []
-            }
 
-            var widgetNode = createWidgetNode(id, widgetName, subType, widget, wrapper)
-            groups[groupName].push(widgetNode)
+            groups[groupName].push(createWidgetNode(
+                id,
+                widget.name_widget || id,
+                widget.subtype || "unknown",
+                widget,
+                wrapper
+            ))
         }
 
         for (var groupName in groups) {
             result.push(createGroupNode(groupName, groups[groupName]))
         }
 
-        result.sort(function(a, b) { return a.name.localeCompare(b.name) })
         return result
     }
 
-    // =========================================================================
-    // CREATE NODES
-    // =========================================================================
-    function createGroupNode(groupName, children) {
+    // =================================================
+    // NODE FACTORIES
+    // =================================================
+    function createGroupNode(name, children) {
         return {
-            "name": groupName,
-            "id": "group_" + groupName,
-            "type": "group",
-            "level": 0,
-            "expanded": false,
-            "children": children,
-            "icon": "📁",
-            "color": "#ffffff",
-            "bold": true,
-            "visible": true
+            name: name,
+            id: "group_" + name,
+            type: "group",
+            level: 0,
+            expanded: false,
+            children: children,
+            hasChildren: children.length > 0,
+            icon: "📁",
+            color: "#ffffff",
+            bold: true
         }
     }
 
-    // =========================================================================
-    // TODO: 3-й уровень (внутренние элементы виджета)
-    // =========================================================================
-    /*
-    ============================================================================
-    3-й УРОВЕНЬ ДЕРЕВА: ВНУТРЕННИЕ ЭЛЕМЕНТЫ ВИДЖЕТА
-    ============================================================================
-
-    Структура:
-      Уровень 0: Группа (📁 GroupeCement)
-      Уровень 1: Виджет (🧩 Valve_01)
-      Уровень 2: Элементы виджета (🔹 Body, 🔹 Status LED, 🔹 Progress Bar)
-
-    Для реализации 3-го уровня необходимо:
-
-    1. В каждом виджете добавить свойство internalElements:
-       ```qml
-       property var internalElements: [
-           { "name": "Body", "id": id_widget + "_body" },
-           { "name": "Status LED", "id": id_widget + "_led" },
-           { "name": "Progress Bar", "id": id_widget + "_progress" }
-       ]
-       ```
-
-    2. Раскомментировать функцию getInternalElements() ниже
-
-    3. В createWidgetNode() заменить:
-       var internalElements = []
-       на:
-       var internalElements = getInternalElements(id, widgetName, subType, widgetRef, wrapperRef)
-
-    4. В SceneListElementPanel.qml добавить отступ для уровня 2:
-       anchors.leftMargin: (modelData && modelData.level !== undefined) ? modelData.level * 20 : 0
-       (уже работает, level=2 даст отступ 40px)
-
-    5. Добавить иконку для элементов (🔹)
-
-    ============================================================================
-    */
-
-    function createWidgetNode(id, widgetName, subType, widgetRef, wrapperRef) {
-        // === TODO: Раскомментировать для 3-го уровня ===
-        // var internalElements = getInternalElements(id, widgetName, subType, widgetRef, wrapperRef)
-
-        var internalElements = []  // Пока пусто (2 уровня)
-
+    function createWidgetNode(id, name, subtype, widgetRef, wrapperRef) {
         return {
-            "name": widgetName,
-            "id": id,
-            "type": "widget",
-            "subtype": subType,
-            "level": 1,
-            "expanded": false,
-            "children": internalElements,
-            "icon": "🧩",
-            "color": "#dddddd",
-            "bold": false,
-            "visible": true,
-            "widgetRef": widgetRef,
-            "wrapperRef": wrapperRef
+            name: name,
+            id: id,
+            type: "widget",
+            subtype: subtype,
+            level: 1,
+            expanded: false,
+            children: [],
+            hasChildren: false,
+            icon: "🧩",
+            color: "#dddddd",
+            bold: false,
+            widgetRef: widgetRef,
+            wrapperRef: wrapperRef
         }
     }
 
-    // =========================================================================
-    // TODO: Функция для получения внутренних элементов виджета
-    // =========================================================================
-    /*
-    function getInternalElements(widgetId, widgetName, subType, widgetRef, wrapperRef) {
-        var elements = []
+    // =================================================
+    // REBUILD NODE MAP (для быстрого поиска по id)
+    // =================================================
+    function rebuildNodeMap(nodes) {
+        nodeMap = {}
 
-        // 1. Попытка получить internalElements из виджета
-        if (widgetRef && widgetRef.internalElements) {
-            var internalList = widgetRef.internalElements
-            for (var i = 0; i < internalList.length; i++) {
-                var elem = internalList[i]
-                elements.push(createElementNode(
-                    elem.id || (widgetId + "_elem_" + i),
-                    elem.name || ("Element " + (i + 1)),
-                    widgetId,
-                    widgetRef,
-                    wrapperRef
-                ))
+        function walk(nodelist) {
+            for (var i = 0; i < nodelist.length; i++) {
+                var node = nodelist[i]
+                nodeMap[node.id] = node
+                if (node.children.length > 0)
+                    walk(node.children)
             }
         }
 
-        // 2. Заглушки для демонстрации (если нет internalElements)
-        if (elements.length === 0) {
-            elements.push(createElementNode(widgetId + "_body", "Body", widgetId, widgetRef, wrapperRef))
-            elements.push(createElementNode(widgetId + "_status", "Status", widgetId, widgetRef, wrapperRef))
-
-            if (wrapperRef) {
-                elements.push(createElementNode(
-                    widgetId + "_geometry",
-                    "Geometry (X:" + wrapperRef.relX + ", Y:" + wrapperRef.relY + ")",
-                    widgetId,
-                    widgetRef,
-                    wrapperRef
-                ))
-            }
-        }
-
-        return elements
+        walk(nodes)
     }
 
-    function createElementNode(id, name, parentWidgetId, widgetRef, wrapperRef) {
-        return {
-            "name": name,
-            "id": id,
-            "type": "element",
-            "level": 2,
-            "expanded": false,
-            "children": [],
-            "icon": "🔹",
-            "color": "#aaaaaa",
-            "bold": false,
-            "visible": true,
-            "parentWidgetId": parentWidgetId,
-            "widgetRef": widgetRef,
-            "wrapperRef": wrapperRef
-        }
-    }
-    */
+    // =================================================
+    // REBUILD FLAT MODEL (виртуализация)
+    // =================================================
+    function rebuildFlatModel() {
+        var result = []
+        var search = searchText
 
-    // =========================================================================
-    // FLATTEN TREE TO LIST
-    // =========================================================================
-    function buildFlatModel(treeNodes, visibleParent) {
-        var flat = []
-        if (visibleParent === undefined) visibleParent = true
+        function walk(nodes) {
+            for (var i = 0; i < nodes.length; i++) {
+                var node = nodes[i]
+                var nameLower = node.name.toLowerCase()
+                var match = search === "" || nameLower.indexOf(search) !== -1
 
-        for (var i = 0; i < treeNodes.length; i++) {
-            var node = treeNodes[i]
-
-            var flatNode = {}
-            for (var key in node) {
-                if (key !== "children") {
-                    flatNode[key] = node[key]
-                }
-            }
-
-            flatNode.hasChildren = node.children && node.children.length > 0
-            flatNode.visible = visibleParent
-            flatNode.index = flat.length
-
-            flat.push(flatNode)
-
-            if (node.children && node.children.length > 0 && node.expanded && visibleParent) {
-                // console.log("[buildFlatModel] Expanding:", node.name, "adding", node.children.length, "children")
-                var childrenFlat = buildFlatModel(node.children, true)
-                for (var j = 0; j < childrenFlat.length; j++) {
-                    flat.push(childrenFlat[j])
+                if (node.type === "group") {
+                    result.push(node)
+                    if (node.expanded || search !== "")
+                        walk(node.children)
+                } else {
+                    if (match)
+                        result.push(node)
                 }
             }
         }
 
-        return flat
+        walk(treeData)
+        flatModel = result
+        modelChanged()
     }
 
-    function setExpanded(nodeList, expanded) {
-        for (var i = 0; i < nodeList.length; i++) {
-            nodeList[i].expanded = expanded
-            if (nodeList[i].children && nodeList[i].children.length > 0) {
-                setExpanded(nodeList[i].children, expanded)
-            }
+    // =================================================
+    // UTILS
+    // =================================================
+    function setExpanded(nodes, state) {
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i]
+            node.expanded = state
+            if (node.children.length > 0)
+                setExpanded(node.children, state)
         }
+    }
+
+    function findNode(nodes, id) {
+        return nodeMap[id] || null
     }
 }
