@@ -18,13 +18,10 @@ Module {
                                         exportMetaObjectRevisions: [256]
                                         Signal { name: "signalLoadFile" }
     Signal { name: "signalErrorLoad" }
-    Property { name: "itemsFileSettingsDict"; type: "QQmlPropertyMap*"; isWritable: false; notify: "signalLoadFile" }
-    Method { name: "add_project"; type: "bool"
-                Parameter { name: "dict_data"; type: "var" } }
+    Property { name: "dict_settings_project"; type: "var"; isWritable: false; notify: "signalLoadFile" }
+    Property { name: "projectModel"; type: "QObject*"; isWritable: false; notify: undefined }
     Method { name: "get_parametrs_qml_module"; type: "void" }
     Method { name: "load_file_settings"; type: "void" }
-    Method { name: "remove_project"; type: "bool"
-                Parameter { name: "id_uuic"; type: "str" } }
     Method { name: "save_block_installation_settings"; type: "void"
                 Parameter { name: "dict_installation"; type: "var" } }
     Method { name: "save_block_settings_time_us_format"; type: "void"

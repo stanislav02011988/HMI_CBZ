@@ -9,7 +9,8 @@ from PySide6.QtCore import QObject, Slot, Signal, Property, QFileSystemWatcher, 
 from PySide6.QtQml import QQmlPropertyMap, QJSValue
 
 from python.py_utils.decorators.decorators_qml_registration_module.decorators_qml_registration_module import QmlRegistrationModule
-
+from python.py_settings_project.project.project_store import ProjectStore
+from python.py_settings_project.project.project_model import ProjectModel
 
 QML_IMPORT_TYPE = "singleton"
 Singleton_Type_Register = "singleton_instance_register"
@@ -38,7 +39,16 @@ class SettingsProject(QObject):
         self._db_engine = db_engine
         self._json_menager = json_menager
 
-        self._items = QQmlPropertyMap(self)
+        self._settings_project = {}
+
+        self._project_store = ProjectStore(
+            json_menager,
+            self._file_path,
+            self._file_name,
+            self
+        )
+
+        self._project_model = ProjectModel(self._project_store, self)
 
         # === Наблюдатель за файлом ===
         self._watcher = QFileSystemWatcher(self)
@@ -104,7 +114,6 @@ class SettingsProject(QObject):
     # =====================================================
     def _get_current_timestamp(self) -> str:
         """Получение текущей временной метки в ISO формате"""
-        from datetime import datetime
         return datetime.now().isoformat()
 
 
@@ -115,48 +124,57 @@ class SettingsProject(QObject):
     def load_file_settings(self):
         try:
             data = self._json_menager.read_json_file(self._file_path, self._file_name)
+
             if data is None:
                 data = {}
 
-            current_keys = set(self._items.keys())
-            new_keys = set(data.keys())
-
-            for key in current_keys - new_keys:
-                self._items.clear(key)
-
-            for key, value in data.items():
-                self._items.insert(key, value)
-
+            self._settings_project = data
+            self._project_store.load(data)
+            self._project_model.reload()
             self.signalLoadFile.emit()
 
+            print("[SettingsProject] hot reload applied")
         except Exception as e:
             self.signalErrorLoad.emit("[SettingsProject] Ошибка загрузки данных", str(e))
 
 
+    @Property("QVariantMap", notify=signalLoadFile)
+    def dict_settings_project(self):
+        return self._settings_project
 
-    @Property(QQmlPropertyMap, notify=signalLoadFile)
-    def itemsFileSettingsDict(self):
-        return self._items
-
+    # =============================================================================
+    # Модель ProjectModel(QAbstractListModel)
+    # =============================================================================
+    @Property(QObject, constant=True)
+    def projectModel(self):
+        return self._project_model
 
     # =====================================================
     # Методы сохранения
     # =====================================================
+    def _save_settings(self):
+        """Сохранение текущих настроек в файл"""
+        try:
+            self._json_menager.write_json_file(path_folder=self._file_path, file_name=self._file_name, items=self._settings_project)
+
+            self._add_watch()
+            self.signalLoadFile.emit()
+
+        except Exception as e:
+            print(f"[SettingsProject] save error: {e}")
+
+
     @Slot(str)
     def save_theme(self, name_theme) -> None:
-        data = self._json_menager.read_json_file(self._file_path, self._file_name) or {}
-        data.setdefault("block_theme_app", {})["theme_path"] = (
-            f"qrc:/json_file_theme/files_settings/json_files/settings/project_settings/theme/{name_theme}.json"
-        )
-        self._json_menager.write_json_file(path_folder=self._file_path, file_name=self._file_name, items=data)
-        self._add_watch()
-        self.signalLoadFile.emit()
+        self._settings_project.setdefault("block_theme_app", {})["theme_path"] = (
+                f"qrc:/json_file_theme/files_settings/json_files/settings/project_settings/theme/{name_theme}.json"
+            )
+        self._save_settings()
 
 
     @Slot("QVariant")
     def save_block_user_settings_project(self, dict_user) -> None:
-        items = self._json_menager.read_json_file(self._file_path, self._file_name) or {}
-        items["block_user"] = {
+        self._settings_project["block_user"] = {
             "id_user": dict_user["id_user"],
             "last_name": dict_user["last_name"],
             "first_name": dict_user["first_name"],
@@ -167,124 +185,32 @@ class SettingsProject(QObject):
             "time_in": dict_user["time_in"],
             "time_out": "---"
         }
-        self._json_menager.write_json_file(path_folder=self._file_path, file_name=self._file_name, items=items)
-        self._add_watch()
-        self.signalLoadFile.emit()
+
+        self._save_settings()
 
 
     @Slot("QVariant")
     def save_block_settings_time_us_format(self, usFormat: bool) -> None:
-        items = self._json_menager.read_json_file(self._file_path, self._file_name) or {}
-        items.setdefault("block_time_settings", {})["use24HourFormat"] = usFormat
-        self._json_menager.write_json_file(path_folder=self._file_path, file_name=self._file_name, items=items)
-        self._add_watch()
-        self.signalLoadFile.emit()
+        self._settings_project.setdefault("block_time_settings", {})["use24HourFormat"] = usFormat
+        self._save_settings()
+
 
 
     @Slot("QVariant")
     def save_block_installation_settings(self, dict_installation) -> None:
-        items = self._json_menager.read_json_file(self._file_path, self._file_name) or {}
-        items["block_installation_settings"] = {
+        self._settings_project["block_installation_settings"] = {
             "name_installation": dict_installation["name_installation"],
             "type_installation": dict_installation["type_installation"],
             "inf_number": dict_installation["inf_number"],
             "installation_number": dict_installation["installation_number"],
             "year_installation": dict_installation["year_installation"]
         }
-        self._json_menager.write_json_file(path_folder=self._file_path, file_name=self._file_name, items=items)
-        self._add_watch()
-        self.signalLoadFile.emit()
 
-    # ==========================
-    # Работа с проектами
-    # ==========================
-    @Slot("QVariant", result=bool)
-    def add_project (self, dict_data) -> bool:
-        try:
-            if isinstance(dict_data, QJSValue):
-                data = dict_data.toVariant()
-            else:
-                data = dict_data
+        self._save_settings()
 
-            items = self._json_menager.read_json_file(self._file_path, self._file_name) or {}
 
-            if "projects" not in items:
-                items["projects"] = []
 
-            new_project = {
-                "id_uuic": data.get("id_uuic"),
-                "installationName": data.get("installationName"),
-                "typeInstallation": data.get("typeInstallation"),
-                "numberINF": data.get("numberINF"),
-                "numberInstallation": data.get("numberInstallation"),
-                "yearInstallation": data.get("yearInstallation"),
-                "project_file": data.get("project_file"),
-                "previewInstallation": dict_data.get("previewInstallation"),
-                "user": dict_data.get("user"),
-                "position_users": dict_data.get("position_users"),
-                "created": data.get("created"),
-                "last_saved": data.get("last_saved"),
-            }
 
-            items["projects"].append(new_project)
 
-            self._json_menager.write_json_file(
-                path_folder=self._file_path,
-                file_name=self._file_name,
-                items=items
-            )
 
-            self._add_watch()
-            self.signalLoadFile.emit()
-            print(f"[settings_project.py][559 - OK] Новый логический проект '{data.get('installationName')}' добавлен")
-            return True
 
-        except Exception as e:
-            print(f"[settings_project.py][563 - ERR] add_project: {e}")
-            return False
-
-    @Slot(str, result=bool)
-    def remove_project(self, id_uuic: str) -> bool:
-        try:
-            items = self._json_menager.read_json_file(self._file_path, self._file_name) or {}
-            projects = items.get("projects", [])
-
-            # Ищем проект по ID
-            project_to_remove = None
-            for p in projects:
-                if p.get("id_uuic") == id_uuic:
-                    project_to_remove = p
-                    break
-
-            if not project_to_remove:
-                print(f"[WARN] remove_logic_project: проект с id_uuic '{id_uuic}' не найден")
-                return False
-
-            # Удаляем физический файл/папку проекта
-            project_path = project_to_remove.get("project_file", "")
-            if project_path:
-                path_obj = Path(project_path)
-                if path_obj.exists():
-                    if path_obj.is_file():
-                        path_obj.unlink()
-                    elif path_obj.is_dir():
-                        shutil.rmtree(path_obj)
-                    print(f"[OK] Удалён физический файл/папка проекта: {project_path}")
-
-            # Удаляем из JSON
-            projects.remove(project_to_remove)
-            items["projects"] = projects
-            self._json_menager.write_json_file(
-                path_folder=self._file_path,
-                file_name=self._file_name,
-                items=items
-            )
-
-            self._add_watch()
-            self.signalLoadFile.emit()
-            print(f"[OK] Проект '{project_to_remove.get('installationName')}' удалён из настроек")
-            return True
-
-        except Exception as e:
-            print(f"[ERR] remove_project: {e}")
-            return False

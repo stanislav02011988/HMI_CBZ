@@ -10,20 +10,9 @@ import python.py_settings_project.interface_settings_project
 
 QtObject {
     id: root
-    signal signalAddedProject()
-
-    function createProject(dict) {
-        var data = ProjectManager.create_project(dict)
-        SettingsProject.add_project(data)
-    }
-
-    function loadProject(projectFilePath) {
-        ProjectManager.loadProject(projectFilePath)
-        QmlSceneManager.loadScene()
-    }
 
     //---- Данные установки (завода)
-    property var dict: ProjectManager.itemsProjectData ? ProjectManager.itemsProjectData : ({})
+    // property var dict: ProjectManager.itemsProjectData ? ProjectManager.itemsProjectData : ({})
 
     property string id_uuic: ProjectManager.itemsProjectData?.id_uuic || ""
     property string installationName: ProjectManager.itemsProjectData?.installationName || ""
@@ -43,4 +32,22 @@ QtObject {
     function loadCameraParams() { return ProjectManager.load_camera_params() }
     function saveCameraParams(cameraData) { ProjectManager.save_camera_params(cameraData) }
     function resetCameraParams() { return ProjectManager.reset_camera_params() }
+
+
+    function createProject(dict) {
+        QmlProjectSettings.model.addProject(ProjectManager.create_project(dict))
+    }
+
+    function loadProject(id_uuic, projectFilePath) {
+        QmlProjectSettings.model.setActivateProject(id_uuic)
+        ProjectManager.loadProject(projectFilePath)
+        QmlSceneManager.loadScene()
+    }
+
+    Component.onCompleted: {
+        var project = QmlProjectSettings.model.getAutoLoadProject()
+        if(project.projectPath){
+            ProjectManager.loadProject(project.projectPath)
+        }
+    }
 }

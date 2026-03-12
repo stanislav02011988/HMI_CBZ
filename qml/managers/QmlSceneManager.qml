@@ -64,7 +64,6 @@ QtObject {
         const sceneData = projectManager.dataElementScaene
         if (!sceneData)
             return
-        // console.log("SCENE DATA:", JSON.stringify(sceneData, null, 2))
         for (let group in sceneData) {
             for (let subtype in sceneData[group]) {
                 for (let id in sceneData[group][subtype]) {

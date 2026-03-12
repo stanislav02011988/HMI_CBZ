@@ -11,6 +11,8 @@ import qml.utils.menadger_windows
 import qml.controls.switch
 import qml.controls.menu_bar
 
+import "../../project_manage_window"
+
 Item {
     id: root
     width: parent.width
@@ -18,7 +20,9 @@ Item {
 
     property color colorDefault: "#67aa25"
     property color colorMouseOver: "#7ece2d"
-    property color colorPressed: "#558b1f"
+    property color colorPressed: "#558b1f"    
+
+    ProjectManagerWindow { id: dialogProjectManager }
 
     Rectangle {
         id: bg
@@ -56,7 +60,7 @@ Item {
                 onMenuActionTriggered: (action) => {
                     switch (action) {
                         case "project_manager_open":
-                            MenagerWindows.showWindow("qrc:/qml/content/project_manage_window/ProjectManagerWindow.qml")
+                            dialogProjectManager.open()
                             break
 
                         case "file_open":
@@ -130,5 +134,5 @@ Item {
                 }
             }
         }
-    }
+    }    
 }

@@ -9,9 +9,11 @@ import qml.settings.project_settings
 import qml.managers
 
 Popup {
-    id: root
+    id: root    
     width: 400
     height: 600
+    x: Math.round((parent.width - width) / 2)
+    y: Math.round((parent.height - height) / 2)
     modal: true
     focus: true
     background: Rectangle {

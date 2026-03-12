@@ -2,6 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import qml.managers
+import qml.settings.project_settings
+
 import qml.content.main_window.top_bar
 import qml.content.main_window.top_bar_button
 import qml.content.main_window.center_widget
@@ -16,7 +19,9 @@ Window {
     visible: true
     color: "#00ffffff"
 
-    Component.onCompleted: { root.showMaximized() }
+    Component.onCompleted: {
+        root.showMaximized()
+    }
 
     // flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowSystemMenuHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint
 

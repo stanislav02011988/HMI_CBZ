@@ -9,16 +9,8 @@ from pathlib import Path
 from datetime import datetime
 from typing import Any, Optional, Dict
 
-from PySide6.QtCore import (
-    QObject,
-    QUrl,
-    Slot,
-    Signal,
-    Property,
-    QFileSystemWatcher,
-)
-
-from PySide6.QtQml import QQmlPropertyMap, QJSValue
+from PySide6.QtCore import QObject, QUrl, Slot, Signal, Property, QFileSystemWatcher
+from PySide6.QtQml import QJSValue
 
 from python.py_utils.decorators.decorators_qml_registration_module.decorators_qml_registration_module import QmlRegistrationModule
 
@@ -46,7 +38,7 @@ class ProjectManager(QObject):
 
         self._json_menager = json_menager
 
-        self._items = QQmlPropertyMap(self)
+        self._project_data: Dict[str, Any] = {}
 
         # текущий файл проекта
         self._project_file: Optional[Path] = None
@@ -61,7 +53,6 @@ class ProjectManager(QObject):
     # =====================================================
     # HOT RELOAD
     # =====================================================
-
     def _add_watch(self):
         if not self._project_file:
             return
@@ -87,26 +78,18 @@ class ProjectManager(QObject):
             return
 
         try:
-
-            with open(self._project_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            data = self._json_menager.read_json_file(self._project_file, "")
 
             if data is None:
                 data = {}
 
-            current_keys = set(self._items.keys())
-            new_keys = set(data.keys())
-
-            for key in current_keys - new_keys:
-                self._items.clear(key)
-
-            for key, value in data.items():
-                self._items.insert(key, value)
+            self._project_data = data
 
             self.signalLoadFile.emit()
 
         except Exception as e:
             print("[ERR] reload_project:", e)
+
 
 
     # =====================================================
@@ -115,55 +98,51 @@ class ProjectManager(QObject):
     @Slot("QVariant", result="QVariant")
     def create_project(self, dict_data):
         try:
-
+            # Приводим к dict независимо от типа
             if isinstance(dict_data, QJSValue):
-                dict_data = dict_data.toVariant()
+                data = dict_data.toVariant()
+            else:
+                data = dict_data  # <-- важно! иначе data не существует
 
-            installation_name = dict_data["installationName"]
+            # Проверка на словарь
+            if not isinstance(data, dict):
+                print("[project_manager.py] invalid project data:", data)
+                return {}
 
-            project_path = Path(QUrl(dict_data["projectPath"]).toLocalFile())
-
+            installation_name = data["installationName"]
+            project_path = Path(QUrl(data["projectPath"]).toLocalFile())
             project_file = project_path / f"{installation_name}.json"
-
             id_uuic = str(uuid.uuid4())
 
+            default_project = {
+                "id_uuic": id_uuic,
+                "installationName": installation_name,
+                "typeInstallation": data.get("typeInstallation"),
+                "numberINF": data.get("numberINF"),
+                "numberInstallation": data.get("numberInstallation"),
+                "yearInstallation": data.get("yearInstallation"),
+                "project_file": str(project_file),
+                "previewInstallation": data.get("previewInstallation"),
+                "user": data.get("user"),
+                "position_users": data.get("position_users"),
+                "created": datetime.now().isoformat(),
+                "last_saved": datetime.now().isoformat(),
+                "scene": {},
+                "nodes": {},
+                "connections": {}
+            }
+
+            # Создаём файл, если его ещё нет
             if not project_file.exists():
-
-                default_project = {
-
-                    "id_uuic": id_uuic,
-                    "installationName": installation_name,
-                    "typeInstallation": dict_data["typeInstallation"],
-                    "numberINF": dict_data["numberINF"],
-                    "numberInstallation": dict_data["numberInstallation"],
-                    "yearInstallation": dict_data["yearInstallation"],
-
-                    "project_file": str(project_file),
-
-                    "previewInstallation": dict_data["previewInstallation"],
-                    "user": dict_data["user"],
-                    "position_users": dict_data["position_users"],
-
-                    "created": datetime.now().isoformat(),
-                    "last_saved": datetime.now().isoformat(),
-
-                    "scene": {},
-                    "nodes": {},
-                    "connections": {}
-
-                }
-
+                project_path.mkdir(parents=True, exist_ok=True)
                 with open(project_file, "w", encoding="utf-8") as f:
                     json.dump(default_project, f, indent=4, ensure_ascii=False)
 
-            print("[OK] проект создан")
-
+            print("[project_manager.py] [OK] проект создан")
             return default_project
 
         except Exception as e:
-
-            print("[ERR] create_project:", e)
-
+            print("[project_manager.py][ERR] create_project:", e)
             return {}
 
     # =====================================================
@@ -172,6 +151,7 @@ class ProjectManager(QObject):
     @Slot(str)
     def loadProject(self, project_path):
         try:
+
             if project_path.startswith("file:///"):
                 path = Path(QUrl(project_path).toLocalFile())
             else:
@@ -182,18 +162,12 @@ class ProjectManager(QObject):
 
             self._project_file = path
 
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            data = self._json_menager.read_json_file(self._project_file, "")
 
             if data is None:
                 data = {}
 
-            # правильная очистка
-            for key in list(self._items.keys()):
-                self._items.clear(key)
-
-            for key, value in data.items():
-                self._items.insert(key, value)
+            self._project_data = data
 
             self._add_watch()
 
@@ -208,17 +182,16 @@ class ProjectManager(QObject):
     # =====================================================
     # PROPERTY QML
     # =====================================================
-    @Property(QQmlPropertyMap, notify=signalLoadFile)
+    @Property("QVariantMap", notify=signalLoadFile)
     def itemsProjectData(self):
-        return self._items
+        return self._project_data
 
     # =========================================================================
     # Получение элементов сцены из файла
     # =========================================================================
     @Slot(result="QVariant")
     def load_elements_scene(self):
-        items = self._json_menager.read_json_file(self._project_file, "") or {}
-        return items.get("scene", {})
+        return self._project_data.get("scene", {})
     # =====================================================
     # SAVE SCENE
     # =====================================================
@@ -229,7 +202,7 @@ class ProjectManager(QObject):
             if not self._project_file:
                 return
 
-            items = self._json_menager.read_json_file(self._project_file, "") or {}
+            items = self._project_data
 
             items["scene"] = graphics_dict
 
@@ -274,7 +247,7 @@ class ProjectManager(QObject):
             # === 2. Загружаем текущую конфигурацию ===
             items = self._json_menager.read_json_file(self._project_file,"") or {}
 
-            if "scene" not in items:
+            if "scene" not in self._project_data:
                 print("[ERR] update_element_in_config: scene отсутствует в конфигурации")
                 self._restore_from_backup(backup_path)
                 return False
@@ -284,7 +257,7 @@ class ProjectManager(QObject):
             target_element = None
             target_path = ("", "", "")  # (group, subtype, id_widget)
 
-            for group, subtypes in items["scene"].items():
+            for group, subtypes in self._project_data["scene"].items():
                 # Пропускаем служебные блоки (например, "Camera_Settings")
                 if not isinstance(subtypes, dict) or group.startswith("Camera_"):
                     continue
@@ -332,7 +305,7 @@ class ProjectManager(QObject):
                         print(f"[WARN] update_element_in_config: игнорируем некорректное значение sizeProperties.{prop_name}={value}")
 
             # === 5. Сохраняем ОБНОВЛЁННУЮ конфигурацию ===
-            self._json_menager.write_json_file( path_folder=self._project_file, file_name="", items=items)
+            self._json_menager.write_json_file( path_folder=self._project_file, file_name="", items=self._project_data)
 
             # === 6. Перерегистрируем наблюдение (файл мог быть заменён) ===
             self._add_watch()
@@ -404,15 +377,14 @@ class ProjectManager(QObject):
     @Slot(result="QVariant")
     def load_camera_params(self, default: Any = None) -> Optional[dict]:
         try:
-            items = self._json_menager.read_json_file( self._project_file, "" ) or {}
-            # Проверяем наличие внутри block_graphics
-            if "scene" not in items:
+
+            if "scene" not in self._project_data:
                 return default
 
-            if "Camera_Settings" not in items["scene"]:
+            if "Camera_Settings" not in self._project_data["scene"]:
                 return default
 
-            camera_data = items["scene"]["Camera_Settings"]
+            camera_data = self._project_data["scene"]["Camera_Settings"]
 
             return {
                 "zoom": float(camera_data.get("zoom", 1.0)),
@@ -436,18 +408,12 @@ class ProjectManager(QObject):
                 camera_data = camera_data.toVariant()
 
             if not isinstance(camera_data, dict):
-                raise TypeError(
-                    f"camera_data must be dict, got {type(camera_data)}"
-                )
+                raise TypeError(f"camera_data must be dict, got {type(camera_data)}")
 
-            items = self._json_menager.read_json_file(
-                self._project_file,
-                ""
-            ) or {}
-            if "scene" not in items:
-                items["scene"] = {}
+            if "scene" not in self._project_data:
+                self._project_data["scene"] = {}
 
-            items["scene"]["Camera_Settings"] = {
+            self._project_data["scene"]["Camera_Settings"] = {
                 "zoom": float(camera_data.get("zoom", 1.0)),
                 "offsetX": float(camera_data.get("offsetX", 0)),
                 "offsetY": float(camera_data.get("offsetY", 0))
@@ -455,7 +421,7 @@ class ProjectManager(QObject):
             self._json_menager.write_json_file(
                 path_folder=self._project_file,
                 file_name="",
-                items=items
+                items=self._project_data
             )
             return True
         except Exception as e:

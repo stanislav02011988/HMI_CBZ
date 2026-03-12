@@ -3,6 +3,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import qml.registers
+
 Item {
     id: root
     width: parent ? parent.width : 600

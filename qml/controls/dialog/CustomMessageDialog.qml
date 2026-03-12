@@ -5,6 +5,7 @@ import QtQuick.Window
 
 import qml.controls.button
 import qml.settings.menager_theme
+import qml.settings.project_settings
 
 import python.py_settings_project.interface_settings_project
 
@@ -13,7 +14,7 @@ Popup {
 
     signal signalBtnOK()
 
-    property string path_image_logo: SettingsProject.itemsFileSettingsDict.logo_progect
+    property string path_image_logo: QmlProjectSettings.logoImage
 
     property int m_width: 320
     property int m_height: 160

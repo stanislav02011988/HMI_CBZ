@@ -24,37 +24,57 @@
         "tab_number": 14706,
         "position_users": "Старший механик",
         "access_group": "admin",
-        "time_in": "10-03-2026 21:26",
+        "time_in": "12-03-2026 09:38",
         "time_out": "---"
     },
     "projects": [
         {
-            "id_uuic": "8f08725a-b280-4c66-b799-8e2e4e7af97f",
+            "id_uuic": "5ef2a608-30ea-4f5f-964a-308f9c1e0984",
             "installationName": "EUROMIX",
             "typeInstallation": "4000",
-            "numberINF": "565465",
-            "numberInstallation": "56456456",
-            "yearInstallation": "2313",
+            "numberINF": "14574",
+            "numberInstallation": "566456asd213",
+            "yearInstallation": "a3s2d1a3",
             "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\Euromix4000\\EUROMIX.json",
             "previewInstallation": "file:///F:/__QtQml_Python_HMI_Euromix/HMI_CBZ/res/image/foto_installation/BENNINGHOVEN/MBA200/zavod.jpg",
             "user": "Неберикутя Станислав Александрович",
             "position_users": "Старший механик",
-            "created": "2026-03-10T20:20:50.233817",
-            "last_saved": "2026-03-10T20:20:50.233817"
+            "created": "2026-03-12T11:10:39.528585",
+            "last_saved": "2026-03-12T11:10:39.528585",
+            "check_auto_load": true,
+            "isActivateProject": true
         },
         {
-            "id_uuic": "063d605a-dd58-412e-b835-c119237f56fb",
-            "installationName": "hasdfkdf",
-            "typeInstallation": "ssdfsf",
-            "numberINF": "fsdfs",
-            "numberInstallation": "asdfsdf",
-            "yearInstallation": "sdfsdf",
-            "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\BENNINGHOVEN\\hasdfkdf.json",
+            "id_uuic": "4cc03ba5-96dd-4277-885b-68fa09bfe33b",
+            "installationName": "AAAAAAAAAAAAAAAAA",
+            "typeInstallation": "asd",
+            "numberINF": "asda",
+            "numberInstallation": "sdas",
+            "yearInstallation": "dasd",
+            "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\BENNINGHOVEN\\AAAAAAAAAAAAAAAAA.json",
             "previewInstallation": "",
             "user": "Неберикутя Станислав Александрович",
             "position_users": "Старший механик",
-            "created": "2026-03-10T20:56:54.699938",
-            "last_saved": "2026-03-10T20:56:54.699938"
+            "created": "2026-03-12T15:44:24.148130",
+            "last_saved": "2026-03-12T15:44:24.148130",
+            "check_auto_load": false,
+            "isActivateProject": false
+        },
+        {
+            "id_uuic": "de27735d-6883-46d4-b0ff-26a220a8aaea",
+            "installationName": "asd",
+            "typeInstallation": "asf",
+            "numberINF": "asf",
+            "numberInstallation": "asfa",
+            "yearInstallation": "sf",
+            "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\BENNINGHOVEN\\asd.json",
+            "previewInstallation": "",
+            "user": "Неберикутя Станислав Александрович",
+            "position_users": "Старший механик",
+            "created": "2026-03-12T15:55:43.716118",
+            "last_saved": "2026-03-12T15:55:43.716118",
+            "check_auto_load": false,
+            "isActivateProject": false
         }
     ]
 }

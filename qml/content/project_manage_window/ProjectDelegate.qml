@@ -5,51 +5,95 @@ import QtQuick.Layouts
 import QtQuick.Controls.Material
 
 Item {
-
     id: root
-    width: 250
-    height: 300
 
-    property var projectData
+    // ================================
+    // STAGED STATE
+    // ================================
+    property bool stagedAutoLoad: check_auto_load
+    property bool changed: false
 
-    // Сигналы для родителя
-    signal editRequested(string projectFile)
-    signal deleteRequested(string idUuic)
+    // ================================
+    // ВХОДНЫЕ СВОЙСТВА ИЗ GRIDVIEW
+    // ================================
+    property string selectedId: ""
+    property string activeAutoLoadId: ""
+    property bool activeAutoLoadIntendedValue: false  //  НОВОЕ
+
+    //  Вычисляемые свойства
+    readonly property bool isSelected: selectedId === id_uuic
+    readonly property bool isAutoLoadActive: activeAutoLoadId === id_uuic
+
+    // ================================
+    // Состояние наведения
+    // ================================
+    property bool hovered: false
+
+    // ================================
+    // Сигналы
+    // ================================
+    signal signalOpenProject(string idUuic, string projectFilePath)
+    signal signalDeleteProject(string idUuic)
+    signal selected(bool isSelected)
+    signal autoLoadActivated(string idUuic, bool intendedValue)  // Передаём намеренное значение
+    signal autoLoadSaveRequested(string idUuic, bool value)
 
     Rectangle {
         anchors.fill: parent
+        anchors.margins: 10
         radius: 8
-        border.width: 1
-        border.color: "#555"
-        color: "#3a3d42"
+        border.width: 3
+
+        border.color: {
+            if (root.isSelected) return "#4CAF50"
+            if (root.hovered) return "#66BB6A"
+            if (isActivateProject) return "red"
+            return "#555"
+        }
+
+        color: root.isSelected ? "#4a4d52" : "#3a3d42"
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+
+            onEntered: { if (!root.isSelected) root.hovered = true }
+            onExited: { if (!root.isSelected) root.hovered = false }
+
+            onClicked: {
+                if (root.isSelected) {
+                    root.selected(false)
+                } else {
+                    root.selected(true)
+                }
+                root.hovered = false
+            }
+        }
 
         ColumnLayout {
             anchors.fill: parent
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            // ================================
+            // HEADER
+            // ================================
             Rectangle {
-                id: header
                 color: "transparent"
                 Layout.fillWidth: true
                 Layout.preferredHeight: 60
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 ColumnLayout {
                     anchors.fill: parent
                     spacing: 0
 
                     Rectangle {
-                        id: rectangle1
-                        width: 200
-                        height: 200
                         color: "#00ffffff"
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                         Text {
-                            text: projectData.installationName || "Новый проект"
+                            text: installationName + " " + typeInstallation + " " + "инв. №" + numberINF
                             font.bold: true
                             font.pixelSize: 16
                             color: "white"
@@ -60,98 +104,120 @@ Item {
                         }
                     }
 
+                    // ================================
+                    //  AUTOLOAD BLOCK (ИСПРАВЛЕННЫЙ)
+                    // ================================
                     Rectangle {
-                        id: rectangle2
-                        width: 200
-                        height: 200
                         color: "#00ffffff"
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                        CheckBox {
-                            id: checkBox
-                            text: qsTr("Автозагрузка проекта")
+                        RowLayout {
                             anchors.fill: parent
-                            font.family: "Times New Roman"
-                            font.pointSize: 10
+                            spacing: 6
+
+                            CheckBox {
+                                id: checkBox
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+
+                                text: qsTr("Автозагрузка проекта")
+                                font.family: "Times New Roman"
+                                font.pointSize: 10
+
+                                //  ИСПРАВЛЕННАЯ логика отображения чекбокса:
+                                checked: {
+                                    if (root.isAutoLoadActive) {
+                                        // Эта карточка редактируется → показываем локальное staged
+                                        return root.stagedAutoLoad
+                                    } else if (root.activeAutoLoadId !== "" && root.activeAutoLoadIntendedValue === true) {
+                                        // ДРУГАЯ карточка активна и хочет быть ON → эта должна выглядеть как OFF
+                                        return false
+                                    } else {
+                                        // Обычный режим → показываем значение из модели
+                                        return check_auto_load
+                                    }
+                                }
+
+                                onToggled: {
+                                    root.stagedAutoLoad = checked
+                                    root.changed = (root.stagedAutoLoad !== check_auto_load)
+                                    if (!root.isAutoLoadActive) {
+                                        root.autoLoadActivated(id_uuic, checked)
+                                    }
+                                }
+                            }
+
+                            Button {
+                                text: qsTr("Сохранить")
+                                visible: root.isAutoLoadActive && root.changed
+                                Layout.fillHeight: true
+
+                                onClicked: {
+                                    root.autoLoadSaveRequested(id_uuic, root.stagedAutoLoad)
+                                }
+                            }
                         }
                     }
-
-
                 }
             }
 
+            // ================================
+            // IMAGE / DATES / BUTTONS (без изменений)
+            // ================================
             Rectangle {
-                id: imageConteiner
-                width: 200
-                height: 200
                 color: "transparent"
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 Image {
-                    id: image
                     anchors.fill: parent
-                    source: projectData.previewInstallation && projectData.previewInstallation !== "" ? projectData.previewInstallation : ""
+                    source: previewInstallation && previewInstallation !== ""
+                            ? previewInstallation
+                            : ""
                     asynchronous: true
                     fillMode: Image.PreserveAspectFit
                 }
 
                 MouseArea {
                     anchors.fill: parent
-                    onDoubleClicked: editRequested(projectData.project_file)
+                    propagateComposedEvents: true
+                    onDoubleClicked: { signalOpenProject(id_uuic, project_file) }
+                    onClicked: (mouse) => { mouse.accepted = false }
                 }
             }
 
             Rectangle {
-                id: dataCreate
-                width: 200
-                height: 200
                 color: "transparent"
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 Layout.preferredHeight: 50
                 Layout.fillWidth: true
-
                 ColumnLayout {
                     anchors.fill: parent
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                    Text { text: "Создан: " + (projectData.created || ""); font.pixelSize: 10; Layout.fillHeight: true; Layout.fillWidth: true; color: "lightgray" }
-                    Text { text: "Последнее: " + (projectData.last_saved || ""); font.pixelSize: 10; Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter; Layout.fillHeight: true; Layout.fillWidth: true; color: "lightgray" }
+                    anchors.margins: 10
+                    Text { text: "Создан: " + (created || ""); font.pixelSize: 10; color: "lightgray"; Layout.fillWidth: true }
+                    Text { text: "Последнее: " + (last_saved || ""); font.pixelSize: 10; color: "lightgray"; Layout.fillWidth: true }
                 }
             }
 
             Rectangle {
-                id: rectangle
-                width: 200
-                height: 200
                 color: "transparent"
                 Layout.preferredHeight: 50
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
+                visible: root.isSelected
                 RowLayout {
                     anchors.fill: parent
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    anchors.margins: 10
                     Button {
                         text: "Открыть"
-                        Layout.fillHeight: true
                         Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                        onClicked: editRequested(projectData.project_file)
+                        Layout.fillHeight: true
+                        onClicked: signalOpenProject(id_uuic, project_file)
                     }
                     Button {
                         text: "Удалить"
-                        Layout.fillHeight: true
                         Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                        onClicked: deleteRequested(projectData.id_uuic)
+                        Layout.fillHeight: true
+                        onClicked: signalDeleteProject(id_uuic)
                     }
                 }
             }

@@ -18,7 +18,7 @@ Module {
                                         exportMetaObjectRevisions: [256]
                                         Signal { name: "signalLoadFile" }
     Signal { name: "signalErrorLoad" }
-    Property { name: "itemsProjectData"; type: "QQmlPropertyMap*"; isWritable: false; notify: "signalLoadFile" }
+    Property { name: "itemsProjectData"; type: "var"; isWritable: false; notify: "signalLoadFile" }
     Method { name: "create_project"; type: "void"
                 Parameter { name: "dict_data"; type: "var" } }
     Method { name: "get_parametrs_qml_module"; type: "void" }
