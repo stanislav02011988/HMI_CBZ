@@ -29,10 +29,14 @@ QtObject {
 
     function saveBlockUserSettings(dict_user){ SettingsProject.save_block_user_settings_project(dict_user) }    
 
+    // ======== Данные Настроек
+    property var listGropeElement: SettingsProject.list_groupe_element ? SettingsProject.list_groupe_element : []
+
     //======== Данные Проектов
     property var model: SettingsProject.projectModel ? SettingsProject.projectModel : []
 
     Component.onCompleted: {
         TimeManager.start_timer()
+        // console.log("listGropeElement", JSON.stringify(listGropeElement, null, 2))
     }
 }

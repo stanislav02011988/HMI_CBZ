@@ -20,6 +20,8 @@ QtObject {
     // ============================================================
     readonly property int count: backend.count
 
+    property bool isDirty: backend.isDirty
+
     // ============================================================
     // PUBLIC SIGNALS (Proxy layer)
     // ============================================================

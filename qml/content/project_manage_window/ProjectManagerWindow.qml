@@ -1,4 +1,4 @@
-// qml/windows/ProjectManagerWindow.qml
+// qml\content\project_manage_window\ProjectManagerWindow.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -12,13 +12,13 @@ import qml.managers
 import "./dialog_new_project"
 
 Popup {
-    id: root
+    id: root    
+
+    width: 800
+    height: Math.min(600, Screen.height * 0.9)
 
     x: Math.round((Overlay.overlay.width - width) / 2)
     y: Math.round((Overlay.overlay.height - height) / 2)
-
-    width: 900
-    height: Math.min(600, Screen.height * 0.9)
 
     modal: true
     focus: true
@@ -32,7 +32,7 @@ Popup {
     Rectangle {
         id: bg
         anchors.fill: parent
-        color: "white"
+        color: "#81848c"
         border.color: "#444"
         radius: 8
 
@@ -46,7 +46,7 @@ Popup {
 
         ColumnLayout {
             anchors.fill: parent
-            spacing: 5
+            spacing: 0
 
             // =====================================================
             // HEADER (DRAG AREA)
@@ -55,9 +55,10 @@ Popup {
                 id: header
                 Layout.fillWidth: true
                 Layout.preferredHeight: 36
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.margins: 10
                 color: "#2c3e50"
                 radius: 6
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 MouseArea {
                     anchors.fill: parent
@@ -112,101 +113,140 @@ Popup {
                 }
             }
 
-            RowLayout {
+            Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 30
+                Layout.preferredHeight: 40
                 Layout.margins: 10
-                spacing: 8
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                border.width: 1
+                radius: 4
+                color: "transparent"
 
-                Button {
-                    text: "Новый проект"
-                    onClicked: dialogNewProject.open()
-                }
-                TextField {
-                    id: searchField
-                    Layout.fillWidth: true
-                    placeholderText: "Поиск..."
-                    onTextChanged: {
-                        searchDelay.restart()
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    spacing: 8
+
+                    Button {
+                        Layout.preferredWidth: 30
+                        Layout.preferredHeight: 30
+                        Layout.margins: 2
+                        text: "Новый проект"
+                        onClicked: dialogNewProject.open()
+                    }
+
+                    TextField {
+                        id: searchField
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+                        Layout.margins: 2
+                        placeholderText: "Поиск..."
+                        onTextChanged: {
+                            searchDelay.restart()
+                        }
                     }
                 }
+
             }
 
-            // =====================================================
-            // GRIDVIEW С АДАПТИВНЫМИ КОЛОНКАМИ
-            // =====================================================
-            GridView {
-                id: gridProjects
-                Layout.fillWidth: true
+            Rectangle {
                 Layout.fillHeight: true
+                Layout.fillWidth: true
                 Layout.margins: 10
-                model: QmlProjectSettings.model
-                clip: true
-                cacheBuffer: 800
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                color: "transparent"
+                border.width: 1
+                radius: 4
 
-                // Адаптивные колонки
-                property int columns: {
-                    if (width < 650) return 1
-                    if (width < 1100) return 2
-                    return 3
-                }
-                property real cellSpacing: 20
-                cellWidth: (width - (columns - 1) * cellSpacing) / columns
-                cellHeight: 350
+                // =====================================================
+                // GRIDVIEW С АДАПТИВНЫМИ КОЛОНКАМИ
+                // =====================================================
+                GridView {
+                    id: gridProjects
+                    anchors.fill: parent
+                    anchors.centerIn: parent
+                    anchors.margins: 5
+                    model: QmlProjectSettings.model
+                    clip: true
+                    cacheBuffer: 800
 
-                // Выделение карточки
-                property string selectedId: ""
-                function deselectAll() { selectedId = "" }
-
-                //  Активная карточка для редактирования автозагрузки
-                property string activeAutoLoadId: ""
-                //  НОВОЕ: Намеренное значение автозагрузки для активной карточки
-                property bool activeAutoLoadIntendedValue: false
-
-                function deactivateAutoLoad() {
-                    activeAutoLoadId = ""
-                    activeAutoLoadIntendedValue = false
-                }
-
-                delegate: ProjectDelegate {
-                    width: gridProjects.cellWidth
-                    height: gridProjects.cellHeight
-
-                    //  Передаём ВСЕ необходимые свойства
-                    selectedId: gridProjects.selectedId
-                    activeAutoLoadId: gridProjects.activeAutoLoadId
-                    activeAutoLoadIntendedValue: gridProjects.activeAutoLoadIntendedValue
-
-                    // Выделение карточки
-                    onSelected: (isSelected) => {
-                        if (isSelected) {
-                            gridProjects.selectedId = id_uuic
-                        } else if (gridProjects.selectedId === id_uuic) {
-                            gridProjects.selectedId = ""
+                    // ==========================
+                    // Снятие выделения
+                    // ==========================
+                    TapHandler {
+                        acceptedButtons: Qt.LeftButton
+                        onTapped: {
+                            gridProjects.deselectAll()
+                            gridProjects.deactivateAutoLoad()
                         }
                     }
 
-                    //  Активация чекбокса для редактирования
-                    onAutoLoadActivated: (idUuic, intendedValue) => {
-                        gridProjects.activeAutoLoadId = idUuic
-                        gridProjects.activeAutoLoadIntendedValue = intendedValue
+                    // Адаптивные колонки
+                    property int columns: {
+                        if (width < 650) return 1
+                        if (width < 1100) return 2
+                        return 3
                     }
 
-                    // Запрос на сохранение
-                    onAutoLoadSaveRequested: (idUuic, value) => {
-                        QmlProjectSettings.model.setAutoLoad(idUuic, value)
+                    property real cellSpacing: 0
+                    cellWidth: (width - (columns - 1) * cellSpacing) / columns
+                    cellHeight: 360
+
+                    // Выделение карточки
+                    property string selectedId: ""
+                    function deselectAll() { selectedId = "" }
+
+                    // Активная карточка автозагрузки
+                    property string activeAutoLoadId: ""
+                    property bool activeAutoLoadIntendedValue: false
+
+                    function deactivateAutoLoad() {
+                        activeAutoLoadId = ""
+                        activeAutoLoadIntendedValue = false
                     }
 
-                    onSignalOpenProject: (id_uuic, projectFilePath) => root.openProject(id_uuic, projectFilePath)
+                    delegate: ProjectDelegate {
+                        width: gridProjects.cellWidth
+                        height: gridProjects.cellHeight
 
-                    onSignalDeleteProject: (id_uuic) => {
-                        QmlProjectSettings.model.removeProject(id_uuic)
-                        if (gridProjects.selectedId === id_uuic) gridProjects.deselectAll()
-                        if (gridProjects.activeAutoLoadId === id_uuic) gridProjects.deactivateAutoLoad()
+                        selectedId: gridProjects.selectedId
+                        activeAutoLoadId: gridProjects.activeAutoLoadId
+                        activeAutoLoadIntendedValue: gridProjects.activeAutoLoadIntendedValue
+
+                        onSelected: (isSelected) => {
+                            if (isSelected) {
+                                gridProjects.selectedId = id_uuic
+                            } else if (gridProjects.selectedId === id_uuic) {
+                                gridProjects.selectedId = ""
+                            }
+                        }
+
+                        onAutoLoadActivated: (idUuic, intendedValue) => {
+                            gridProjects.activeAutoLoadId = idUuic
+                            gridProjects.activeAutoLoadIntendedValue = intendedValue
+                        }
+
+                        onAutoLoadSaveRequested: (idUuic, value) => {
+                            QmlProjectSettings.model.setAutoLoad(idUuic, value)
+                        }
+
+                        onSignalOpenProject: (id_uuic, projectFilePath) =>
+                            root.openProject(id_uuic, projectFilePath)
+
+                        onSignalDeleteProject: (id_uuic) => {                            
+                            if (gridProjects.activeAutoLoadId === id_uuic)
+                                gridProjects.deactivateAutoLoad()
+                            QmlProjectManager.removeProject(id_uuic)
+                        }
                     }
                 }
             }
         }
+    }
+
+    onClosed: {
+        gridProjects.deselectAll()
+        gridProjects.deactivateAutoLoad()
     }
 
     Timer {

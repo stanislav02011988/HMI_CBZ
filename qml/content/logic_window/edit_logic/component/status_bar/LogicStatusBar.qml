@@ -3,34 +3,44 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-Rectangle {
+import qml.managers
+import qml.registers
 
-    color: "#2b2d30"
+Item {
+    id: root
 
-    RowLayout {
+    property real zoomScene: QmlLogicMapScene.zoomLogicScene
+    property int countElementsScene: QmlRegisterComponentLogicMap.count
+
+    Rectangle {
         anchors.fill: parent
-        anchors.margins: 8
+        color: "#2b2d30"
 
-        Label {
-            text: "Zoom: 100%"
-            color: "#aaa"
-        }
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 8
 
-        Label {
-            text: "Blocks: 0"
-            color: "#aaa"
-        }
+            Label {
+                text: `Zoom: ${Math.round(root.zoomScene * 100)}%`
+                color: "#aaa"
+            }
 
-        Label {
-            text: "Connections: 0"
-            color: "#aaa"
-        }
+            Label {
+                text: `Blocks: ${root.countElementsScene}`
+                color: "#aaa"
+            }
 
-        Item { Layout.fillWidth: true }
+            Label {
+                text: "Connections: 0"
+                color: "#aaa"
+            }
 
-        Label {
-            text: "Saved"
-            color: "#4caf50"
+            Item { Layout.fillWidth: true }
+
+            Label {
+                text: "Saved"
+                color: "#4caf50"
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material
 
 import qml.registers
+import qml.settings.project_settings
 
 ColumnLayout {
     id: root
@@ -32,6 +33,7 @@ ColumnLayout {
         name_widget: "",     // Name - пользователь сам присвоит уникальные данные
         componentGroupe: "", // Добавляется после присвоения из списка ComboBox
     })
+    property string nameGroupe
 
     visible: root.isVisible
 
@@ -53,23 +55,159 @@ ColumnLayout {
             Layout.topMargin: 10
 
             // ГРУППА
-            ColumnLayout {
+            ComboBox {
+                id: comboGroup
+
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: 6
-                Label { text: "Группа элемента *"; color: "#bbbbbb"; font.pixelSize: 13 }
-                ComboBox {
-                    id: comboGroup
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 40
-                    model: ["Блок цемента", "Блок воды", "Блок химии", "Блок смесителя", "Прочие"]
-                    currentIndex: -1
-                    font.pixelSize: 14
-                    font.family: "Arial"
+                Layout.preferredHeight: 40
+
+                model: QmlProjectSettings.listGropeElement
+                textRole: "name"
+
+                currentIndex: -1
+
+                // =========================================================
+                // COSMETIC SETTINGS
+                // =========================================================
+
+                property color textColor: "#ffffff"
+                property color textHoverColor: "#ffffff"
+
+                property color bgColor: "#2d2d2d"
+                property color bgHoverColor: "#3a3a3a"
+
+                property color borderColor: "#555555"
+                property color borderFocusColor: "#2196F3"
+
+                property int borderRadius: 6
+
+                property int fontSize: 14
+                property string fontFamily: "Arial"
+
+                // текст если ничего не выбрано
+                property string placeholderText: "Выберите группу"
+
+                // =========================================================
+                font.pixelSize: fontSize
+                font.family: fontFamily
+                font.bold: false
+
+
+                // =========================================================
+                // BACKGROUND COMBOBOX
+                // =========================================================
+                background: Rectangle {
+                    radius: comboGroup.borderRadius
+                    color: comboGroup.hovered
+                           ? comboGroup.bgHoverColor
+                           : comboGroup.bgColor
+
+                    border.color: comboGroup.activeFocus
+                                  ? comboGroup.borderFocusColor
+                                  : comboGroup.borderColor
+
+                    border.width: 1
+                }
+
+
+                // =========================================================
+                // TEXT INSIDE COMBOBOX
+                // =========================================================
+                contentItem: Text {
+
+                    text: comboGroup.currentIndex === -1
+                          ? comboGroup.placeholderText
+                          : comboGroup.displayText
+
+                    color: comboGroup.currentIndex === -1
+                           ? "#888888"
+                           : comboGroup.textColor
+
+                    font.pixelSize: comboGroup.fontSize
+                    font.family: comboGroup.fontFamily
+
+                    verticalAlignment: Text.AlignVCenter
+
+                    leftPadding: 10
+
+                    elide: Text.ElideRight
+                }
+
+
+                // =========================================================
+                // POPUP LIST BACKGROUND
+                // =========================================================
+                popup.background: Rectangle {
+                    radius: comboGroup.borderRadius
+                    color: comboGroup.bgColor
+                    border.color: comboGroup.borderColor
+                    border.width: 1
+                }
+
+
+                // =========================================================
+                // LIST ELEMENT
+                // =========================================================
+
+                delegate: ItemDelegate {
+
+                    width: comboGroup.width
+                    height: comboGroup.height
+
+                    contentItem: Text {
+
+                        text: modelData.name
+
+                        color: comboGroup.highlightedIndex === index
+                               ? comboGroup.textHoverColor
+                               : comboGroup.textColor
+
+                        font.pixelSize: comboGroup.fontSize
+                        font.family: comboGroup.fontFamily
+
+                        verticalAlignment: Text.AlignVCenter
+
+                        leftPadding: 10
+
+                        elide: Text.ElideRight
+                    }
+
                     background: Rectangle {
-                        radius: 6; color: "#2d2d2d"
-                        border.color: activeFocus ? "#2196F3" : "#555555"
-                        border.width: 1
+
+                        radius: comboGroup.borderRadius
+
+                        color: comboGroup.highlightedIndex === index
+                               ? comboGroup.bgHoverColor
+                               : "transparent"
+                    }
+
+                    Material.elevation: 0
+                    Material.background: "transparent"
+                }
+
+
+                // =========================================================
+                // LOGIC
+                // =========================================================
+                onCurrentIndexChanged: {
+                    if (currentIndex < 0)
+                        return
+
+                    if (!model)
+                        return
+
+                    if (model.length !== undefined && model.length === 0)
+                        return
+
+                    var selectedItem = model[currentIndex]
+
+                    if (selectedItem && selectedItem.value) {
+                        root.nameGroupe = selectedItem.value
+                        console.log("Выбрана группа:", selectedItem.name)
+                        console.log("Код для отправки:", selectedItem.value)
+
+                        // тут можно отправлять значение в backend
+                        // backend.setGroupType(selectedItem.value)
                     }
                 }
             }
@@ -230,21 +368,12 @@ ColumnLayout {
         root.isSaving = true
         root.statusMessage = "Добавление..."
 
-        // 🔑 Карта: отображаемое имя → внутренний ключ
-        var groupMap = {
-            0: "GroupeCement",
-            1: "GroupeWater",
-            2: "GroupeChemistry",
-            3: "GroupeMixer",
-            4: "GroupeOther"
-        }
-
         // Формируем dataList
         root.dataList = {
             subtypeId: root.selectedSubtypeId,
             id_widget: textFieldID.text.trim(),
             name_widget: textFieldName.text.trim(),
-            componentGroupe: groupMap[comboGroup.currentIndex]
+            componentGroupe: root.nameGroupe
         }
         root.addRequested(root.dataList)
     }
@@ -261,5 +390,6 @@ ColumnLayout {
         }
         root.isSaving = false
         root.statusMessage = ""
+        root.nameGroupe = ""
     }
 }

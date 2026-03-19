@@ -13,6 +13,7 @@ Item {
 
     property real zoomScene
     property int countElementsScene: QmlRegisterComponentObject.count
+    property string stateSaveFile: QmlRegisterComponentObject.isDirty ? "No Saved" : "Saved"
 
     Rectangle {
         anchors.fill: parent
@@ -37,7 +38,7 @@ Item {
             Item { Layout.fillHeight: true; Layout.fillWidth: true }
 
             Label {
-                text: "Saved"
+                text: root.stateSaveFile
                 color: "#4caf50"
             }
         }

@@ -26,7 +26,7 @@ Item {
     property alias world: world
 
     // ==============================
-    // Параметры ВЫДЕЛЕНИЯ (НОВОЕ!)
+    // Параметры ВЫДЕЛЕНИЯ
     // ==============================
     property bool selecting: false
     property point selectStart: Qt.point(0, 0)
@@ -111,7 +111,7 @@ Item {
         }
 
         // ==========================
-        // РАМКА МНОЖЕСТВЕННОГО ВЫДЕЛЕНИЯ (ОБЯЗАТЕЛЬНО ДОБАВИТЬ!)
+        // РАМКА МНОЖЕСТВЕННОГО ВЫДЕЛЕНИЯ
         // ==========================
         Rectangle {
             id: selectionRect
@@ -391,6 +391,7 @@ Item {
         panelButtons.width,
         panelButtons.height
     )
+
     PanelButtonEditMode {
         id: panelButtons
         anchors.left: parent.left

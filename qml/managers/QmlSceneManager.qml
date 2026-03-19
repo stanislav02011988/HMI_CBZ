@@ -22,7 +22,7 @@ QtObject {
     property var projectManager: QmlProjectManager
 
     // =====================================================
-    // Появление кнопки для редактирования главной сцены
+    // Появление кнопки для редактирования главной сцены в файле CenterWidget.qml
     // =====================================================
     property bool isActivateEditMode: false
     function activateEditMode() {
@@ -35,6 +35,8 @@ QtObject {
     property Component wrapperComponent: null
     property var previewComponents: null
     property rect panelRect: Qt.rect(0,0,0,0)
+
+    property real zoomLogicScene: sceneContainer ? sceneContainer.scale : 0
 
     // =====================================================
     // ВНУТРЕННЕЕ СОСТОЯНИЕ
@@ -67,7 +69,7 @@ QtObject {
         for (let group in sceneData) {
             for (let subtype in sceneData[group]) {
                 for (let id in sceneData[group][subtype]) {
-                    createObject(sceneData[group][subtype][id])                    
+                    createObject(sceneData[group][subtype][id])
                 }
             }
         }

@@ -20,6 +20,7 @@ Module {
     Signal { name: "signalErrorLoad" }
     Property { name: "dict_settings_project"; type: "var"; isWritable: false; notify: "signalLoadFile" }
     Property { name: "projectModel"; type: "QObject*"; isWritable: false; notify: undefined }
+    Property { name: "list_groupe_element"; type: "list"; isWritable: false; notify: "signalLoadFile" }
     Method { name: "get_parametrs_qml_module"; type: "void" }
     Method { name: "load_file_settings"; type: "void" }
     Method { name: "save_block_installation_settings"; type: "void"

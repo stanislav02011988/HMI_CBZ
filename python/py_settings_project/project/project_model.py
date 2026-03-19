@@ -14,6 +14,7 @@ class ProjectModel(QAbstractListModel):
     IsActivateProject = Qt.UserRole + 8
     TypeInstallation = Qt.UserRole + 9
     NumberINF = Qt.UserRole + 10
+    NameProject = Qt.UserRole + 11
 
     def __init__(self, store, parent=None):
 
@@ -39,11 +40,13 @@ class ProjectModel(QAbstractListModel):
             self.ProjectFileRole: b'project_file',
             self.IsActivateProject: b'isActivateProject',
             self.TypeInstallation: b'typeInstallation',
-            self.NumberINF: b'numberINF'
+            self.NumberINF: b'numberINF',
+            self.NameProject: b'nameProject'
         }
 
     # -------------------------------------------------
     def rowCount(self, parent=QModelIndex()):
+        if parent.isValid(): return 0
         return len(self._filtered)
 
     # -------------------------------------------------
@@ -82,6 +85,9 @@ class ProjectModel(QAbstractListModel):
 
         if role == self.NumberINF:
             return p["numberINF"]
+
+        if role == self.NameProject:
+            return p["nameProject"]
 
     # -------------------------------------------------
     def _reload(self):

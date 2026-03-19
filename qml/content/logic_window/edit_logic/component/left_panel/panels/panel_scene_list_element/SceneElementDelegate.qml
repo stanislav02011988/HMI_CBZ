@@ -8,6 +8,8 @@ Rectangle {
     property int elementIndex
     property var modelController
 
+    signal signalAddElementToScene(var elementObject)
+
     height: 26
     color: "#3a3d42"
 
@@ -57,9 +59,15 @@ Rectangle {
                 hoverEnabled: true
                 onEntered: root.color = "#4a4d52"
                 onExited: root.color = "#3a3d42"
-                onClicked: {
-                    if (modelController)
-                        modelController.selectElement(elementData)
+                onDoubleClicked: {
+                    if (elementData) {
+                        // console.log("=== DEBUG: elementData ===")
+                        // console.log("Keys:", Object.keys(elementData))
+                        // console.log("id_widget:", elementData.id_widget)
+                        // console.log("geometry:", JSON.stringify(elementData.geometry))
+                        // console.log("sizeProperties:", JSON.stringify(elementData.sizeProperties))
+                        root.signalAddElementToScene(elementData)
+                    }
                 }
             }
         }

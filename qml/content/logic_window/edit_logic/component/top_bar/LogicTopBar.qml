@@ -4,29 +4,38 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 
-Rectangle {
+Item {
+    id: root
 
-    color: "#81848c"
 
-    RowLayout {
+    Rectangle {
         anchors.fill: parent
-        anchors.margins: 10
+        color: "#81848c"
 
-        Label {
-            text: "Logic Map"
-            font.pixelSize: 18
-            color: "white"
-        }
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 10
 
-        Item { Layout.fillWidth: true }
+            Label {
+                text: "Logic Map"
+                font.pixelSize: 18
+                color: "white"
+            }
 
-        Button {
-            text: "Run Mode"
-        }
+            Item { Layout.fillWidth: true }
 
-        Button {
-            text: "Close"
-            onClicked: Qt.quit()
+            Button {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 150
+                text: "Run Mode"
+            }
+
+            Button {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 150
+                text: "Close"
+                onClicked: Qt.quit()
+            }
         }
     }
 }

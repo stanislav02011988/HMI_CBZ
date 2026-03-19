@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
+import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
@@ -21,8 +22,8 @@ Item {
     property bool activeAutoLoadIntendedValue: false  //  НОВОЕ
 
     //  Вычисляемые свойства
-    readonly property bool isSelected: selectedId === id_uuic
-    readonly property bool isAutoLoadActive: activeAutoLoadId === id_uuic
+    property bool isSelected: selectedId === id_uuic
+    property bool isAutoLoadActive: activeAutoLoadId === id_uuic
 
     // ================================
     // Состояние наведения
@@ -40,7 +41,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        anchors.margins: 10
+        anchors.margins: 5
         radius: 8
         border.width: 3
 
@@ -53,6 +54,14 @@ Item {
 
         color: root.isSelected ? "#4a4d52" : "#3a3d42"
 
+        layer.enabled: true
+        layer.effect: DropShadow {
+            color: "#60000000"
+            radius: 10
+            samples: 20
+            verticalOffset: 4
+        }
+
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
@@ -60,12 +69,15 @@ Item {
             onEntered: { if (!root.isSelected) root.hovered = true }
             onExited: { if (!root.isSelected) root.hovered = false }
 
-            onClicked: {
+            onClicked: (mouse) => {
+                mouse.accepted = true
+
                 if (root.isSelected) {
                     root.selected(false)
                 } else {
                     root.selected(true)
                 }
+
                 root.hovered = false
             }
         }
@@ -93,7 +105,7 @@ Item {
                         Layout.fillWidth: true
 
                         Text {
-                            text: installationName + " " + typeInstallation + " " + "инв. №" + numberINF
+                            text: nameProject
                             font.bold: true
                             font.pixelSize: 16
                             color: "white"

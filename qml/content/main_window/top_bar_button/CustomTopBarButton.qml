@@ -12,6 +12,7 @@ import qml.controls.switch
 import qml.controls.menu_bar
 
 import "../../project_manage_window"
+import "../../logic_window/edit_logic"
 
 Item {
     id: root
@@ -23,6 +24,7 @@ Item {
     property color colorPressed: "#558b1f"    
 
     ProjectManagerWindow { id: dialogProjectManager }
+    EditLogicMapWindow { id: editLogicMapWindow }
 
     Rectangle {
         id: bg
@@ -55,33 +57,30 @@ Item {
                 id: topBar
                 height: bg.height
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                accessUser: QmlProjectSettings.access_group
+                Layout.fillHeight: true                
                 onMenuActionTriggered: (action) => {
                     switch (action) {
+                        // Меню Файл
                         case "project_manager_open":
                             dialogProjectManager.open()
-                            break
-
-                        case "file_open":
-                            console.log("Открыть файл")
-                            // сюда код для открытия файла
                             break
 
                         case "file_exit":
                             Qt.quit()
                             break
 
+                        // Меню Диагностика
+                        case "logic_map":
+                            MenagerWindows.openWindow("win_logic_map", "qrc:/qml/content/logic_window/logic/LogicMapWindow.qml", {editMode: false})
+                            break
+
+                        // Меню Режимы редактирования
                         case "edit_mode_scene":
                             QmlSceneManager.activateEditMode()
                             break
 
-                        case "logic_map":
-                            MenagerWindows.showWindow("qrc:/qml/content/logic_window/logic/LogicMapWindow.qml")
-                            break
-
                         case "edit_mode_logic":
-                            MenagerWindows.showWindow("qrc:/qml/content/logic_window/edit_logic/EditLogicMapWindow.qml")
+                            MenagerWindows.openWindow("win_edit_mode_logic_map", "qrc:/qml/content/logic_window/edit_logic/EditLogicMapWindow.qml", {editMode: true})
                             break
 
                         default:

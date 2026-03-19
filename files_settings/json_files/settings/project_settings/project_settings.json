@@ -9,13 +9,6 @@
         "useUTC": false,
         "showSeconds": true
     },
-    "block_installation_settings": {
-        "name_installation": "Euromix",
-        "type_installation": "4000",
-        "inf_number": "14174",
-        "installation_number": "AZ-1564",
-        "year_installation": "2013"
-    },
     "block_user": {
         "id_user": 1,
         "last_name": "Неберикутя",
@@ -24,57 +17,34 @@
         "tab_number": 14706,
         "position_users": "Старший механик",
         "access_group": "admin",
-        "time_in": "12-03-2026 09:38",
+        "time_in": "13-03-2026 20:58",
         "time_out": "---"
+    },
+    "settings": {
+        "groupe_elements": {
+            "Группа Цемента": "GroupeCement",
+            "Группа Врды": "GroupeWater",
+            "Группа Хим. Добавки": "GroupeChemistry",
+            "Группа Смеситель": "GroupeMixer"
+        }
     },
     "projects": [
         {
-            "id_uuic": "5ef2a608-30ea-4f5f-964a-308f9c1e0984",
+            "id_uuic": "9aec4fd9-7bdf-4fa4-9ae8-675959986072",
             "installationName": "EUROMIX",
             "typeInstallation": "4000",
-            "numberINF": "14574",
-            "numberInstallation": "566456asd213",
-            "yearInstallation": "a3s2d1a3",
-            "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\Euromix4000\\EUROMIX.json",
+            "numberINF": "14754",
+            "numberInstallation": "AZ-456-4564",
+            "yearInstallation": "2013",
+            "nameProject": "EUROMIX 4000 ном.уст. AZ-456-4564 инв.ном. 14754",
+            "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\Euromix4000\\EUROMIX 4000 ном.уст. AZ-456-4564 инв.ном.json",
             "previewInstallation": "file:///F:/__QtQml_Python_HMI_Euromix/HMI_CBZ/res/image/foto_installation/BENNINGHOVEN/MBA200/zavod.jpg",
             "user": "Неберикутя Станислав Александрович",
             "position_users": "Старший механик",
-            "created": "2026-03-12T11:10:39.528585",
-            "last_saved": "2026-03-12T11:10:39.528585",
+            "created": "13.03.2026  16:56",
+            "last_saved": "13.03.2026  16:56",
             "check_auto_load": true,
             "isActivateProject": true
-        },
-        {
-            "id_uuic": "4cc03ba5-96dd-4277-885b-68fa09bfe33b",
-            "installationName": "AAAAAAAAAAAAAAAAA",
-            "typeInstallation": "asd",
-            "numberINF": "asda",
-            "numberInstallation": "sdas",
-            "yearInstallation": "dasd",
-            "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\BENNINGHOVEN\\AAAAAAAAAAAAAAAAA.json",
-            "previewInstallation": "",
-            "user": "Неберикутя Станислав Александрович",
-            "position_users": "Старший механик",
-            "created": "2026-03-12T15:44:24.148130",
-            "last_saved": "2026-03-12T15:44:24.148130",
-            "check_auto_load": false,
-            "isActivateProject": false
-        },
-        {
-            "id_uuic": "de27735d-6883-46d4-b0ff-26a220a8aaea",
-            "installationName": "asd",
-            "typeInstallation": "asf",
-            "numberINF": "asf",
-            "numberInstallation": "asfa",
-            "yearInstallation": "sf",
-            "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\BENNINGHOVEN\\asd.json",
-            "previewInstallation": "",
-            "user": "Неберикутя Станислав Александрович",
-            "position_users": "Старший механик",
-            "created": "2026-03-12T15:55:43.716118",
-            "last_saved": "2026-03-12T15:55:43.716118",
-            "check_auto_load": false,
-            "isActivateProject": false
         }
     ]
 }

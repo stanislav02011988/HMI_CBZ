@@ -56,8 +56,8 @@
         <file>qml/content/main_window/center_widget/modes/edit_mode/EditableItem.qml</file>
         <file>qml/managers/QmlProjectManager.qml</file>
         <file>qml/registers/QmlRegisterComponentObject.qml</file>
-        <file>qml/system/QmlBusManager.qml</file>
-        <file>qml/system/ReactiveElement.qml</file>
+        <file>qml/busManager/QmlBusManager.qml</file>
+        <file>qml/busManager/ReactiveElement.qml</file>
         <file>qml/content/logic_window/logic/LogicMapWindow.qml</file>
         <file>qml/content/logic_window/edit_logic/EditLogicMapWindow.qml</file>
         <file>qml/content/logic_window/logic/component/top_bar/LogicTopBar.qml</file>
@@ -65,7 +65,6 @@
         <file>qml/content/logic_window/logic/component/left_panel/LogicLeftPanel.qml</file>
         <file>qml/content/logic_window/logic/component/scene/LogicScene.qml</file>
         <file>qml/content/logic_window/logic/component/right_panel/LogicRightPanel.qml</file>
-        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/ProjectTreePanel.qml</file>
         <file>qml/content/logic_window/edit_logic/component/left_panel/panels/StandardBlocksPanel.qml</file>
         <file>qml/content/logic_window/edit_logic/component/top_bar/LogicTopBar.qml</file>
         <file>qml/content/logic_window/edit_logic/component/left_panel/LogicLeftPanel.qml</file>
@@ -74,9 +73,9 @@
         <file>qml/content/logic_window/edit_logic/component/status_bar/LogicStatusBar.qml</file>
         <file>qml/content/logic_window/edit_logic/component/scene/grid_layer/GridLayer.qml</file>
         <file>qml/content/logic_window/edit_logic/component/scene/panel_btn/PanelBauttons.qml</file>
-        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneListElementPanel.qml</file>
-        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneElementsModel.qml</file>
-        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/scene_list_element_panel/SceneElementDelegate.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/panel_scene_list_element/SceneListElementPanel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/panel_scene_list_element/SceneElementsModel.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/panel_scene_list_element/SceneElementDelegate.qml</file>
         <file>qml/controls/elements_scene/elements/shutter/Shutter.qml</file>
         <file>qml/controls/elements_scene/elements_preview/PreviewShutter.qml</file>
         <file>qml/content/main_window/center_widget/modes/edit_mode/dialog_add_elements/element_selector/models_element/ShutterSubtypes.qml</file>
@@ -93,6 +92,15 @@
         <file>qml/content/project_manage_window/ProjectManagerWindow.qml</file>
         <file>qml/content/project_manage_window/dialog_new_project/DialogNewProject.qml</file>
         <file>qml/content/project_manage_window/ProjectDelegate.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/panel_project_tree/ProjectTreePanel.qml</file>
+        <file>qml/managers/QmlLogicMapScene.qml</file>
+        <file>qml/registers/QmlRegisterComponentLogicMap.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/scene/ItemLogicScene.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/scene/dialog_resize_element_logic_map/DialogResizeElementLogicMap.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/scene/dialog_resize_element_logic_map/ResizePropertiesModelLogicMap.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/scene/dialog_resize_element_logic_map/ResizePropertyDelegateLogicMap.qml</file>
+        <file>qml/content/logic_window/edit_logic/component/left_panel/panels/panel_project_tree/TreeViewDelegate.qml</file>
+        <file>qml/busManager/ConnectionManager.qml</file>
     </qresource>
     <qresource prefix="/svg_icon_btn">
         <file>res/svg/svg_image_btn/reset/reset_a.svg</file>

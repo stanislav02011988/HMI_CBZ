@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls
 
 import qml.managers
+import qml.busManager
 import qml.settings.project_settings
 import qml.controls.elements_scene
 import qml.content.main_window.center_widget.modes.edit_mode
@@ -35,9 +36,6 @@ Item {
         anchors.fill: parent
         clip: true
 
-        // ==========================
-        // WORLD (двигаем и масштабируем)
-        // ==========================
         // ==========================
         // WORLD
         // ==========================

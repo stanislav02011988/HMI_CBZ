@@ -24,6 +24,9 @@ class RegisterComponentObject(QObject):
     elementRemoved = Signal(str)    # id_widget
     registryChanged = Signal()
 
+    # Новый сигнал для изменения состояния "грязности" (есть несохраненные изменения)
+    dirtyChanged = Signal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -33,8 +36,24 @@ class RegisterComponentObject(QObject):
         # Для обхода и экспорта
         self._elements_list: List[Dict[str, Any]] = []
 
+        # Флаг изменений (аналог modified в текстовых редакторах)
+        self._is_dirty = False
+
     def get_parametrs_qml_module(self):
         return QML_IMPORT_TYPE, Singleton_Type_Register, QML_IMPORT_NAME, QML_MODULE_MAJOR_VERSION, QML_MODULE_MINOR_VERSION
+
+    # =========================================================================
+    # ВНУТРЕННЯЯ ЛОГИКА ИЗМЕНЕНИЙ (DIRTY FLAG)
+    # =========================================================================
+    def _set_dirty(self, value: bool):
+        """Внутренний метод установки флага изменений"""
+        if self._is_dirty != value:
+            self._is_dirty = value
+            self.dirtyChanged.emit()
+            if value:
+                print("[INFO] Scene modified: unsaved changes detected.")
+            else:
+                print("[INFO] Scene saved: no pending changes.")
 
     # =========================================================================
     # PROPERTY count (для QML биндингов)
@@ -42,6 +61,28 @@ class RegisterComponentObject(QObject):
     @Property(int, notify=registryChanged)
     def count(self) -> int:
         return len(self._elements_list)
+
+    # =========================================================================
+    # PROPERTY isDirty (ГЛАВНОЕ ИЗМЕНЕНИЕ)
+    # =========================================================================
+    @Property(bool, notify=dirtyChanged)
+    def isDirty(self) -> bool:
+        """
+        Возвращает True, если в списке элементов были изменения,
+        которые еще не были сохранены в файл.
+        """
+        return self._is_dirty
+
+    # =========================================================================
+    # SLOT: Сброс флага после сохранения
+    # =========================================================================
+    @Slot()
+    def markSaved(self):
+        """
+        Вызывается после успешного сохранения файла конфигурации.
+        Сбрасывает флаг изменений в False.
+        """
+        self._set_dirty(False)
 
     # =========================================================================
     # REGISTER
@@ -70,6 +111,8 @@ class RegisterComponentObject(QObject):
         self.elementAdded.emit(element_id)
         self.registryChanged.emit()
 
+        # === ВАЖНО: Помечаем как измененное ===
+        self._set_dirty(True)
         return True
 
     # =========================================================================
@@ -81,7 +124,6 @@ class RegisterComponentObject(QObject):
             return False
 
         id_widget = None
-        # === ИСПРАВЛЕНО: используем правильный ключ "wrapperRef" ===
         for key, record in self._elements_by_id.items():
             if record.get("wrapperRef") == wrapper_ref:
                 id_widget = key
@@ -96,12 +138,28 @@ class RegisterComponentObject(QObject):
 
         self.elementRemoved.emit(id_widget)
         self.registryChanged.emit()
-        print(f"[DEL] Удалён элемент: {id_widget} Осталось элементов в сцене {self.count }")
+        # print(f"[DEL] Удалён элемент: {id_widget} Осталось элементов в сцене {self.count}")
+
+        # === ВАЖНО: Помечаем как измененное ===
+        self._set_dirty(True)
+
         return True
 
+    # =========================================================================
+    # CLEAR
+    # =========================================================================
+    @Slot()
+    def clear(self):
+        if self._elements_list: # Только если что-то было
+            self._elements_by_id.clear()
+            self._elements_list.clear()
+            self.registryChanged.emit()
+            # === ВАЖНО: Помечаем как измененное ===
+            self._set_dirty(True)
+            print("[INFO] Регистр очищен")
 
     # =========================================================================
-    # O(1) GET
+    # GETTERS (без изменений, кроме мелких правок под ваш код)
     # =========================================================================
     @Slot(str, result="QVariant")
     def getElementById(self, id_widget: str) -> Optional[dict]:
@@ -110,7 +168,7 @@ class RegisterComponentObject(QObject):
     @Slot(str, result=QObject)
     def getElementWrapper(self, id_widget: str):
         record = self._elements_by_id.get(id_widget)
-        return record["wrapper"] if record else None
+        return record["wrapperRef"] if record else None # Исправлено ключ на wrapperRef
 
     @Slot(str, result=QObject)
     def getElementWidgetRef(self, id_widget: str):
@@ -119,42 +177,25 @@ class RegisterComponentObject(QObject):
 
     @Slot(QObject, result="QVariant")
     def getElementByWrapper(self, wrapper_ref):
-        """Получить запись элемента по ссылке на обёртку"""
         for record in self._elements_list:
             if record.get("wrapperRef") == wrapper_ref:
                 return record
         return None
 
-    # =========================================================================
-    # GET ALL IDS
-    # =========================================================================
     @Slot(result="QVariant")
     def getAllIds(self) -> List[str]:
         return list(self._elements_by_id.keys())
 
     # =========================================================================
-    # ВСПОМОГАТЕЛЬНЫЙ МЕТОД ЭКСПОРТА
+    # EXPORT HELPERS (без изменений логики dirty, так как только читают)
     # =========================================================================
     def _export_element_data(self, record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """
-        Экспортирует данные ОДНОГО элемента в формате, совместимом с exportSceneData()
-        Возвращает структуру:
-        {
-            "id_widget": str,
-            "name_widget": str,
-            "componentGroupe": str,
-            "subtype": str,
-            "geometry": { "relX": float, "relY": float, "relW": float, "relH": float },
-            "sizeProperties": dict
-        }
-        """
         widget = record.get("widgetRef")
         wrapper = record.get("wrapperRef")
 
         if not widget or not wrapper:
             return None
 
-        # Базовые свойства
         element_id = widget.property("id_widget")
         if not element_id:
             return None
@@ -163,7 +204,6 @@ class RegisterComponentObject(QObject):
         subtype = widget.property("subtype")
         name = widget.property("name_widget")
 
-        # Геометрия обёртки
         geometry = {
             "relX": wrapper.property("relX"),
             "relY": wrapper.property("relY"),
@@ -171,7 +211,6 @@ class RegisterComponentObject(QObject):
             "relH": wrapper.property("relH")
         }
 
-        # Свойства размеров виджета
         size_props = {}
         if hasattr(widget, "exportPropertiesSize"):
             try:
@@ -179,24 +218,24 @@ class RegisterComponentObject(QObject):
             except Exception as e:
                 print(f"[WARN] exportPropertiesSize failed for {element_id}: {e}")
 
+        # 🔥 НОВОЕ
+        signals = self._extract_signals(widget)
+        slots = self._extract_slots(widget)
+
         return {
             "id_widget": element_id,
             "name_widget": name,
             "componentGroupe": group,
             "subtype": subtype,
             "geometry": geometry,
-            "sizeProperties": size_props
+            "sizeProperties": size_props,
+            "signals": signals,
+            "slots": slots
         }
 
-    # =========================================================================
-    # EXPORT ОДНОГО ЭЛЕМЕНТА (публичный слот для QML)
-    # =========================================================================
+
     @Slot(str, result="QVariant")
     def exportElementData(self, id_widget: str) -> Dict[str, Any]:
-        """
-        Экспортирует данные конкретного элемента по его ID
-        Используется для частичного сохранения без перезаписи всей сцены
-        """
         record = self._elements_by_id.get(id_widget)
         if not record:
             print(f"[WARN] exportElementData: элемент не найден - {id_widget}")
@@ -205,21 +244,20 @@ class RegisterComponentObject(QObject):
         data = self._export_element_data(record)
         return data if data else {}
 
-    # =========================================================================
-    # EXPORT
-    # =========================================================================
+
     @Slot(result="QVariant")
     def exportSceneData(self):
         result = {}
 
         for record in self._elements_list:
+            element_data = self._export_element_data(record)
 
-            widget = record["widgetRef"]
-            wrapper = record["wrapperRef"]
+            if not element_data:
+                continue
 
-            group = widget.property("componentGroupe")
-            subtype = widget.property("subtype")
-            element_id = widget.property("id_widget")
+            group = element_data["componentGroupe"]
+            subtype = element_data["subtype"]
+            element_id = element_data["id_widget"]
 
             if group not in result:
                 result[group] = {}
@@ -227,40 +265,54 @@ class RegisterComponentObject(QObject):
             if subtype not in result[group]:
                 result[group][subtype] = {}
 
-            # =====================================================
-            # SIZE PROPERTIES
-            # =====================================================
-            size_props = {}
+            result[group][subtype][element_id] = element_data
 
-            if hasattr(widget, "exportPropertiesSize"):
-                try:
-                    size_props = widget.exportPropertiesSize()
-                except Exception:
-                    size_props = {}
-
-            result[group][subtype][element_id] = {
-                "id_widget": element_id,
-                "name_widget": widget.property("name_widget"),
-                "componentGroupe": group,
-                "subtype": subtype,
-                "geometry": {
-                    "relX": wrapper.property("relX"),
-                    "relY": wrapper.property("relY"),
-                    "relW": wrapper.property("relW"),
-                    "relH": wrapper.property("relH")
-                },
-                "sizeProperties": size_props
-            }
+        # ✅ ВАЖНО — один раз, а не в цикле
+        self.markSaved()
 
         return result
 
+    def _extract_slots(self, widget) -> list:
+        if not hasattr(widget, "getSlotTargets"):
+            return []
 
-    # =========================================================================
-    # Очистка
-    # =========================================================================
-    @Slot()
-    def clear(self):
-        self._elements_by_id.clear()
-        self._elements_list.clear()
-        self.registryChanged.emit()
-        print("[INFO] Регистр очищен")
+        try:
+            raw = widget.getSlotTargets()
+            if hasattr(raw, "toVariant"):
+                raw = raw.toVariant()
+        except Exception as e:
+            print(f"[WARN] getSlotTargets failed: {e}")
+            return []
+
+        result = []
+
+        for item in raw:
+            result.append({
+                "elementId": item.get("elementId"),
+                "slots": item.get("slots", [])
+            })
+
+        return result
+
+    def _extract_signals(self, widget) -> list:
+        if not hasattr(widget, "getSignalSources"):
+            return []
+
+        try:
+            raw = widget.getSignalSources()
+
+            if hasattr(raw, "toVariant"):
+                raw = raw.toVariant()
+        except Exception as e:
+            print(f"[WARN] getSignalSources failed: {e}")
+            return []
+
+        result = []
+
+        for item in raw:
+            result.append({
+                "elementId": item.get("elementId"),
+                "signals": item.get("signals", [])
+            })
+        return result
+

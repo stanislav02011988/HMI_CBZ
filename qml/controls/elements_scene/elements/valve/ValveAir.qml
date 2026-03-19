@@ -11,8 +11,10 @@ Button {
     hoverEnabled: true
     focusPolicy: Qt.StrongFocus
 
-    property string id_valve_air: ""
-    property string name_valve_air: ""
+    property string componentGroupe: ""
+    property string subtype: ""
+    property string id_widget: ""
+    property string name_widget: ""
 
     // Градиенты для всех состояний
     property color normalLeftStart:   "#a8a8a8"
@@ -43,6 +45,14 @@ Button {
     property int intervalPressed: 2000
 
     Accessible.role: Accessible.Button
+
+    layer.enabled: true
+    layer.effect: DropShadow {
+        color: "#60000000"
+        radius: 4
+        horizontalOffset: 2
+        verticalOffset: 2
+    }
 
     background: Item {
         anchors.fill: parent
@@ -88,9 +98,6 @@ Button {
                 let cx = w * (0.5 + Math.max(-0.45, Math.min(0.45, root.centerShift)));
                 let cy = h/2;
 
-                // эффект утопления при нажатии
-                // if (root.down) cy += 3;
-
                 // левый треугольник
                 ctx.fillStyle = getFillStyle(ctx, "left");
                 ctx.beginPath();
@@ -127,41 +134,10 @@ Button {
 
     Keys.onSpacePressed: root.clicked()
     Keys.onEnterPressed: root.clicked()
-    Keys.onReturnPressed: root.clicked()
+    Keys.onReturnPressed: root.clicked()    
 
-    Timer {
-        id: autoReleaseTimer
-        interval: intervalPressed
-        repeat: false
-        onTriggered: {
-            pressedAuto = false
-            root.down = false
-        }
-    }
-
-    // MouseArea {
-    //     anchors.fill: parent
-    //     hoverEnabled: true
-
-    //     onPressed: {
-    //         root.down = true
-    //         pressedAuto = true
-    //         autoReleaseTimer.start()
-    //     }
-
-    //     onReleased: {
-    //         if (!pressedAuto) { // обычное нажатие без автосрабатывания
-    //             root.down = false
-    //             root.clicked()
-    //         }
-    //     }
-
-    //     onExited: {
-    //         if (!pressedAuto) {
-    //             root.hovered = false
-    //         }
-    //     }
-
-    //     onEntered: root.hovered = true
-    // }
+    function getPropertiesSize() { return [] }
+    function setPropertySize(name, value) { /* noop */ }
+    function exportPropertiesSize() { return {} }
+    function importProperties(data) { /* noop */ }
 }

@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
 import QtQuick.Controls.Material
+import Qt5Compat.GraphicalEffects
 
 import qml.managers
 
@@ -18,78 +19,88 @@ Window {
 
     width: 1600
     height: 900
-    visible: true
-    title: "Logic Map"
-    color: "#81848c"
+    visible: false
+    title: "Logic Editor"
+
+    // color: "transparent"
+
+    // =====================================================
+    // РЕЖИМ FALSE - RUN MODE TRUE - EDIT MODE
+    // =====================================================
+    property bool editMode: false
 
     property string projectFilePath: ""
 
-    property real leftPanelWidth: 320
-    property real rightPanelWidth: 340
+    property real leftPanelWidth: 300
+    property real rightPanelWidth: 300
 
-    // Component.onCompleted: {
-    //     if (projectFilePath !== "") {
-    //         QmlLogicProjectManager.loadLogicProjectManager(projectFilePath)
-    //     }
-    // }
-
-    ColumnLayout {
+    Rectangle {
+        id: bg
         anchors.fill: parent
-        spacing: 0
+        color: "#81848c"
 
-        // =========================================
-        // TOP BAR
-        // =========================================
-
-        LogicTopBar {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 50
-        }
-
-        // =========================================
-        // CENTRAL CONTENT
-        // =========================================
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        ColumnLayout {
+            anchors.fill: parent
             spacing: 0
 
-            // =====================================
-            // LEFT PANEL
-            // =====================================
+            // LogicTopBar {
+            //     Layout.fillWidth: true
+            //     Layout.preferredHeight: 50
+            //     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            // }
 
-            LogicLeftPanel {
-                Layout.preferredWidth: root.leftPanelWidth
+            SplitView {
+                id: mainSplit
                 Layout.fillHeight: true
-            }
-
-            // =====================================
-            // CENTER SCENE
-            // =====================================
-
-            LogicScene {
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.margins: 5
+                orientation: Qt.Horizontal
+
+                handle: Rectangle {
+                    implicitWidth: 6
+                    color: "#444"
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.SplitHCursor
+                    }
+                }
+
+                // =====================================================
+                // LEFT PANEL
+                // =====================================================
+                LogicLeftPanel {
+                    id: logicLeftPanel
+                    SplitView.minimumWidth: 200
+                    SplitView.maximumWidth: 500
+                    SplitView.preferredWidth: root.leftPanelWidth
+                }
+
+                // =====================================================
+                // CENTER SCENE
+                // =====================================================
+                LogicScene {
+                    SplitView.fillWidth: true
+                    SplitView.minimumWidth: 400
+
+                    stateWindow: root.visible
+                    editMode: root.editMode
+                }
+
+                // =====================================================
+                // RIGHT PANEL
+                // =====================================================
+                LogicRightPanel {
+                    SplitView.minimumWidth: 250
+                    SplitView.maximumWidth: 400
+                    SplitView.preferredWidth: root.rightPanelWidth
+                }
             }
 
-            // =====================================
-            // RIGHT PANEL
-            // =====================================
-
-            LogicRightPanel {
-                Layout.preferredWidth: root.rightPanelWidth
-                Layout.fillHeight: true
+            LogicStatusBar {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 28
             }
-        }
-
-        // =========================================
-        // STATUS BAR
-        // =========================================
-
-        LogicStatusBar {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 28
         }
     }
 }

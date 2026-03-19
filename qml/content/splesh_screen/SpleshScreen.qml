@@ -108,7 +108,7 @@ Window {
         onTriggered: {
             customMessageDialog.close()
             splashScreen.close()
-            MenagerWindows.show("qrc:/qml_files/qml/content/main_window/MainWindow.qml", customMessageDialog)
+            MenagerWindows.openWindow("main_window", "qrc:/qml_files/qml/content/main_window/MainWindow.qml")
         }
     }
 
@@ -213,7 +213,10 @@ Window {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 10
 
-            onClicked: { splashScreen.close(); MenagerWindows.show("qrc:/qml_files/qml/content/registration/RegistrationWindow.qml", customMessageDialog) }
+            onClicked: {
+                splashScreen.close();
+                MenagerWindows.openWindow("registration_window", "qrc:/qml_files/qml/content/registration/RegistrationWindow.qml");
+            }
         }
 
         Label {

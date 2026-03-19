@@ -21,6 +21,11 @@ Window {
     title: "Logic Map"
     color: "#81848c"
 
+    // =====================================================
+    // РЕЖИМ FALSE - RUN MODE TRUE - EDIT MODE
+    // =====================================================
+    property bool editMode: false
+
     property real leftPanelWidth: 320
     property real rightPanelWidth: 340
 

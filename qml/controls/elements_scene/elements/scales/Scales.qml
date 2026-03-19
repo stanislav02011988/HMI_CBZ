@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import Qt5Compat.GraphicalEffects
 
+import qml.busManager
 import qml.controls.button.toggle_button
 import qml.controls.truncated_cone
 import qml.controls.triangle
@@ -13,24 +14,199 @@ import qml.controls.tool_tip
 
 import qml.settings.project_settings
 
+import "../shutter"
+
 Item {
     id: root
 
     // ==========================================================
-    // 1. ЭТАЛОННЫЙ РАЗМЕР
+    // INTERNAL ELEMENT ALIAS (ДЛЯ РЕДАКТОРА)
+    // ==========================================================
+    property alias el_btnHand: btnHand
+    property alias el_btnReset: btnReset
+    property alias el_btnZeroing: btnZeroing
+    property alias el_btnSettings: btnSettings
+    property alias el_progress: customProgressBarScales
+
+    // ==========================================================
+    // 🔵 1. SIGNAL SOURCES (СОБЫТИЯ)
+    // ==========================================================
+    function getSignalSources() {
+        return [
+            {
+                elementId: "btnHand",
+                object: el_btnHand,
+                signals: [
+                    { name: "clicked", params: [] },
+                    { name: "checkedChanged", params: [{ name: "checked", type: "bool" }] }
+                ]
+            },
+            {
+                elementId: "btnReset",
+                object: el_btnReset,
+                signals: [
+                    { name: "clicked", params: [] }
+                ]
+            },
+            {
+                elementId: "btnZeroing",
+                object: el_btnZeroing,
+                signals: [
+                    { name: "checkedChanged", params: [{ name: "checked", type: "bool" }] }
+                ]
+            },
+            {
+                elementId: "btnSettings",
+                object: el_btnSettings,
+                signals: [
+                    { name: "clicked", params: [] }
+                ]
+            }
+        ]
+    }
+
+    // ==========================================================
+    // 🟢 2. SLOT TARGETS (ДЕЙСТВИЯ)
+    // ==========================================================
+    function getSlotTargets() {
+        return [
+            {
+                elementId: "progressBar",
+                object: el_progress,
+                slots: [{ name: "setValue", params: [{ name: "value", type: "real" }] }]
+            },
+            {
+                elementId: "btnHand",
+                object: el_btnHand,
+                slots: [{ name: "setChecked", params: [{ name: "checked", type: "bool" }] }]
+            },
+            {
+                elementId: "btnReset",
+                object: el_btnReset,
+                slots: [{ name: "setChecked", params: [{ name: "checked", type: "bool" }] }]
+            },
+            {
+                elementId: "btnZeroing",
+                object: el_btnZeroing,
+                slots: [{ name: "setChecked", params: [{ name: "checked", type: "bool" }] }]
+            }
+        ]
+    }
+
+    // ==========================================================
+    // 🔴 3. APPLY SLOT (ИСПОЛНЕНИЕ)
+    // ==========================================================
+    function applySlot(elementId, slotName, params) {
+        const targets = getSlotTargets()
+        for (let i = 0; i < targets.length; i++) {
+
+            const t = targets[i]
+
+            if (t.elementId !== elementId)
+                continue
+
+            const obj = t.object
+
+            if (slotName === "setValue") {
+                obj.value = params.value
+            }
+
+            if (slotName === "setChecked") {
+                obj.checked = params.checked
+            }
+        }
+    }
+
+    // ==========================================================
+    // EVENT EMIT (ЕДИНАЯ ТОЧКА)
+    // ==========================================================
+    function emitSignal(elementId, signalName, payload) {
+        QmlBusManager.publish(
+            root.id_widget + "." + elementId,
+            signalName,
+            payload
+        )
+    }
+
+    // ==========================================================
+    // Синхронизация (ЕДИНАЯ ТОЧКА)
+    // ==========================================================
+    ReactiveElement {
+        id:syncManager
+        widgetId: root.id_widget
+        slotTargets: root.getSlotTargets()
+        syncFn: root.syncElement
+    }
+
+    Component.onCompleted: syncManager.start()
+
+    function syncElement(event, payload, target) {
+        switch(target.elementId) {
+
+            case "btnHand":
+                if(event === "checkedChanged") {
+                    target.object.checked = payload.checked
+                    root.manualModeEnabled = payload.checked
+                }
+                break
+
+            case "btnZeroing":
+                if(event === "checkedChanged") {
+                    target.object.checked = payload.checked
+                    if (payload.checked && enabled) {
+                        root.isZeroingInProgress = payload.checked
+                        autoReleaseTimer.restart()
+                    } else {
+                        autoReleaseTimer.stop()
+                        if (!payload.checked) {
+                            root.isZeroingInProgress = payload.checked
+                        }
+                    }
+                }
+                break
+
+            case "btnReset":
+                if(event === "clicked") {
+                    if(payload.hasOwnProperty("checked"))
+                        target.object.checked = payload.checked
+                    if(payload.hasOwnProperty("systemInEmergency"))
+                        root.systemInEmergency = payload.systemInEmergency
+                }
+                break
+
+            case "btnSettings":
+                if(event === "clicked") {
+                    if(payload.hasOwnProperty("checked"))
+                        target.object.checked = payload.checked
+                }
+                break
+
+            case "progressBar":
+                if(event === "setValue") {
+                    target.object.value = payload.value
+                }
+                break
+
+            default:
+                console.warn("Unknown elementId in syncElement:", target.elementId)
+                break
+        }
+    }
+
+    // ==========================================================
+    // 1. ЭТАЛОН
     // ==========================================================
     property real referenceWidth: 240
-    property real referenceHeight: 100
+    property real referenceHeight: 150
 
     implicitWidth: referenceWidth
     implicitHeight: referenceHeight
 
     // ==========================================================
-    // 2. МАСШТАБ
+    // 2. КОЭФФИЦИЕНТЫ (ВМЕСТО SCALE)
     // ==========================================================
-    property real scaleX: width  > 0 ? width  / referenceWidth  : 1
-    property real scaleY: height > 0 ? height / referenceHeight : 1
-    property real scale: Math.min(scaleX, scaleY)
+    property real kx: width  / referenceWidth
+    property real ky: height / referenceHeight
 
     // ==========================================================
     // 3. КОНФИГУРАЦИЯ РАЗМЕРОВ
@@ -42,8 +218,10 @@ Item {
     property real shadowOffsetX: 2
     property real shadowOffsetY: 2
 
-    property real spacing: 4
+    property real spacing: 2
     property real margin: 4
+
+    property real heightTopPanelBtn: 100
 
     property int heightTruncatedCone: 30
     property int borderWidthTrancatedCone: 2
@@ -51,7 +229,7 @@ Item {
     property int sizeText2TrancatedCone: 14
     property real levelTrancatedCone: 0.5
 
-    property int buttonSize: 20
+    property int buttonSize: 25
     property int borderWidthBtn: 1
     property int spacingBtn: 4
     property int radiusBtn: 4
@@ -67,14 +245,19 @@ Item {
     property int radiusPanel: 4
 
     property int widthProgressBar: 180
-    property int heightProgressBar: 20
+    property int heightProgressBar: 25
     property int borderWidthProgressBar: 2
     property int borderRadiusProgressBar: 4
 
-    property int state_width_and_height: 20
+    property int state_width_and_height: 25
     property int state_size_text: 10
     property int stateRadius: 4
     property int stateBorderWidth: 1
+
+    property real widthShutter: 50
+    property real heightShutter: 10
+
+    property real spacingShutter: 1
 
     // ==========================================================
     // 4. БИЗНЕС СВОЙСТВА
@@ -96,9 +279,10 @@ Item {
     layer.effect: DropShadow {
         color: "#60000000"
         radius: shadowRadius
-        horizontalOffset: shadowOffsetX * scale
-        verticalOffset: shadowOffsetY * scale
+        horizontalOffset: shadowOffsetX * kx
+        verticalOffset: shadowOffsetY * ky
     }
+
 
     Rectangle {
         id: contentRect
@@ -112,381 +296,396 @@ Item {
             // === Верхняя панель с кнопками и дисплеем ===
             Rectangle {
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.preferredHeight: heightTopPanelBtn * ky
                 color: "transparent"
                 border.color: "#777777"
-                border.width: borderWidth * scale
-                topLeftRadius: containerRadius * scale
-                topRightRadius: containerRadius * scale
+                border.width: borderWidth * kx
+                topLeftRadius: containerRadius * kx
+                topRightRadius: containerRadius * kx
 
                 ColumnLayout {
                     anchors.fill: parent
                     spacing: 0
 
-                    RowLayout {
+                    Rectangle {
+                        Layout.fillHeight: true
                         Layout.fillWidth: true
-                        Layout.preferredHeight: parent.height * 0.65
-                        spacing: 0
-                        Layout.leftMargin: margin * scale
-                        Layout.rightMargin: margin * scale
-                        Layout.topMargin: margin * scale
+                        Layout.margins: 5 * kx * ky
+                        color: "transparent"
 
-                        Item {
-                            Layout.preferredWidth: spacingBtn * scale
-                            Layout.preferredHeight: 1
-                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            spacing: 0
 
-                        // === КНОПКА РУЧНОГО РЕЖИМА (HAND) ===
-                        CustomToggleButtonIcon {
-                            id: btnHand
-                            Layout.preferredWidth: buttonSize * scale
-                            Layout.preferredHeight: buttonSize * scale
-                            iconScale: iconScale
-                            iconSource: checked
-                                ? "qrc:/svg_icon_btn/res/svg/svg_image_btn/hand/hand-point-right.svg"
-                                : "qrc:/svg_icon_btn/res/svg/svg_image_btn/hand/hand.svg"
-                            m_borderWidth: borderWidthBtn * scale
-                            m_radius: radiusBtn * scale
-                            m_background_color: "transparent"
-                            m_color_hovered: "#888"
-                            m_color_checked: "#666666"
+                            Item {
+                                Layout.preferredWidth: spacingBtn * kx
+                                Layout.preferredHeight: 1
+                            }
 
-                            iconColor: "#666666"
-                            iconColorHovered: "white"
-                            iconColorChecked: "white"
-                            iconColorCheckedHovered: "white"
-                            checkable: true
+                            // === КНОПКА РУЧНОГО РЕЖИМА (HAND) ===
+                            CustomToggleButtonIcon {
+                                id: btnHand
+                                Layout.preferredWidth: buttonSize * kx
+                                Layout.preferredHeight: buttonSize * ky
+                                iconScale: iconScale
+                                iconSource: checked
+                                    ? "qrc:/svg_icon_btn/res/svg/svg_image_btn/hand/hand-point-right.svg"
+                                    : "qrc:/svg_icon_btn/res/svg/svg_image_btn/hand/hand.svg"
+                                m_borderWidth: borderWidthBtn * kx
+                                m_radius: radiusBtn * kx
+                                m_background_color: "transparent"
+                                m_color_hovered: "#888"
+                                m_color_checked: "#666666"
 
-                            // При нажатии включаем/выключаем ручной режим
-                            onCheckedChanged: {
-                                // Локальное обновление состояния
-                                root.manualModeEnabled = checked
+                                iconColor: "#666666"
+                                iconColorHovered: "white"
+                                iconColorChecked: "white"
+                                iconColorCheckedHovered: "white"
+                                checkable: true
 
-                                if (!checked) {
-                                    btnZeroing.checked = false
-                                    root.isZeroingInProgress = false
+                                // onClicked: {
+                                //     emitSignal("btnHand", "checkedChanged", {
+                                //         checked: checked
+                                //     })
+                                // }
+
+                                onCheckedChanged: {
+                                    emitSignal("btnHand", "checkedChanged", {
+                                        checked: checked
+                                    })
+                                }
+
+                                CustomToolTip {
+                                    id: toolTipBtnHand
+                                    target: btnHand
+                                    customText: root.name_widget + "\n" + "Ручной режим управления."
+                                    customDelay: 2000
+                                    showOnDisabledOnly: false
+                                    backgroundColor: root.systemInEmergency ? "#e74c3c" : "#2c3e50"
+                                    borderColor: root.systemInEmergency ? "#c0392b" : "#3498db"
+                                    fontSize: 13
                                 }
                             }
 
-                            CustomToolTip {
-                                id: toolTipBtnHand
-                                target: btnHand
-                                customText: root.name_widget + "\n" + "Ручной режим управления."
-                                customDelay: 2000
-                                showOnDisabledOnly: false
-                                backgroundColor: root.systemInEmergency ? "#e74c3c" : "#2c3e50"
-                                borderColor: root.systemInEmergency ? "#c0392b" : "#3498db"
-                                fontSize: 13
+                            Item {
+                                Layout.preferredWidth: spacingBtn * kx
+                                Layout.preferredHeight: 1
                             }
-                        }
 
-                        Item {
-                            Layout.preferredWidth: spacingBtn * scale
-                            Layout.preferredHeight: 1
-                        }
+                            // === КНОПКА СБРОСА АВАРИИ (RESET) ===
+                            CustomToggleButtonIcon {
+                                id: btnReset
+                                Layout.preferredWidth: buttonSize * kx
+                                Layout.preferredHeight: buttonSize * ky
+                                iconSource: "qrc:/svg_icon_btn/res/svg/svg_image_btn/reset/reset_a.svg"
+                                m_borderWidth: borderWidthBtn * kx
+                                m_radius: radiusBtn * kx
 
-                        // === КНОПКА СБРОСА АВАРИИ (RESET) ===
-                        CustomToggleButtonIcon {
-                            id: btnReset
-                            Layout.preferredWidth: buttonSize * scale
-                            Layout.preferredHeight: buttonSize * scale
-                            iconSource: "qrc:/svg_icon_btn/res/svg/svg_image_btn/reset/reset_a.svg"
-                            m_borderWidth: borderWidthBtn * scale
-                            m_radius: radiusBtn * scale
+                                m_background_color: "transparent"
+                                m_color_hovered: "#888"
+                                m_color_checked: "#666666"
 
-                            m_background_color: "transparent"
-                            m_color_hovered: "#888"
-                            m_color_checked: "#666666"
+                                iconColor: "#666666"
+                                iconColorHovered: "white"
+                                iconColorChecked: "white"
+                                iconColorCheckedHovered: "white"
+                                checkable: true
+                                // Доступна ТОЛЬКО в ручном режиме
+                                enabled: root.manualModeEnabled
 
-                            iconColor: "#666666"
-                            iconColorHovered: "white"
-                            iconColorChecked: "white"
-                            iconColorCheckedHovered: "white"
-
-                            // Доступна ТОЛЬКО в ручном режиме
-                            enabled: root.manualModeEnabled
-
-                            // При нажатии сбрасываем аварийное состояние
-                            onClicked: {
-                                if (root.systemInEmergency) {
-                                    resetFeedbackTimer.start()
+                                // При нажатии сбрасываем аварийное состояние
+                                onClicked: {
+                                    emitSignal("btnReset", "clicked", {})
                                 }
-                            }
 
-                            // Таймер для визуальной обратной связи сброса
-                            Timer {
-                                id: resetFeedbackTimer
-                                interval: 2000
-                                onTriggered: {
-                                    btnReset.checked = true
-                                    root.systemInEmergency = false
-                                    btnReset.checked = false
-                                }
-                            }
-
-                            CustomToolTip {
-                                id: toolTipBtnReset
-                                target: btnReset
-                                customText: {
-                                    if (root.systemInEmergency) {
-                                        showOnDisabledOnly = true
-                                        return "Система в аварийном состоянии! Сначала сбросьте аварию кнопкой Reset"
-                                    } else {
-                                        showOnDisabledOnly = false
-                                        return "Кнопка Сброса ошибок.\nВ данный момент ошибок нет."
+                                // Таймер для визуальной обратной связи сброса
+                                Timer {
+                                    id: resetFeedbackTimer
+                                    interval: 2000
+                                    onTriggered: {
+                                        btnReset.checked = true
+                                        root.systemInEmergency = false
+                                        btnReset.checked = false
                                     }
                                 }
 
-                                customDelay: 2000
-                                backgroundColor: root.systemInEmergency ? "#e74c3c" : "#2c3e50"
-                                borderColor: root.systemInEmergency ? "#c0392b" : "#3498db"
-                                fontSize: 13
-                            }
+                                CustomToolTip {
+                                    id: toolTipBtnReset
+                                    target: btnReset
+                                    customText: {
+                                        if (root.systemInEmergency) {
+                                            showOnDisabledOnly = true
+                                            return "Система в аварийном состоянии! Сначала сбросьте аварию кнопкой Reset"
+                                        } else {
+                                            showOnDisabledOnly = false
+                                            return "Кнопка Сброса ошибок.\nВ данный момент ошибок нет."
+                                        }
+                                    }
 
-
-                            // === ИНДИКАТОР АВАРИИ В ПРАВОМ ВЕРХНЕМ УГЛУ КНОПКИ RESET ===
-                            Rectangle {
-                                anchors.top: parent.top
-                                anchors.right: parent.right
-                                width: Math.max(8, scale * 4)   // Очень компактный: 8-12px
-                                height: width
-                                radius: width / 2
-                                color: "#ff3333"
-                                border.color: "white"
-                                border.width: 1
-                                visible: root.systemInEmergency  // Появляется ТОЛЬКО при аварии
-
-                                // Интенсивное мигание для привлечения внимания
-                                SequentialAnimation on opacity {
-                                    running: root.systemInEmergency
-                                    loops: Animation.Infinite
-                                    NumberAnimation { to: 1.0; duration: 400 }
-                                    NumberAnimation { to: 0.4; duration: 400 }
+                                    customDelay: 2000
+                                    backgroundColor: root.systemInEmergency ? "#e74c3c" : "#2c3e50"
+                                    borderColor: root.systemInEmergency ? "#c0392b" : "#3498db"
+                                    fontSize: 13
                                 }
 
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "!"
-                                    font.pixelSize: Math.max(6, width * 0.8)
-                                    font.bold: true
-                                    color: "white"
+
+                                // === ИНДИКАТОР АВАРИИ В ПРАВОМ ВЕРХНЕМ УГЛУ КНОПКИ RESET ===
+                                Rectangle {
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    width: Math.max(8, kx * 4)   // Очень компактный: 8-12px
+                                    height: width
+                                    radius: width / 2
+                                    color: "#ff3333"
+                                    border.color: "white"
+                                    border.width: 1
+                                    visible: root.systemInEmergency  // Появляется ТОЛЬКО при аварии
+
+                                    // Интенсивное мигание для привлечения внимания
+                                    SequentialAnimation on opacity {
+                                        running: root.systemInEmergency
+                                        loops: Animation.Infinite
+                                        NumberAnimation { to: 1.0; duration: 400 }
+                                        NumberAnimation { to: 0.4; duration: 400 }
+                                    }
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "!"
+                                        font.pixelSize: Math.max(6, width * 0.8)
+                                        font.bold: true
+                                        color: "white"
+                                    }
                                 }
                             }
-                        }
 
-                        Item {
-                            Layout.preferredWidth: spacingBtn * scale
-                            Layout.preferredHeight: 1
-                        }
+                            Item {
+                                Layout.preferredWidth: spacingBtn * kx
+                                Layout.preferredHeight: 1
+                            }
 
-                        // === КНОПКА ОБНУЛЕНИЯ (ZEROING) ===
-                        CustomToggleButtonIcon {
-                            id: btnZeroing
-                            Layout.preferredWidth: buttonSize * scale
-                            Layout.preferredHeight: buttonSize * scale
-                            iconSource: checked
-                                ? "qrc:/svg_icon_btn/res/svg/svg_image_btn/zeroing/zeroing_out_a.svg"
-                                : "qrc:/svg_icon_btn/res/svg/svg_image_btn/zeroing/zeroing_out_init.svg"
-                            m_borderWidth: borderWidthBtn * scale
-                            m_radius: radiusBtn * scale
+                            // === КНОПКА ОБНУЛЕНИЯ (ZEROING) ===
+                            CustomToggleButtonIcon {
+                                id: btnZeroing
+                                Layout.preferredWidth: buttonSize * kx
+                                Layout.preferredHeight: buttonSize * ky
+                                iconSource: checked
+                                    ? "qrc:/svg_icon_btn/res/svg/svg_image_btn/zeroing/zeroing_out_a.svg"
+                                    : "qrc:/svg_icon_btn/res/svg/svg_image_btn/zeroing/zeroing_out_init.svg"
+                                m_borderWidth: borderWidthBtn * kx
+                                m_radius: radiusBtn * kx
 
-                            m_background_color: "transparent"
-                            m_color_hovered: "#888"
-                            m_color_checked: "#666666"
+                                m_background_color: "transparent"
+                                m_color_hovered: "#888"
+                                m_color_checked: "#666666"
 
-                            iconColor: "#666666"
-                            iconColorHovered: "white"
-                            iconColorChecked: "white"
-                            iconColorCheckedHovered: "white"
+                                iconColor: "#666666"
+                                iconColorHovered: "white"
+                                iconColorChecked: "white"
+                                iconColorCheckedHovered: "white"
 
-                            // Доступна ТОЛЬКО в ручном режиме И при отсутствии аварии И без активной операции
-                            enabled: root.manualModeEnabled && !root.systemInEmergency && !root.isZeroingInProgress
+                                // Доступна ТОЛЬКО в ручном режиме И при отсутствии аварии И без активной операции
+                                enabled: root.manualModeEnabled && !root.systemInEmergency && !root.isZeroingInProgress
 
-                            // Логика автоматического отжатия
-                            onCheckedChanged: {
-                                if (checked && enabled) {
-                                    root.isZeroingInProgress = true
-                                    autoReleaseTimer.restart()
-                                } else {
-                                    autoReleaseTimer.stop()
-                                    if (!checked) {
+                                onClicked: {
+                                    emitSignal("btnZeroing", "checkedChanged", {
+                                        checked: checked
+                                    })
+                                }
+
+                                // onCheckedChanged: {
+                                //     if (checked && enabled) {
+                                //         root.isZeroingInProgress = true
+                                //         autoReleaseTimer.restart()
+                                //     } else {
+                                //         autoReleaseTimer.stop()
+                                //         if (!checked) {
+                                //             root.isZeroingInProgress = false
+                                //         }
+                                //     }
+                                // }
+
+                                // Таймер автоматического отжатия (2 секунды)
+                                Timer {
+                                    id: autoReleaseTimer
+                                    interval: 2000
+                                    repeat: false
+                                    onTriggered: {
+                                        btnZeroing.checked = false
                                         root.isZeroingInProgress = false
                                     }
                                 }
-                            }
 
-                            // Таймер автоматического отжатия (2 секунды)
-                            Timer {
-                                id: autoReleaseTimer
-                                interval: 2000
-                                repeat: false
-                                onTriggered: {
-                                    btnZeroing.checked = false
-                                    root.isZeroingInProgress = false
-                                }
-                            }
-
-                            CustomToolTip {
-                                id: toolTipBtnZeroing
-                                target: btnZeroing
-                                customText: {
-                                    if (!root.manualModeEnabled) {
-                                        return root.name_widget + " " + "обнулить"
-                                    } else if (root.systemInEmergency) {
-                                        return root.name_widget + "\n" + "Есть ошибка!\nСначала сбросьте ошибку кнопкой Reset"
-                                    } else if (root.isZeroingInProgress) {
-                                        return "Операция обнуления уже выполняется..."
+                                CustomToolTip {
+                                    id: toolTipBtnZeroing
+                                    target: btnZeroing
+                                    customText: {
+                                        if (!root.manualModeEnabled) {
+                                            return root.name_widget + " " + "обнулить"
+                                        } else if (root.systemInEmergency) {
+                                            return root.name_widget + "\n" + "Есть ошибка!\nСначала сбросьте ошибку кнопкой Reset"
+                                        } else if (root.isZeroingInProgress) {
+                                            return "Операция обнуления уже выполняется..."
+                                        }
+                                        return "Кнопка обнуления весов"  // Пустой текст = подсказка не показывается
                                     }
-                                    return "Кнопка обнуления весов"  // Пустой текст = подсказка не показывается
+                                    customDelay: 2000
+                                    showOnDisabledOnly: false
+                                    backgroundColor: root.systemInEmergency ? "#e74c3c" : "#2c3e50"
+                                    borderColor: root.systemInEmergency ? "#c0392b" : "#3498db"
+                                    fontSize: 13
                                 }
-                                customDelay: 2000
-                                showOnDisabledOnly: false
-                                backgroundColor: root.systemInEmergency ? "#e74c3c" : "#2c3e50"
-                                borderColor: root.systemInEmergency ? "#c0392b" : "#3498db"
-                                fontSize: 13
                             }
-                        }
 
-                        Item {
-                            Layout.preferredWidth: paddingPanelLeft * scale
-                            Layout.preferredHeight: 1
-                        }
+                            Item {
+                                Layout.preferredWidth: paddingPanelLeft * kx
+                                Layout.preferredHeight: 1
+                            }
 
-                        // === ДИСПЛЕЙ ВЕСОВ ===
-                        Rectangle {
-                            Layout.preferredWidth: scale * sizePanelTextWidth
-                            Layout.preferredHeight: scale * sizePanelTextHeight
-                            color: "transparent"
-                            radius: scale * radiusPanel
-                            border.color: "#777777"
-                            // border.width: panelTextBorderWidth * scale
+                            // === ДИСПЛЕЙ ВЕСОВ ===
+                            Rectangle {
+                                Layout.preferredWidth: sizePanelTextWidth * kx
+                                Layout.preferredHeight: sizePanelTextHeight * ky
+                                color: "transparent"
+                                radius: radiusPanel * ky
+                                border.color: "#777777"
+                                border.width: panelTextBorderWidth * ky
 
-                            ColumnLayout {
-                                anchors.fill: parent
-                                spacing: 0
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: 0
 
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    color: "transparent"
-                                    border.color: "#777777"
-                                    border.width: panelTextBorderWidth * scale
-                                    radius: scale * radiusPanel
-                                    bottomLeftRadius: 0
-                                    bottomRightRadius: 0
-                                    anchors.margins: scale * radiusPanel
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        color: "transparent"
+                                        border.color: "#777777"
+                                        border.width: panelTextBorderWidth * ky
+                                        radius: radiusPanel * ky
+                                        bottomLeftRadius: 0
+                                        bottomRightRadius: 0
+                                        anchors.margins: radiusPanel * ky
 
-                                    Text {
-                                        text: "1546.8"
-                                        anchors.centerIn: parent
-                                        font.pixelSize: sizePanelText1 * scale
-                                        font.family: "Times New Roman"
-                                        color: "#333333"
+                                        Text {
+                                            text: "1546.8"
+                                            anchors.centerIn: parent
+                                            font.pixelSize: sizePanelText1 * ky
+                                            font.family: "Times New Roman"
+                                            color: "#333333"
+                                        }
                                     }
-                                }
 
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                    color: "#e0e0e0"
-                                    radius: scale * radiusPanel
-                                    border.color: "#777777"
-                                    border.width: panelTextBorderWidth * scale
-                                    topRightRadius: 0
-                                    topLeftRadius: 0
-                                    anchors.margins: scale * radiusPanel
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        color: "#e0e0e0"
+                                        radius: radiusPanel * ky
+                                        border.color: "#777777"
+                                        border.width: panelTextBorderWidth * ky
+                                        topRightRadius: 0
+                                        topLeftRadius: 0
+                                        anchors.margins: radiusPanel * ky
 
-                                    Text {
-                                        text: "380.8"
-                                        anchors.centerIn: parent
-                                        font.pixelSize: sizePanelText2 * scale
-                                        font.family: "Times New Roman"
-                                        color: "#333333"
+                                        Text {
+                                            text: "380.8"
+                                            anchors.centerIn: parent
+                                            font.pixelSize: sizePanelText2 * ky
+                                            font.family: "Times New Roman"
+                                            color: "#333333"
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        Item {
-                            Layout.preferredWidth: paddingPanelRight * scale
-                            Layout.preferredHeight: 1
-                        }
-
-                        // === КНОПКА НАСТРОЕК ===
-                        CustomToggleButtonIcon {
-                            id: btnSettings
-                            Layout.preferredWidth: buttonSize * scale
-                            Layout.preferredHeight: buttonSize * scale
-                            iconSource: "qrc:/svg_icon_btn/res/svg/svg_image_btn/setting/setting_d.svg"
-                            m_borderWidth: borderWidthBtn * scale
-                            m_radius: radiusBtn * scale
-
-                            m_background_color: "transparent"
-                            m_color_hovered: "#888"
-                            m_color_checked: "#666666"
-
-                            iconColor: "#666666"
-                            iconColorHovered: "white"
-                            iconColorChecked: "white"
-                            iconColorCheckedHovered: "white"
-                            checkable: true
-
-                            CustomToolTip {
-                                target: btnSettings
-                                customText: "Настройки весов" + " " + name_widget
-                                customDelay: 300
-                                showOnDisabledOnly: false
-                                backgroundColor: "#3498db"
-                                borderColor: "#2980b9"
-                                fontSize: 13
+                            Item {
+                                Layout.preferredWidth: paddingPanelRight * kx
+                                Layout.preferredHeight: 1
                             }
-                        }
 
-                        Item {
-                            Layout.preferredWidth: spacing * scale
-                            Layout.preferredHeight: 1
+                            // === КНОПКА НАСТРОЕК ===
+                            CustomToggleButtonIcon {
+                                id: btnSettings
+                                Layout.preferredWidth: buttonSize * kx
+                                Layout.preferredHeight: buttonSize * ky
+                                iconSource: "qrc:/svg_icon_btn/res/svg/svg_image_btn/setting/setting_d.svg"
+                                m_borderWidth: borderWidthBtn * kx
+                                m_radius: radiusBtn * kx
+
+                                m_background_color: "transparent"
+                                m_color_hovered: "#888"
+                                m_color_checked: "#666666"
+
+                                iconColor: "#666666"
+                                iconColorHovered: "white"
+                                iconColorChecked: "white"
+                                iconColorCheckedHovered: "white"
+                                checkable: true
+
+                                onClicked: {
+                                    emitSignal("btnSettings", "clicked", {})
+                                }
+
+                                CustomToolTip {
+                                    target: btnSettings
+                                    customText: "Настройки весов" + " " + name_widget
+                                    customDelay: 300
+                                    showOnDisabledOnly: false
+                                    backgroundColor: "#3498db"
+                                    borderColor: "#2980b9"
+                                    fontSize: 13
+                                }
+                            }
+
+                            Item {
+                                Layout.preferredWidth: spacing * kx
+                                Layout.preferredHeight: 1
+                            }
                         }
                     }
 
-                    RowLayout {
-                        Layout.fillWidth: true
+                    Rectangle {
                         Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.margins: 5 * kx * ky
+                        color: "transparent"
 
-                        Rectangle {
-                            Layout.preferredWidth: state_width_and_height * scale
-                            Layout.preferredHeight: state_width_and_height * scale
-                            color: "transparent"
-                            border.color: "#777777"
-                            border.width: stateBorderWidth * scale
-                            radius: scale * stateRadius
-                            Layout.margins: margin * 2
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            spacing: root.spacing * kx * ky
 
-                            Text {
-                                text: "1"
-                                anchors.centerIn: parent
-                                font.pixelSize: state_size_text * scale
-                                font.family: "Times New Roman"
-                                color: "#333333"
+                            Rectangle {
+                                Layout.preferredWidth: state_width_and_height * kx
+                                Layout.preferredHeight: state_width_and_height * ky
+                                color: "transparent"
+                                border.color: "#777777"
+                                border.width: stateBorderWidth * ky
+                                radius: stateRadius * ky
+                                Layout.margins: margin * 2
+
+                                Text {
+                                    text: "1"
+                                    anchors.centerIn: parent
+                                    font.pixelSize: state_size_text * ky
+                                    font.family: "Times New Roman"
+                                    color: "#333333"
+                                }
                             }
-                        }
 
-                        CustomProgressBar {
-                            id: customProgressBarScales
-                            Layout.preferredWidth: widthProgressBar * scale
-                            Layout.preferredHeight: heightProgressBar * scale
-                            visible_border_progress: true
-                            borderRadius: borderRadiusProgressBar * scale
-                            borderWidth: borderWidthProgressBar * scale
-                            blockSpacing: -5
-                            padding: 4
-                            textPosition: "none"
-                            blockCount: 1
-                            value: 0.8
-                        }
-
-                        Item {
-                            Layout.preferredWidth: spacing * scale
-                            Layout.preferredHeight: 1
+                            CustomProgressBar {
+                                id: customProgressBarScales
+                                Layout.preferredWidth: widthProgressBar * kx
+                                Layout.preferredHeight: heightProgressBar * ky
+                                visible_border_progress: true
+                                borderRadius: borderRadiusProgressBar * ky
+                                borderWidth: borderWidthProgressBar * ky
+                                blockSpacing: -5
+                                padding: 4
+                                textPosition: "none"
+                                blockCount: 1
+                                value: 0.8
+                            }
                         }
                     }
                 }
@@ -495,8 +694,8 @@ Item {
             // === Усечённый конус ===
             TruncatedCone {
                 Layout.fillWidth: true
-                Layout.preferredHeight: scale * heightTruncatedCone
-                borderWidth: borderWidthTrancatedCone * scale
+                Layout.preferredHeight: heightTruncatedCone * ky
+                borderWidth: borderWidthTrancatedCone * ky
                 borderColor: "#777777"
                 liquidColor: "#d55f6d7a"
                 fillColor: "#00e6e6e6"
@@ -506,7 +705,7 @@ Item {
                     anchors.fill: parent
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: scale * spacing
+                    spacing: root.spacing * ky
 
                     Item {
                         Layout.fillWidth: true
@@ -515,7 +714,7 @@ Item {
 
                     Text {
                         text: "1560.78"
-                        font.pixelSize: sizeTextTrancatedCone * scale
+                        font.pixelSize: sizeTextTrancatedCone * ky
                         font.family: "Times New Roman"
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -524,7 +723,7 @@ Item {
 
                     Text {
                         text: "кг"
-                        font.pixelSize: sizeText2TrancatedCone * scale
+                        font.pixelSize: sizeText2TrancatedCone * ky
                         font.family: "Times New Roman"
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -535,6 +734,39 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 1
                     }
+                }
+            }
+
+            RowLayout {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                Item {
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: spacingShutter * kx
+                }
+
+                Shutter {
+                    id: shutterLeft
+                    Layout.preferredWidth: widthShutter * kx
+                    Layout.preferredHeight: heightShutter * ky
+                }
+
+                Item {
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: spacingShutter * kx
+                }
+
+                Shutter {
+                    id: shutterRight
+                    Layout.preferredWidth: widthShutter * kx
+                    Layout.preferredHeight: heightShutter * ky
+                }
+
+                Item {
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: spacingShutter * kx
                 }
             }
         }
@@ -566,6 +798,16 @@ Item {
             },
 
             // Группа: Дисплей панели
+            {
+                idGroupeProperty: "tublo",
+                nameGroupeProperty: "Свойства дисплей-панели",
+                name: "heightTopPanelBtn",
+                value: heightTopPanelBtn,
+                min: 10,
+                max: 500,
+                step: 1,
+                label: "Высота верхней панели кнопок"
+            },
             {
                 idGroupeProperty: "tublo",
                 nameGroupeProperty: "Свойства дисплей-панели",
@@ -803,6 +1045,37 @@ Item {
                 step: 1,
                 label: "Размер шрифта второго текста"
             },
+                    // Настройка размеров затворов весов
+            {
+                idGroupeProperty: "Shutter",
+                nameGroupeProperty: "Размеры затворов",
+                name: "widthShutter",
+                value: widthShutter,
+                min: 0,
+                max: 200,
+                step: 0.1,
+                label: "Ширина левого затвора"
+            },
+            {
+                idGroupeProperty: "Shutter",
+                nameGroupeProperty: "Размеры затворов",
+                name: "heightShutter",
+                value: heightShutter,
+                min: 0,
+                max: 200,
+                step: 0.1,
+                label: "Высота левого затвора"
+            },
+            {
+                idGroupeProperty: "Shutter",
+                nameGroupeProperty: "Размеры затворов",
+                name: "spacingShutter",
+                value: spacingShutter,
+                min: 0,
+                max: 100,
+                step: 0.1,
+                label: "Растояние между затворами"
+            }
         ];
     }
 
@@ -811,10 +1084,7 @@ Item {
             root[name] = value
         }
     }
-
-    // ==========================================================
-    // 7. EXPORT / IMPORT
-    // ==========================================================
+        // EXPORT / IMPORT
     function exportPropertiesSize() {
         var props = getPropertiesSize()
         var result = {}
@@ -838,5 +1108,9 @@ Item {
                 root[key] = data[key]
         }
     }
+
+    // ==========================================================
+    // 7. API Бизнес Свйоства
+    // ==========================================================
 }
 

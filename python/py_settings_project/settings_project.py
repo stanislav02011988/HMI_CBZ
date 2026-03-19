@@ -1,12 +1,9 @@
 # python\py_settings_project\settings_project.py
-import shutil, tempfile, uuid, json
 from datetime import datetime
 
 from pathlib import Path
-from typing import Any, Optional, Dict
 
-from PySide6.QtCore import QObject, Slot, Signal, Property, QFileSystemWatcher, QTimer, QUrl
-from PySide6.QtQml import QQmlPropertyMap, QJSValue
+from PySide6.QtCore import QObject, Slot, Signal, Property, QFileSystemWatcher, QTimer
 
 from python.py_utils.decorators.decorators_qml_registration_module.decorators_qml_registration_module import QmlRegistrationModule
 from python.py_settings_project.project.project_store import ProjectStore
@@ -138,6 +135,7 @@ class SettingsProject(QObject):
             self.signalErrorLoad.emit("[SettingsProject] Ошибка загрузки данных", str(e))
 
 
+
     @Property("QVariantMap", notify=signalLoadFile)
     def dict_settings_project(self):
         return self._settings_project
@@ -206,11 +204,16 @@ class SettingsProject(QObject):
             "year_installation": dict_installation["year_installation"]
         }
 
-        self._save_settings()
+        self._save_settings()    
 
-
-
-
-
-
-
+    # =====================================================
+    # Settings параметры
+    # =====================================================
+    @Property(list, notify=signalLoadFile)
+    def list_groupe_element(self):
+        dict = self._settings_project.get('settings', {}).get('groupe_elements', {})
+        groups_list = [
+            {"name": key, "value": value}
+            for key, value in dict.items()
+        ]
+        return groups_list

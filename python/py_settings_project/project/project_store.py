@@ -52,45 +52,60 @@ class ProjectStore(QObject):
     # -------------------------------------------------
     def add_project(self, dict_data):
         try:
-            # Приводим данные к dict
+
+            # -------------------------------------------------
+            # ПРИВОДИМ К DICT
+            # -------------------------------------------------
             if isinstance(dict_data, QJSValue):
                 data = dict_data.toVariant()
             else:
-                data = dict_data  # <-- важно, иначе data не существует
+                data = dict_data
 
-            # Проверка на словарь
             if not isinstance(data, dict):
                 print("[ProjectStore] invalid project data:", data)
                 return
 
-            # Добавляем в список созданных проектов
+            # -------------------------------------------------
+            # META ДАННЫЕ
+            # -------------------------------------------------
+            meta = data.get("meta", data)
+            # если вдруг старый проект без meta
+
+            now = datetime.now().strftime("%d.%m.%Y  %H:%M")
+
             project = {
-                "id_uuic": data.get("id_uuic"),
-                "installationName": data.get("installationName", "Новый проект"),
-                "typeInstallation": data.get("typeInstallation"),
-                "numberINF": data.get("numberINF"),
-                "numberInstallation": data.get("numberInstallation"),
-                "yearInstallation": data.get("yearInstallation"),
-                "project_file": data.get("project_file"),
-                "previewInstallation": data.get("previewInstallation"),
-                "user": data.get("user"),
-                "position_users": data.get("position_users"),
-                "created": data.get("created") or datetime.now().isoformat(),
-                "last_saved": data.get("last_saved") or datetime.now().isoformat(),
+                "id_uuic": meta.get("id_uuic"),
+                "installationName": meta.get("installationName", "Новый проект"),
+                "typeInstallation": meta.get("typeInstallation"),
+                "numberINF": meta.get("numberINF"),
+                "numberInstallation": meta.get("numberInstallation"),
+                "yearInstallation": meta.get("yearInstallation"),
+                "nameProject": meta.get("nameProject"),
+                "project_file": meta.get("project_file"),
+                "previewInstallation": meta.get("previewInstallation"),
+                "user": meta.get("user"),
+                "position_users": meta.get("position_users"),
+                "created": meta.get("created") or now,
+                "last_saved": meta.get("last_saved") or now,
                 "check_auto_load": False,
                 "isActivateProject": False
             }
 
-            # Добавляем проект в список
+            # -------------------------------------------------
+            # ДОБАВЛЯЕМ В СПИСОК
+            # -------------------------------------------------
             self._projects.append(project)
 
-            # Сохраняем настройки
+            # -------------------------------------------------
+            # СОХРАНЯЕМ SETTINGS
+            # -------------------------------------------------
             self._save()
 
             print("[ProjectStore] project added:", project["installationName"])
 
         except Exception as e:
             print("[ProjectStore][ERR] add_project:", e)
+
 
 
 

@@ -1,2 +1,3 @@
 module qml.registers
 singleton QmlRegisterComponentObject 1.0 QmlRegisterComponentObject.qml
+singleton QmlRegisterComponentLogicMap 1.0 QmlRegisterComponentLogicMap.qml

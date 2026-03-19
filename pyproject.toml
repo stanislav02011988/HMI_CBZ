@@ -2,4 +2,4 @@
 name = "HMI_CBZ"
 
 [tool.pyside6-project]
-files = ["main.py", "python/py_project_manager/project_manager.py", "python/py_register_component_object/register_component_object.py", "python/py_settings_project/project/project_model.py", "python/py_settings_project/project/project_store.py", "qrc.qrc"]
+files = ["main.py", "python/py_project_manager/project_manager.py", "python/py_project_manager/q_abstractlist_model/model.py", "python/py_project_manager/q_abstractlist_model/store.py", "python/py_project_manager/tree_view_project/tree_view_model.py", "python/py_project_manager/tree_view_project/tree_view_store.py", "python/py_register_component_logic_map/register_component_logic_map.py", "python/py_register_component_object/register_component_object.py", "python/py_settings_project/project/project_model.py", "python/py_settings_project/project/project_store.py", "qrc.qrc"]

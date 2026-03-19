@@ -1,0 +1,260 @@
+{
+    "meta": {
+        "id_uuic": "9aec4fd9-7bdf-4fa4-9ae8-675959986072",
+        "installationName": "EUROMIX",
+        "typeInstallation": "4000",
+        "numberINF": "14754",
+        "numberInstallation": "AZ-456-4564",
+        "yearInstallation": "2013",
+        "nameProject": "EUROMIX 4000 ном.уст. AZ-456-4564 инв.ном. 14754",
+        "project_file": "F:\\__QtQml_Python_HMI_Euromix\\HMI_CBZ\\projects\\Euromix4000\\EUROMIX 4000 ном.уст. AZ-456-4564 инв.ном.json",
+        "previewInstallation": "file:///F:/__QtQml_Python_HMI_Euromix/HMI_CBZ/res/image/foto_installation/BENNINGHOVEN/MBA200/zavod.jpg",
+        "user": "Неберикутя Станислав Александрович",
+        "position_users": "Старший механик",
+        "created": "13.03.2026  16:56",
+        "last_saved": "13.03.2026  16:56"
+    },
+    "scene": {
+        "GroupeCement": {
+            "scales": {
+                "scales_cem_1": {
+                    "componentGroupe": "GroupeCement",
+                    "geometry": {
+                        "relH": 0.1976284584980237,
+                        "relW": 0.1855230125523013,
+                        "relX": 0.4121338912133891,
+                        "relY": 0.24703557312252963
+                    },
+                    "id_widget": "scales_cem_1",
+                    "name_widget": "Цем 1",
+                    "signals": [
+                        {
+                            "elementId": "btnHand",
+                            "signals": [
+                                {
+                                    "name": "clicked",
+                                    "params": []
+                                },
+                                {
+                                    "name": "checkedChanged",
+                                    "params": [
+                                        {
+                                            "name": "checked",
+                                            "type": "bool"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "elementId": "btnReset",
+                            "signals": [
+                                {
+                                    "name": "clicked",
+                                    "params": []
+                                }
+                            ]
+                        },
+                        {
+                            "elementId": "btnZeroing",
+                            "signals": [
+                                {
+                                    "name": "checkedChanged",
+                                    "params": [
+                                        {
+                                            "name": "checked",
+                                            "type": "bool"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "elementId": "btnSettings",
+                            "signals": [
+                                {
+                                    "name": "clicked",
+                                    "params": []
+                                }
+                            ]
+                        }
+                    ],
+                    "sizeProperties": {
+                        "borderRadiusProgressBar": 4.0,
+                        "borderWidth": 2.0,
+                        "borderWidthBtn": 1.0,
+                        "borderWidthTrancatedCone": 2.0,
+                        "buttonSize": 25.0,
+                        "containerRadius": 6.0,
+                        "heightProgressBar": 25.0,
+                        "heightShutter": 10.0,
+                        "heightTopPanelBtn": 100.0,
+                        "heightTruncatedCone": 30.0,
+                        "paddingPanelLeft": 40.0,
+                        "paddingPanelRight": 40.0,
+                        "panelTextBorderWidth": 1.0,
+                        "radiusBtn": 4.0,
+                        "radiusPanel": 4.0,
+                        "sizePanelText1": 10.0,
+                        "sizePanelText2": 8.0,
+                        "sizePanelTextHeight": 30.0,
+                        "sizePanelTextWidth": 30.0,
+                        "sizeText2TrancatedCone": 14.0,
+                        "sizeTextTrancatedCone": 20.0,
+                        "spacingBtn": 4.0,
+                        "spacingShutter": 1.0,
+                        "stateBorderWidth": 1.0,
+                        "stateRadius": 4.0,
+                        "state_size_text": 10.0,
+                        "state_width_and_height": 25.0,
+                        "widthProgressBar": 180.0,
+                        "widthShutter": 102.4
+                    },
+                    "slots": [
+                        {
+                            "elementId": "progressBar",
+                            "slots": [
+                                {
+                                    "name": "setValue",
+                                    "params": [
+                                        {
+                                            "name": "value",
+                                            "type": "real"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "elementId": "btnHand",
+                            "slots": [
+                                {
+                                    "name": "setChecked",
+                                    "params": [
+                                        {
+                                            "name": "checked",
+                                            "type": "bool"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "elementId": "btnReset",
+                            "slots": [
+                                {
+                                    "name": "setChecked",
+                                    "params": [
+                                        {
+                                            "name": "checked",
+                                            "type": "bool"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "elementId": "btnZeroing",
+                            "slots": [
+                                {
+                                    "name": "setChecked",
+                                    "params": [
+                                        {
+                                            "name": "checked",
+                                            "type": "bool"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "subtype": "scales"
+                }
+            }
+        }
+    },
+    "logic": {
+        "programs": {
+            "main": {
+                "name": "Main Program",
+                "cycle_ms": 100,
+                "scene": {
+                    "GroupeCement": {
+                        "scales": {
+                            "scales_cem_1": {
+                                "componentGroupe": "GroupeCement",
+                                "geometry": {
+                                    "relH": 0.1976284584980237,
+                                    "relW": 0.3255230125523014,
+                                    "relX": 0.4121338912133891,
+                                    "relY": 0.24703557312252963
+                                },
+                                "id_widget": "scales_cem_1",
+                                "name_widget": "Цем 1",
+                                "sizeProperties": {
+                                    "borderRadiusProgressBar": 4,
+                                    "borderWidth": 2.0,
+                                    "borderWidthBtn": 1,
+                                    "borderWidthTrancatedCone": 2,
+                                    "buttonSize": 25,
+                                    "containerRadius": 6,
+                                    "heightProgressBar": 25,
+                                    "heightShutter": 15.499999999999982,
+                                    "heightTopPanelBtn": 100.0,
+                                    "heightTruncatedCone": 30,
+                                    "paddingPanelLeft": 40,
+                                    "paddingPanelRight": 40,
+                                    "panelTextBorderWidth": 1,
+                                    "radiusBtn": 4,
+                                    "radiusPanel": 4,
+                                    "sizePanelText1": 10,
+                                    "sizePanelText2": 8,
+                                    "sizePanelTextHeight": 30.0,
+                                    "sizePanelTextWidth": 30.0,
+                                    "sizeText2TrancatedCone": 14,
+                                    "sizeTextTrancatedCone": 20,
+                                    "spacingBtn": 4,
+                                    "spacingShutter": 1.0,
+                                    "stateBorderWidth": 1,
+                                    "stateRadius": 4,
+                                    "state_size_text": 10,
+                                    "state_width_and_height": 25,
+                                    "widthProgressBar": 180,
+                                    "widthShutter": 99.99999999999987
+                                },
+                                "subtype": "scales"
+                            }
+                        }
+                    }
+                },
+                "nodes": {},
+                "connections": {},
+                "scene_camera_settings": {
+                    "zoom": 1.2305575242589526,
+                    "offsetX": -206.92296429130738,
+                    "offsetY": 63.917943388937374
+                }
+            },
+            "KAkakakak111": {
+                "name": "KAkakakak111",
+                "cycle_ms": 100,
+                "scene": {},
+                "scene_camera_settings": {},
+                "nodes": {},
+                "connections": {}
+            }
+        }
+    },
+    "variables": {
+        "inputs": {},
+        "outputs": {},
+        "globals": {}
+    },
+    "resources": {},
+    "files": {},
+    "camera_Settings": {
+        "zoom": 1.0,
+        "offsetX": 0.0,
+        "offsetY": 0.0
+    }
+}

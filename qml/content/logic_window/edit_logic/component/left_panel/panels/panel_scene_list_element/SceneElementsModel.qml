@@ -16,7 +16,7 @@ QtObject {
     property int countElementsScene: backend.count
 
     readonly property var backend: QmlRegisterComponentObject
-    property var nodeMap: {}           // карта id → node для O(1) поиска
+    property var nodeMap: ({})           // карта id → node для O(1) поиска
 
     signal elementClicked(var elementData)
     signal modelChanged()
@@ -154,7 +154,7 @@ QtObject {
     function createWidgetNode(id, name, subtype, widgetRef, wrapperRef) {
         return {
             name: name,
-            id: id,
+            id: id,  // это id записи в реестре
             type: "widget",
             subtype: subtype,
             level: 1,
@@ -164,8 +164,27 @@ QtObject {
             icon: "🧩",
             color: "#dddddd",
             bold: false,
+
+            // 🔥 Ссылки на оригинальные объекты
             widgetRef: widgetRef,
-            wrapperRef: wrapperRef
+            wrapperRef: wrapperRef,
+
+            // 🔥 Копируем нужные поля для createObject()
+            // Из widgetRef:
+            id_widget: widgetRef?.id_widget || id,
+            name_widget: widgetRef?.name_widget || name,
+            componentGroupe: widgetRef?.componentGroupe || "",
+
+            // Из wrapperRef (геометрия):
+            geometry: wrapperRef ? {
+                relX: wrapperRef.relX || 0.1,
+                relY: wrapperRef.relY || 0.1,
+                relW: wrapperRef.relW || 0.2,
+                relH: wrapperRef.relH || 0.2
+            } : { relX: 0.1, relY: 0.1, relW: 0.2, relH: 0.2 },
+
+            // Свойства размера:
+            sizeProperties: widgetRef?.sizeProperties || {}
         }
     }
 

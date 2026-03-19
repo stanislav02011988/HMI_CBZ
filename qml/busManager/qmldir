@@ -1,3 +1,4 @@
-module qml.system
+module qml.busManager
 ReactiveElement 1.0 ReactiveElement.qml
 singleton QmlBusManager 1.0 QmlBusManager.qml
+singleton ConnectionManager 1.0 ConnectionManager.qml

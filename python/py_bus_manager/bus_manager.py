@@ -9,43 +9,47 @@ QML_MODULE_MAJOR_VERSION = 1
 QML_MODULE_MINOR_VERSION = 0
 
 
-@QmlRegistrationModule(QML_IMPORT_NAME, QML_MODULE_MAJOR_VERSION, QML_MODULE_MINOR_VERSION, QML_IMPORT_TYPE)
+@QmlRegistrationModule(
+    QML_IMPORT_NAME,
+    QML_MODULE_MAJOR_VERSION,
+    QML_MODULE_MINOR_VERSION,
+    QML_IMPORT_TYPE
+)
 class BusManager(QObject):
 
-    # =====================================================
-    # ОСНОВНОЙ СИГНАЛ ШИНЫ
-    # =====================================================
-
-    message = Signal(str, str, object)
-    # topic, event, payload
+    # topic,event,payload
+    message = Signal(str, str, "QVariant")
 
     def __init__(self):
         super().__init__()
 
-        self._subscriptions = {}
+        # только для отладки
+        self._subscriptions = set()
 
     def get_parametrs_qml_module(self):
-        return QML_IMPORT_TYPE, Singleton_Type_Register, QML_IMPORT_NAME, QML_MODULE_MAJOR_VERSION, QML_MODULE_MINOR_VERSION
+        return (
+            QML_IMPORT_TYPE,
+            Singleton_Type_Register,
+            QML_IMPORT_NAME,
+            QML_MODULE_MAJOR_VERSION,
+            QML_MODULE_MINOR_VERSION
+        )
 
-    # =====================================================
-    # ПОДПИСКА
-    # =====================================================
+    # -----------------------------------------------------
+    # SUBSCRIBE
+    # -----------------------------------------------------
 
     @Slot(str)
     def subscribe(self, topic):
-
         if topic not in self._subscriptions:
-            self._subscriptions[topic] = True
+            self._subscriptions.add(topic)
+            print(f"[Bus] subscribe -> {topic}")
 
-        print(f"[SceneBus] subscribe → {topic}")
+    # -----------------------------------------------------
+    # PUBLISH
+    # -----------------------------------------------------
 
-    # =====================================================
-    # ОТПРАВКА
-    # =====================================================
-
-    @Slot(str, str, object)
+    @Slot(str, str, "QVariant")
     def publish(self, topic, event, payload):
-
-        print(f"[SceneBus] publish {topic} {event} {payload}")
-
+        print(f"[Bus] publish {topic} {event}")
         self.message.emit(topic, event, payload)

@@ -1,3 +1,4 @@
 module qml.managers
 singleton QmlSceneManager 1.0 QmlSceneManager.qml
 singleton QmlProjectManager 1.0 QmlProjectManager.qml
+singleton QmlLogicMapScene 1.0 QmlLogicMapScene.qml

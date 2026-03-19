@@ -3,11 +3,41 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import qml.managers
+import qml.controls.elements_scene
+
 import "panel_btn"
 import "grid_layer"
 
 Item {
     id: root
+
+    // =====================================================
+    // Статус открытия окна режима редактирования логики
+    // =====================================================
+    property bool stateWindow: false
+
+    // =====================================================
+    // РЕЖИМ FALSE - RUN MODE TRUE - EDIT MODE
+    // =====================================================
+    property bool editMode: false
+    // =====================================================
+    // Флаг произошла ли загрузка сцены выбранного файла
+    // =====================================================
+    property bool isLoadFilePrograms: QmlLogicMapScene.isLoadFilePrograms
+
+    // ============================================================
+    // СВОЙСТВА ДОСТУПНЫЕ ИЗ ВНЕ
+    // ============================================================
+    property alias viewport: viewport
+    property alias world: world
+
+    // ==============================
+    // Параметры ВЫДЕЛЕНИЯ
+    // ==============================
+    property bool selecting: false
+    property point selectStart: Qt.point(0, 0)
+    property point selectEnd: Qt.point(0, 0)
 
     // ==============================
     // Параметры камеры
@@ -21,16 +51,30 @@ Item {
 
     Rectangle {
         id: bg
-        anchors.fill: parent
-        anchors.topMargin: 6
-        anchors.bottomMargin: 6
-        color: "#666"
+        color: "white"
         radius: 6
+        anchors.fill: parent
+        anchors.margins: 6
 
         // --------------------------------------------------------
         // СЕТКА
         // --------------------------------------------------------
         GridLayer { id: gridLayer }
+
+        Rectangle {
+            id: emptyPreview
+            anchors.fill: parent
+            color: "transparent"
+            visible: !isLoadFilePrograms
+            radius: 6
+            Text {
+                anchors.fill: parent
+                font.pixelSize: 16
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                text: qsTr("Данные отсутствуют или вы не выбрали файл")
+            }
+        }
 
         // ==============================
         // VIEWPORT
@@ -51,25 +95,24 @@ Item {
                 height: viewport.height
                 scale: root.zoom
                 transformOrigin: Item.TopLeft
-
-                // === ДВА ТЕСТОВЫХ КВАДРАТА ===
-
-                Rectangle {
-                    width: 100
-                    height: 100
-                    color: "red"
-                    x: 100
-                    y: 30
-                }
-
-                Rectangle {
-                    width: 100
-                    height: 100
-                    color: "blue"
-                    x: 150
-                    y: 150
-                }
             }
+        }
+
+        // ==========================
+        // РАМКА МНОЖЕСТВЕННОГО ВЫДЕЛЕНИЯ
+        // ==========================
+        Rectangle {
+            id: selectionRect
+            visible: root.selecting && editMode
+            x: Math.min(root.selectStart.x, root.selectEnd.x)
+            y: Math.min(root.selectStart.y, root.selectEnd.y)
+            width: Math.abs(root.selectStart.x - root.selectEnd.x)
+            height: Math.abs(root.selectStart.y - root.selectEnd.y)
+            color: "#4088bbff"
+            border.color: "#88bbff"
+            border.width: 1
+            radius: 2
+            z: 999
         }
 
         // ==========================
@@ -155,15 +198,128 @@ Item {
             onClicked: (mouse) => {
                 if (mouse.button === Qt.LeftButton &&
                     !(mouse.modifiers & Qt.ControlModifier)) {
-                    QmlSceneManager.deselectAll()
+                    QmlLogicMapScene.deselectAll()
                 }
             }
+        }
+    }
+
+    // ============================================================
+    // КОМПОНЕНТ-ОБЁРТКА
+    // ============================================================
+    Component {
+        id: wrapperComponent
+        ItemLogicScene {
+            editMode: root.editMode
+            sceneContainer: world
+            scene: viewport
+            sceneController: root
+        }
+    }
+
+    // ============================================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    Component.onCompleted: {
+        QmlLogicMapScene.configure({
+            sceneController: root,
+            sceneContainer: world,
+            wrapperComponent: wrapperComponent,
+            previewComponents: previewComponents,
+            panelRect: root.panelRect,
+            editMode: root.editMode
+        })
+        QmlLogicMapScene.loadPrograms("main")
+    }
+
+    // ============================================================
+    // ПРЕВЬЮ КОМПОНЕНТОВ
+    // ============================================================
+    PreviewComponents { id: previewComponents }
+
+    // ==========================
+    // КОНТЕКСТНОЕ МЕНЮ СЦЕНЫ
+    // ==========================
+    Menu {
+        id: sceneContextMenu
+
+        MenuItem {
+            text: "Добавить элемент..."
+            onTriggered: console.log("Вызов диалогового окна добаления элементов")
+        }
+    }
+
+    // ============================================================
+    // ВЫДЕЛЕНИЕ ЭЛЕМЕНТОВ В ПРЯМОУГОЛЬНИКЕ
+    // ============================================================
+    function selectElementsInRect(x, y, width, height) {
+        if (!world || !QmlSceneManager) return
+
+        // Преобразуем экранные координаты в мировые
+        const worldRect = {
+            x: (x - root.offsetX) / root.zoom,
+            y: (y - root.offsetY) / root.zoom,
+            width: width / root.zoom,
+            height: height / root.zoom
+        }
+
+        let anySelected = false
+
+        // Проходим по всем обёрткам в обратном порядке (сверху вниз)
+        for (let i = world.children.length - 1; i >= 0; i--) {
+            const wrapper = world.children[i]
+
+            // Проверяем, что это обёртка элемента сцены
+            if (!wrapper || !wrapper.hasOwnProperty("relX") || !wrapper.hasOwnProperty("setWidget"))
+                continue
+
+            // Мировые координаты элемента
+            const elemX = wrapper.x
+            const elemY = wrapper.y
+            const elemW = wrapper.width
+            const elemH = wrapper.height
+
+            // Проверка пересечения прямоугольников
+            const intersects = !(
+                elemX + elemW < worldRect.x ||
+                elemX > worldRect.x + worldRect.width ||
+                elemY + elemH < worldRect.y ||
+                elemY > worldRect.y + worldRect.height
+            )
+
+            if (intersects) {
+                QmlLogicMapScene.selectItem(wrapper, true)  // toggle=true для множественного выбора
+                anySelected = true
+            }
+        }
+
+        // Если ничего не выделено — снимаем все выделения
+        if (!anySelected) {
+            QmlLogicMapScene.deselectAll()
+        }
+    }
+
+    // ============================================================
+    // КЛАВИАТУРА
+    // ============================================================
+    focus: true
+    Keys.onPressed: (event) => {
+        if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_S) {
+            QmlLogicMapScene.saveScene()
+            event.accepted = true
         }
     }
 
     // ==========================
     // Панель Кнопок
     // ==========================
+    property rect panelRect: Qt.rect(
+        panelBtn.x,
+        panelBtn.y,
+        panelBtn.width,
+        panelBtn.height
+    )
+
     PanelBauttons {
         id: panelBtn
         width: 60
@@ -173,6 +329,9 @@ Item {
         anchors.topMargin: 10
         anchors.rightMargin: 10
 
+        editMode: root.editMode
         onSignalActivateGridLayer: (check) => gridLayer.toggleGrid(check)
+        onSignalActivateEditeMode: (check) => root.editMode = check
+        onSignalSaveSceneLogicMap: QmlLogicMapScene.saveScene()
     }
 }

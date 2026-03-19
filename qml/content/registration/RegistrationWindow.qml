@@ -100,7 +100,10 @@ Window {
             m_colorText: QmlMenagerTheme.reg_win_cBtnCallBackLogin_colorText
             m_colorTextHovered: QmlMenagerTheme.reg_win_cBtnCallBackLogin_colorTextHovered
 
-            onClicked: { root.close(); MenagerWindows.show("qrc:/qml_files/qml/content/splesh_screen/SpleshScreen.qml", customMessageDialog) }
+            onClicked: {
+                root.close()
+                MenagerWindows.openWindow("splesh_screen_window", "qrc:/qml_files/qml/content/splesh_screen/SpleshScreen.qml")
+            }
         }
 
         Label {
@@ -254,7 +257,7 @@ Window {
 
         function onRegisterSuccess() {
             root.close()
-            MenagerWindows.show("qrc:/qml_files/qml/content/splesh_screen/SpleshScreen.qml", customMessageDialog)
+            MenagerWindows.openWindow("splesh_screen_window", "qrc:/qml_files/qml/content/splesh_screen/SpleshScreen.qml")
         }
 
         function onRegisterFailed(errorMsg1, errorMsg2, errorMsg3) {

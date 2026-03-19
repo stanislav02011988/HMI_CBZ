@@ -19,7 +19,9 @@ Module {
                                         Signal { name: "elementAdded" }
     Signal { name: "elementRemoved" }
     Signal { name: "registryChanged" }
+    Signal { name: "dirtyChanged" }
     Property { name: "count"; type: "int"; isWritable: false; notify: "registryChanged" }
+    Property { name: "isDirty"; type: "bool"; isWritable: false; notify: "dirtyChanged" }
     Method { name: "clear"; type: "void" }
     Method { name: "exportElementData"; type: "Dict"
                 Parameter { name: "id_widget"; type: "str" } }
@@ -34,6 +36,7 @@ Module {
     Method { name: "getElementWrapper"; type: "void"
                 Parameter { name: "id_widget"; type: "str" } }
     Method { name: "get_parametrs_qml_module"; type: "void" }
+    Method { name: "markSaved"; type: "void" }
     Method { name: "registerElement"; type: "void"
                 Parameter { name: "wrapper_ref"; type: "var" }
                 Parameter { name: "widget_ref"; type: "var" } }

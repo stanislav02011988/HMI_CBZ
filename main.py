@@ -41,6 +41,7 @@ from python.py_settings_project.settings_project import SettingsProject
 from python.py_menager_theme.menager_theme import MenagerTheme
 
 from python.py_register_component_object.register_component_object import RegisterComponentObject
+from python.py_register_component_logic_map.register_component_logic_map import RegisterComponentLogicMap
 from python.py_project_manager.project_manager import ProjectManager
 from python.py_bus_manager.bus_manager import BusManager
 
@@ -70,7 +71,8 @@ class Project:
 
         self.project_manager = ProjectManager(self.menager_json)
         self.bus_manager = BusManager()
-        self.register_component_object = RegisterComponentObject()        
+        self.register_component_object = RegisterComponentObject()
+        self.register_component_logic_map = RegisterComponentLogicMap()
 
         # --- Активация регистрации Qml модулей ----
         self.register_qml_module_auth_menager()
@@ -81,6 +83,7 @@ class Project:
         self.register_qml_project_manager()
         self.register_qml_bus_manager()
         self.register_qml_register_component_object()
+        self.register_qml_register_component_logic_mapt()
 
         # --- 3. Приложение ---
         self.app = QGuiApplication(sys.argv)
@@ -116,11 +119,13 @@ class Project:
     def register_qml_register_component_object(self):
         self.qml_registration_module.registration_module(self.register_component_object)
 
+    def register_qml_register_component_logic_mapt(self):
+        self.qml_registration_module.registration_module(self.register_component_logic_map)
+
     def _load_main_qml(self):
         """Загружаем QML."""
         # qml_file = self.base_path / "qml/content/splesh_screen/SpleshScreen.qml"
         qml_file = self.base_path / "qml/content/main_window/MainWindow.qml"
-        # qml_file = self.base_path / "qml/content/logic_window/edit_logic/EditLogicMapWindow.qml"
         self.engine.load(qml_file)
         if not self.engine.rootObjects():
             del self.engine

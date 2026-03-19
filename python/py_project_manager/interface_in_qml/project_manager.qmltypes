@@ -19,19 +19,41 @@ Module {
                                         Signal { name: "signalLoadFile" }
     Signal { name: "signalErrorLoad" }
     Property { name: "itemsProjectData"; type: "var"; isWritable: false; notify: "signalLoadFile" }
+    Property { name: "tree_view_model"; type: "QObject*"; isWritable: false; notify: undefined }
+    Method { name: "add_new_file_programs_project"; type: "void"
+                Parameter { name: "name_program"; type: "var" } }
     Method { name: "create_project"; type: "void"
                 Parameter { name: "dict_data"; type: "var" } }
+    Method { name: "get_data_programs_project"; type: "void"
+                Parameter { name: "name_programs"; type: "var" } }
     Method { name: "get_parametrs_qml_module"; type: "void" }
     Method { name: "loadProject"; type: "void"
                 Parameter { name: "project_path"; type: "var" } }
     Method { name: "load_camera_params"; type: "Optional"
                 Parameter { name: "default"; type: "Any" } }
+    Method { name: "load_camera_params_scene_logic_map"; type: "Optional"
+                Parameter { name: "nameProgram"; type: "var" }
+                Parameter { name: "default"; type: "Any" } }
+    Method { name: "load_dict_project_in_tree_view_model"; type: "void"
+                Parameter { name: "project_dict"; type: "var" } }
     Method { name: "load_elements_scene"; type: "void" }
+    Method { name: "remove_programm"; type: "void"
+                Parameter { name: "name_programm"; type: "var" } }
     Method { name: "save_camera_params"; type: "bool"
                 Parameter { name: "camera_data"; type: "var" } }
+    Method { name: "save_camera_params_scene_logic_map"; type: "bool"
+                Parameter { name: "name_program"; type: "var" }
+                Parameter { name: "camera_data"; type: "var" } }
+    Method { name: "save_elements_scene_logic_map"; type: "void"
+                Parameter { name: "name_programs"; type: "var" }
+                Parameter { name: "graphics_dict"; type: "var" } }
     Method { name: "save_scene_elements"; type: "void"
                 Parameter { name: "graphics_dict"; type: "var" } }
     Method { name: "update_scene_element"; type: "bool"
+                Parameter { name: "id_widget"; type: "str" }
+                Parameter { name: "update_data"; type: "Dict" } }
+    Method { name: "update_scene_one_element_logic_map"; type: "bool"
+                Parameter { name: "prop_name"; type: "str" }
                 Parameter { name: "id_widget"; type: "str" }
                 Parameter { name: "update_data"; type: "Dict" } }
                                     }

@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import qml.settings.project_settings
 import qml.registers
 
 Item {
@@ -12,7 +13,7 @@ Item {
 
     signal menuActionTriggered(string action)
 
-    property string accessUser: "user"
+    property string accessUser: QmlProjectSettings.access_group === "admin" ? true : false
 
     // ------------------------------------------------------------
     // БАЗОВОЕ МЕНЮ
@@ -35,7 +36,7 @@ Item {
         {
             label: "Диагностика",
             items: [
-                { text: "Карта логики", action: "logic_map" }
+                { text: "Карта логики", action: "logic_map"}
             ]
         }
     ]
@@ -47,9 +48,9 @@ Item {
         return {
             label: "Режим редактирования",
             items: [
-                { text: "Cхемы Сцены", action: "edit_mode_scene" },
-                { text: "Cхемы Логики", action: "edit_mode_logic" },
-                { text: "Cхемы ПЛК", action: "edit_mode_plc" }
+                { text: "Cхемы Сцены", action: "edit_mode_scene"},
+                { text: "Cхемы Логики", action: "edit_mode_logic"},
+                { text: "Cхемы ПЛК", action: "edit_mode_plc"}
             ]
         }
     }
@@ -60,11 +61,11 @@ Item {
     property var finalMenuModel: []
 
     onAccessUserChanged: {
-        finalMenuModel = accessUser === "admin" ? baseMenuModel.concat([editMenu]) : baseMenuModel
+        finalMenuModel = accessUser ? baseMenuModel.concat([editMenu]) : baseMenuModel
     }
 
     Component.onCompleted: {
-        finalMenuModel = accessUser === "admin" ? baseMenuModel.concat([editMenu]) : baseMenuModel
+        finalMenuModel = accessUser ? baseMenuModel.concat([editMenu]) : baseMenuModel
     }
 
     RowLayout {

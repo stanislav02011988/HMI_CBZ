@@ -1,20 +1,40 @@
+// qml/controls/elements_scene/widgets/ShutterButton.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
+import Qt5Compat.GraphicalEffects
+
+import qml.busManager
 
 Button {
     id: root
-    implicitWidth: 140
-    implicitHeight: 48
     focusPolicy: Qt.NoFocus
 
-    property string id_shutter_silos: ""
-    property string name_shutter_silos: ""
+    // ==========================================================
+    // 1. ЭТАЛОННЫЙ РАЗМЕР
+    // ==========================================================
+    property real referenceWidth: 140
+    property real referenceHeight: 48
+
+    implicitWidth: referenceWidth
+    implicitHeight: referenceHeight
+
+    // ==========================================================
+    // 2. МАСШТАБ
+    // ==========================================================
+    property real scaleX: width  > 0 ? width  / referenceWidth  : 1
+    property real scaleY: height > 0 ? height / referenceHeight : 1
+    property real scale: Math.min(scaleX, scaleY)
+
+    property string componentGroupe: ""
+    property string subtype: ""
+    property string id_widget: ""
+    property string name_widget: ""
 
     /* =========================================================
      * РЕЖИМЫ
      * ========================================================= */
-    // false = Автоматический режим , true =Ручной режим
+    // true = Автоматический режим , false = Ручной режим
     property bool controlMode: false
 
     // false = Грубо, true = Точно
@@ -22,19 +42,17 @@ Button {
 
     /* =========================================================
      * СОСТОЯНИЕ ЗАТВОРА
-     * 0 = CLOSED
-     * 1 = OPENED
-     * 2 = WAIT
-     * 3 = ERROR
+     * 0 = CLOSED, 1 = OPENED, 2 = WAIT, 3 = ERROR
      * ========================================================= */
     property int state: 0
 
     /* =========================================================
-     * СИГНАЛЫ
+     * 🔥 СИГНАЛЫ (добавлены для синхронизации)
      * ========================================================= */
     signal manualCoarseOpenRequest()
     signal manualFineOpenRequest()
-    signal signalStateShutter(state:int)
+    signal signalStateShutter(state: int)
+
     /* =========================================================
      * API ДЛЯ КОНТРОЛЛЕРА / PLC
      * ========================================================= */
@@ -46,9 +64,8 @@ Button {
     /* =========================================================
      * ДОСТУПНОСТЬ UI
      * ========================================================= */
-    // AUTO → полный запрет взаимодействия
-    enabled: controlMode && state !== 2
-    hoverEnabled: controlMode
+    enabled: !controlMode && state !== 2
+    hoverEnabled: !controlMode
 
     /* =========================================================
      * ВИЗУАЛЬНЫЕ ПАРАМЕТРЫ
@@ -83,31 +100,33 @@ Button {
     Behavior on currentColor { ColorAnimation { duration: 120 } }
 
     /* =========================================================
-     * ЛОГИКА КЛИКА (ТОЛЬКО MANUAL)
+     * ЛОГИКА КЛИКА
      * ========================================================= */
     onClicked: {
-        if (!controlMode)    // AUTO
-            return
-
-        if (dosageMode)
-            manualFineOpenRequest()
-        else
-            manualCoarseOpenRequest()
-
-        setWait()
+        emitSignal("btnShatter", "clicked", {
+            state: 1
+        })
     }
 
     /* =========================================================
      * СБРОС ПРИ ВКЛЮЧЕНИИ MANUAL
      * ========================================================= */
     onControlModeChanged: {
-        if (controlMode)   // MANUAL
+        if (!controlMode)   // Переход в MANUAL
             setClosed()
     }
 
     /* =========================================================
-     * ФОН / ТРЕУГОЛЬНИКИ (БЕЗ ИЗМЕНЕНИЙ)
+     * ФОН / ТРЕУГОЛЬНИКИ
      * ========================================================= */
+    layer.enabled: true
+    layer.effect: DropShadow {
+        color: "#60000000"
+        radius: 4
+        horizontalOffset: 2
+        verticalOffset: 2
+    }
+
     background: Item {
         anchors.fill: parent
 
@@ -159,4 +178,12 @@ Button {
             onHeightChanged: requestPaint()
         }
     }
+
+    // =========================================================
+    // СЕРИАЛИЗАЦИЯ СВОЙСТВ ГАБОРИТНЫХ РАЗМЕРОВ ЭЛЕМНТА
+    // =========================================================
+    function getPropertiesSize() { return [] }
+    function setPropertySize(name, value) { /* noop */ }
+    function exportPropertiesSize() { return {} }
+    function importProperties(data) { /* noop */ }
 }

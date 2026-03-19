@@ -3,11 +3,12 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import qml.managers
+
 Item {
     id: root
+
     property bool collapsed: true
-    signal collapsedChangedExternal(bool collapsed)
-    onCollapsedChanged: collapsedChangedExternal(collapsed)
 
     SceneElementsModel { id: sceneModel }
 
@@ -46,6 +47,7 @@ Item {
         // Контент
         Rectangle {
             id: content
+            visible: !root.collapsed
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
@@ -77,12 +79,17 @@ Item {
                     reuseItems: true
                     cacheBuffer: 2000
                     interactive: !root.collapsed
+                    visible: !root.collapsed
 
                     delegate: SceneElementDelegate {
                         width: listView.width
                         elementData: modelData
                         elementIndex: index
                         modelController: sceneModel
+
+                        onSignalAddElementToScene: (elementObject) => {
+                            QmlLogicMapScene.addElemntsToSceneLogicMap(elementObject)
+                        }
                     }
                 }
             }

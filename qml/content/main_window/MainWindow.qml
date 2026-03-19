@@ -19,9 +19,7 @@ Window {
     visible: true
     color: "#00ffffff"
 
-    Component.onCompleted: {
-        root.showMaximized()
-    }
+    visibility: Window.Maximized
 
     // flags: Qt.Window | Qt.WindowTitleHint | Qt.WindowSystemMenuHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint
 
@@ -72,7 +70,10 @@ Window {
         }
     }
 
-    CustomTopBarButton { id: customTopBarButton }
+    CustomTopBarButton {
+        id: customTopBarButton
+        parent: parent
+    }
 
     CustomTopBar { id: customTopBar }
 
